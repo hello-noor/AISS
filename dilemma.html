@@ -15,9 +15,23 @@
 <body>
 <div id="root"><div class="boot">Caricamento del gioco…</div></div>
 
-<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+
+<script>
+  window.addEventListener("error", function (e) {
+    var root = document.getElementById("root");
+    if (root && root.querySelector(".boot")) {
+      root.innerHTML =
+        '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;">' +
+        '<div style="max-width:480px;text-align:center;font-family:ui-monospace,monospace;color:#ECE7DB;">' +
+        '<div style="color:#F26B4E;font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;">Errore di caricamento</div>' +
+        '<div style="font-size:13px;color:#8f897c;line-height:1.6;">' + (e && e.message ? e.message : "Uno script non si è caricato correttamente.") + '</div>' +
+        '</div></div>';
+    }
+  });
+</script>
 
 <script type="text/babel" data-presets="react">
 const { useState, useMemo, useEffect, useRef } = React;
