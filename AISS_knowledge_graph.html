@@ -140,7 +140,7 @@
   <main class="flex-1 w-full flex flex-row overflow-hidden relative">
     
     <!-- Left Sidebar: Filtri, Categoria e Ricerca -->
-    <aside id="left-sidebar" class="fixed lg:static top-0 left-0 z-30 w-[290px] h-full lg:h-auto -translate-x-full lg:translate-x-0 transition-transform duration-300 frosted flex flex-col p-4 shrink-0 overflow-y-auto">
+    <aside id="left-sidebar" class="fixed lg:static top-0 left-0 z-30 w-[300px] h-full lg:h-auto -translate-x-full lg:translate-x-0 transition-transform duration-300 frosted flex flex-col p-4 shrink-0 overflow-y-auto">
       <div class="flex items-center justify-between lg:hidden mb-4 pb-2 border-b border-white/5">
         <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300">Filtri & Ricerca</h3>
         <button onclick="toggleLeftSidebar(false)" class="text-slate-400 hover:text-white text-lg font-bold">×</button>
@@ -165,17 +165,44 @@
       </div>
 
       <!-- Contenitore Categorie generato dinamicamente -->
-      <div id="categories" class="space-y-1 pr-1"></div>
+      <div id="categories" class="space-y-1 pr-1 max-h-48 overflow-y-auto mb-4 border-b border-white/5 pb-2"></div>
 
-      <button class="w-full mt-4 py-2 bg-white/5 hover:bg-white/10 text-xs font-semibold rounded-xl border border-white/10 transition active:scale-[0.98]" id="reset-btn">
+      <!-- Legenda delle Relazioni Colorate -->
+      <div class="mb-4">
+        <h2 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">Collegamenti</h2>
+        <div class="space-y-1.5 text-xs">
+          <div class="flex items-center gap-2">
+            <span class="w-3.5 h-1 rounded-full" style="background-color: #818CF8"></span>
+            <span class="text-slate-400">Pedagogia e Metodo</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-3.5 h-1 rounded-full" style="background-color: #F59E0B"></span>
+            <span class="text-slate-400">Umanistico e Cultura</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-3.5 h-1 rounded-full" style="background-color: #06B6D4"></span>
+            <span class="text-slate-400">Tecnologia, AI e Codice</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-3.5 h-1 rounded-full" style="background-color: #F43F5E"></span>
+            <span class="text-slate-400">Esperienze e Giornate</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-3.5 h-1 rounded-full" style="background-color: #10B981"></span>
+            <span class="text-slate-400">Relazioni Umane e Staff</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="w-full py-2 bg-white/5 hover:bg-white/10 text-xs font-semibold rounded-xl border border-white/10 transition active:scale-[0.98]" id="reset-btn">
         Reimposta vista
       </button>
 
-      <div class="mt-6 pt-4 border-t border-white/10">
+      <div class="mt-4 pt-3 border-t border-white/10">
         <h2 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">Istruzioni</h2>
         <p class="text-[11px] leading-relaxed text-slate-400">
-          • <strong>Passa il mouse</strong> su un nodo per isolare la sua rete di connessioni immediate.<br>
-          • <strong>Clicca</strong> su un nodo per fissare la telecamera, visualizzarne la scheda descrittiva a destra ed esplorare le relazioni.
+          • <strong>Passa il mouse</strong> su un nodo per isolare la sua rete di connessioni immediate e vedere gli archi colorati a tema.<br>
+          • <strong>Clicca</strong> su un nodo per visualizzare la sua ricca scheda descrittiva e navigare le relazioni.
         </p>
       </div>
     </aside>
@@ -198,7 +225,7 @@
     </div>
 
     <!-- Right Sidebar: Dettagli Ricchi e Cronologia -->
-    <aside id="right-sidebar" class="fixed lg:static top-0 right-0 z-30 w-[325px] h-full lg:h-auto translate-x-full lg:translate-x-0 transition-transform duration-300 frosted flex flex-col p-5 shrink-0 overflow-y-auto">
+    <aside id="right-sidebar" class="fixed lg:static top-0 right-0 z-30 w-[330px] h-full lg:h-auto translate-x-full lg:translate-x-0 transition-transform duration-300 frosted flex flex-col p-5 shrink-0 overflow-y-auto">
       <div class="flex items-center justify-between lg:hidden mb-4 pb-2 border-b border-white/5">
         <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300">Dettaglio</h3>
         <button onclick="toggleRightSidebar(false)" class="text-slate-400 hover:text-white text-lg font-bold">×</button>
@@ -235,7 +262,6 @@
   </footer>
 
   <script>
-    // Dataset completo con l'integrazione di tutte le 121+ voci dal glossario e dalle relazioni ottimali
     const GRAPH = {
       "categories": {
         "programma": {"color": "#5B4FE9", "label": "Programma"},
@@ -258,14 +284,14 @@
         
         // GIORNATE
         {"id": "giorno1", "label": "Giorno 1", "category": "giorni", "description": "Lunedì 6 Luglio: Le Fondamenta. Storia e filosofia dell'AI, Test di Turing, Stanza Cinese, Patto della Classe, distant writing e prima digressione scientifica sulla banana radioattiva."},
-        {"id": "giorno2", "label": "Giorno 2", "category": "giorni", "description": "Martedì 7 Luglio: Pensare Diverso. Logica binaria, Test di Land (NASA), TwinPix, Universal Paperclips e sessione finale di mindfulness."},
-        {"id": "giorno3", "label": "Giorno 3", "category": "giorni", "description": "Mercoledì 8 Luglio: Dalla Natura ai Giochi. Biologia evolutiva, artefatti HTML con Claude, Dilemma del Prigioniero."},
-        {"id": "giorno4", "label": "Giorno 4", "category": "giorni", "description": "Giovedì 9 Luglio: Dal Codice al Deploy. Razzi ad acqua, sviluppo in JS, pubblicazione su GitHub e introduzione alle Leggi di Cipolla."},
-        {"id": "giorno5", "label": "Giorno 5", "category": "giorni", "description": "Venerdì 10 Luglio: La Sintesi. Neuroscienze, Neil Harbisson, natura stocastica degli LLM, lettura del Simposio di Platone e registrazione del podcast finale."},
+        {"id": "giorno2", "label": "Giorno 2", "category": "giorni", "description": "Martedì 7 Luglio: Pensare Diverso. Logica binaria, Test di Land (NASA), TwinPix, Universal Paperclips e sessione finale di mindfulness. Introduzione del concetto di specchio pedagogico per ripensare i prompt in modo creativo."},
+        {"id": "giorno3", "label": "Giorno 3", "category": "giorni", "description": "Mercoledì 8 Luglio: Dalla Natura ai Giochi. Biologia evolutiva, artefatti HTML con Claude, Dilemma del Prigioniero, il payload genetico e il concetto siberiano di Alatau con gli Otyken."},
+        {"id": "giorno4", "label": "Giorno 4", "category": "giorni", "description": "Giovedì 9 Luglio: Dal Codice al Deploy. Razzi ad acqua, sviluppo in JS, pubblicazione su GitHub e introduzione alle Leggi di Cipolla e all'artefatto Cipollotto."},
+        {"id": "giorno5", "label": "Giorno 5", "category": "giorni", "description": "Venerdì 10 Luglio: La Sintesi. Neuroscienze, Neil Harbisson, natura stocastica degli LLM, lettura del Simposio di Platone e registrazione del podcast finale della settimana."},
 
         // PERSONE
         {"id": "mario_mele", "label": "Mario Mele", "category": "persone", "description": "Ideatore e docente principale della AI Summer School. Formatore e consulente AI presso Skills ed Enzima12, regista e teorico del metodo."},
-        {"id": "laura_galfre", "label": "Laura Galfrè", "category": "persone", "description": "Co-docente, psicologa e HR specialist di Skills Lab. Presenza costante in aula per tutta la settimana."},
+        {"id": "laura_galfre", "label": "Laura Galfrè", "category": "persone", "description": "Co-docente, psicologa e HR specialist di Skills Lab. Presenza costante in aula per tutta la settimana, garante dell'osservazione clinica dell'inclusione e dell'abbassamento del filtro affettivo."},
         {"id": "vincenzo_vietri", "label": "Vincenzo Vietri", "category": "persone", "description": "Co-fondatore di Enzima12/Skills, promotore del progetto AISS."},
         {"id": "vincenzo_salvati", "label": "Vincenzo Salvati", "category": "persone", "description": "Co-fondatore di Enzima12/Skills, promotore del progetto AISS."},
         {"id": "rita_caruso", "label": "Rita Caruso", "category": "persone", "description": "Staff Skills / Enzima12 a supporto parziale della scuola."},
@@ -275,10 +301,10 @@
         {"id": "alessandra_ragni", "label": "Alessandra Ragni", "category": "persone", "description": "Staff Skills / Enzima12 a supporto della scuola."},
 
         // STUDENTI
-        {"id": "francesca", "label": "Francesca", "category": "studenti", "description": "Studentessa. Racconta che il corso non è noioso e sfata l'idea di stare passivi davanti al computer."},
-        {"id": "luigi_p", "label": "Luigi P.", "category": "studenti", "description": "Studente. Consiglia il corso al migliore amico come qualcosa che gli somiglia."},
-        {"id": "umberto", "label": "Umberto", "category": "studenti", "description": "Studente. Il primo giorno voleva andarsene a lavorare, poi invita i coetanei titubanti a provare."},
-        {"id": "greta", "label": "Greta", "category": "studenti", "description": "Studentessa, figlia di Laura Galfrè. Protagonista del recupero del razzo sull'albero che le è valsa la stima e l'aura nel gruppo."},
+        {"id": "francesca", "label": "Francesca", "category": "studenti", "description": "Studentessa. Racconta che il corso non è noioso e sfata l'idea di stare passivi davanti al computer, allineandosi alle logiche costruttiviste."},
+        {"id": "luigi_p", "label": "Luigi P.", "category": "studenti", "description": "Studente. Consiglia il corso al migliore amico come qualcosa che gli somiglia. Sviluppa un forte senso di appartenenza."},
+        {"id": "umberto", "label": "Umberto", "category": "studenti", "description": "Studente. Il primo giorno voleva andarsene a lavorare, poi invita i coetanei titubanti a provare e firma il Patto."},
+        {"id": "greta", "label": "Greta", "category": "studenti", "description": "Studentessa, figlia di Laura Galfrè. Protagonista del recupero del razzo sull'albero che le è valsa la stima e l'aura nel gruppo. Sviluppatrice attiva del gioco Cipollotto."},
         {"id": "giovanni", "label": "Giovanni", "category": "studenti", "description": "Studente. Passato da considerare il corso una perdita di tempo a svegliarsi ogni mattina con la voglia di venire."},
         {"id": "egidio", "label": "Egidio", "category": "studenti", "description": "Studente. Con ironia invita l'amico a un'attività decisamente più produttiva dei soliti podcast."},
         {"id": "luigi_g", "label": "Luigi G.", "category": "studenti", "description": "Studente. Smonta il pregiudizio che sia un'esperienza basata solo sullo schermo e sulla sola AI."},
@@ -301,32 +327,38 @@
         {"id": "brain_break", "label": "Brain break", "category": "pilastri", "description": "Pause che sono anche lezioni: attivazione musicale e motoria, meditazione, la merenda come innesco di discussione."},
         {"id": "filtro_affettivo", "label": "Filtro affettivo", "category": "pilastri", "description": "Le barriere emotive (noia, ansia, paura del giudizio) che rallentano l'apprendimento e che vanno abbassate."},
         {"id": "costruzionismo", "label": "Costruzionismo", "category": "pilastri", "description": "Modello pedagogico di Papert: si impara costruendo oggetti fisici o digitali significativi in prima persona."},
+        {"id": "c_specchio_pedagogico", "label": "Specchio Pedagogico", "category": "pilastri", "description": "Uso di Claude come terza parte neutrale per giudicare idee/prompt (es. smontare i prompt violenti dei ragazzi definendoli 'banali cliché da videogioco', colpendo la coolness dell'idea anziché la persona)."},
+        {"id": "pod_autoanalisi", "label": "Autoanalisi Socratica", "category": "pilastri", "description": "Pratica in cui l'AI non scrive testi al posto dei ragazzi, ma funge da intervistatrice sismografica per aiutarli a strutturare la propria introspezione nel podcast."},
 
         // MATERIE E DISCIPLINE
         {"id": "mat_inglese", "label": "Lingua inglese", "category": "materie", "description": "Immersione linguistica attraverso strumenti e giochi in inglese (Universal Paperclips, GitHub, TwinPix)."},
-        {"id": "mat_linguistica", "label": "Linguistica ed etimologia", "category": "materie", "description": "Le parole come storia degli scambi culturali: algoritmo, zero, albicocca, crisommola."},
-        {"id": "mat_filosofia", "label": "Filosofia ed epistemologia", "category": "materie", "description": "Turing, Searle, Platone e il metodo socratico, Dunning-Kruger, il macchinico."},
-        {"id": "mat_storia_mat", "label": "Storia e matematica", "category": "materie", "description": "Sistema babilonese in base 60, numeri indo-arabi, Al-Khwarizmi."},
-        {"id": "mat_sociologia", "label": "Sociologia ed etica", "category": "materie", "description": "La matrice di Cipolla applicata alle dinamiche di classe; il Patto co-costruito."},
+        {"id": "mat_linguistica", "label": "Linguistica ed etimologia", "category": "materie", "description": "Le parole come storia degli scambi culturali: algoritmo, zero, albicocca, crisommola, genetliaco."},
+        {"id": "mat_filosofia", "label": "Filosofia ed epistemologia", "category": "materie", "description": "Turing, Searle, Platone e il metodo socratico, Dunning-Kruger, il macchinico e l'analisi della coscienza artificiale."},
+        {"id": "mat_storia_mat", "label": "Storia e matematica", "category": "materie", "description": "Sistema babilonese in base 60, numeri indo-arabi, Al-Khwarizmi e lo sviluppo storico del calcolo."},
+        {"id": "mat_sociologia", "label": "Sociologia ed etica", "category": "materie", "description": "La matrice di Cipolla applicata alle dinamiche di classe, la cooperazione e l'analisi dei comportamenti di gruppo."},
         {"id": "mat_biologia", "label": "Biologia ed evoluzione", "category": "materie", "description": "Lamarck contro Darwin, il payload genetico, i terapodi evoluti in uccelli."},
-        {"id": "mat_fisica", "label": "Fisica", "category": "materie", "description": "Portanza e spinta studiate con i razzi ad acqua; fusione nucleare, plasma e buchi neri."},
+        {"id": "mat_fisica", "label": "Fisica", "category": "materie", "description": "Portanza e spinta studiate con i razzi ad acqua; fusione nucleare, plasma, buchi neri e forze fondamentali."},
         {"id": "mat_chimica", "label": "Chimica", "category": "materie", "description": "La radioattività naturale del potassio come porta verso la tavola periodica."},
         {"id": "mat_informatica", "label": "Informatica e logica", "category": "materie", "description": "Dal transistor alle reti neurali; coding in JS, debugging, deploy open source."},
-        {"id": "mat_teoria_giochi", "label": "Teoria dei giochi", "category": "materie", "description": "Il Dilemma del Prigioniero, minimax, tit for tat, applicati anche in classe."},
+        {"id": "mat_teoria_giochi", "label": "Teoria dei giochi", "category": "materie", "description": "Il Dilemma del Prigioniero, minimax, tit for tat, Pavlov, applicati alle relazioni reali."},
         {"id": "mat_economia", "label": "Economia aziendale", "category": "materie", "description": "Gestione di un'azienda virtuale in Universal Paperclips: prezzi, risorse, borsa e investimenti."},
-        {"id": "mat_neuroscienze", "label": "Neuroscienze e psicologia", "category": "materie", "description": "Elaborazione visiva, Neil Harbisson, sincofasia, regolazione cognitiva."},
+        {"id": "mat_neuroscienze", "label": "Neuroscienze e psicologia", "category": "materie", "description": "Elaborazione visiva, Neil Harbisson, sincofasia, regolazione cognitiva e il caso di Phineas Gage."},
 
         // STRUMENTI
         {"id": "claude", "label": "Claude", "category": "strumenti", "description": "Distant writing, vibe coding, meta-autoria, roast. L'LLM specchio usato in classe."},
-        {"id": "paperclips", "label": "Universal Paperclips", "category": "strumenti", "description": "Simulatore economico e systems thinking di borsa, risorse, graffette, fino agli ipnodroni."},
+        {"id": "paperclips", "label": "Universal Paperclips", "category": "strumenti", "description": "Simulatore economico e systems thinking di borsa, risorse, graffette, fino agli ipnodroni spaziali."},
         {"id": "twinpix", "label": "TwinPix", "category": "strumenti", "description": "Gioco di reverse prompting per la sintesi linguistica e precisione delle definizioni in lingua inglese."},
         {"id": "github", "label": "GitHub + JS", "category": "strumenti", "description": "Sviluppo, versioning e pubblicazione open source del codice con licenza MIT."},
         {"id": "mentimeter", "label": "Mentimeter", "category": "strumenti", "description": "Rilevazione del gradimento e dei dati delle attività in tempo reale per monitorare il gruppo."},
         {"id": "simposio", "label": "Simposio di Platone", "category": "strumenti", "description": "Lettura corale e metodo socratico applicato in classe come metafora del prompt engineering."},
         {"id": "matrice_cipolla", "label": "Matrice di Cipolla", "category": "strumenti", "description": "Griglia e schema a quattro quadranti (intelligenti, banditi, ingenui, stupidi) per mappare i comportamenti."},
-        {"id": "razzi_acqua", "label": "Razzi ad acqua", "category": "strumenti", "description": "Esperimento fisico al parco per studiare portanza, spinta e volo."},
+        {"id": "razzi_acqua", "label": "Razzi ad acqua", "category": "strumenti", "description": "Esperimento fisico al parco per studiare portanza, spinta, volo e rischi reali."},
         {"id": "meditazione", "label": "Meditazione", "category": "strumenti", "description": "Pratiche di mindfulness guidate (la ranocchia e la casetta interiore) per la regolazione cognitiva."},
         {"id": "test_land", "label": "Test di Land", "category": "strumenti", "description": "Test ideato dalla NASA sul pensamento divergente, svolto con l'ausilio di oggetti quotidiani."},
+        {"id": "c_bug_g", "label": "Il Bug della G", "category": "strumenti", "description": "Esempio reale di bug incontrato dai ragazzi durante la programmazione JS. Risolto con debugging maieutico guidato dall'AI."},
+        {"id": "c_cipollotto", "label": "Cipollotto", "category": "strumenti", "description": "Il videogioco in stile 8-bit sulle Leggi di Cipolla ideato e sviluppato dalle ragazze, superando il divario di genere nel coding."},
+        {"id": "podcast_giorno5", "label": "Podcast Giorno 5", "category": "strumenti", "description": "Attività di sintesi finale registrata con strumentazione professionale. I ragazzi raccontano l'evoluzione emotiva, il superamento delle paure e la comprensione dell'AI."},
+        {"id": "c_dinosauro_asteroide", "label": "Gioco del Dinosauro", "category": "strumenti", "description": "Videogioco ideato da uno studente il Giorno 5 in cui un dinosauro affronta l'asteroide per evitare di evolversi in gallina (eco della lezione sull'evoluzione)."},
 
         // AUTORI
         {"id": "agatone", "label": "Agatone", "category": "autori", "description": "Poeta tragico greco, ospite del banchetto raccontato nel Simposio platonico."},
@@ -343,11 +375,13 @@
         {"id": "harbisson", "label": "Neil Harbisson", "category": "autori", "description": "Artista cibernetico e primo cyborg riconosciuto ufficialmente da un governo per la sua antenna sensoriale."},
         {"id": "lamarck", "label": "Jean-Baptiste Lamarck", "category": "autori", "description": "Sostenne l'ereditarietà dei caratteri acquisiti durante la vita, contrapponendosi a Darwin."},
         {"id": "land", "label": "George Land", "category": "autori", "description": "Psicologo, ideatore del test NASA sul pensiero divergente per misurare la creatività."},
-        {"id": "nusrat", "label": "Nusrat Fateh Ali Khan", "category": "autori", "description": "Cantante pakistano, leggendario interpreter e maestro del Qawwali devozionale sufi."},
+        {"id": "nusrat", "label": "Nusrat Fateh Ali Khan", "category": "autori", "description": "Cantante pakistano, leggendario interprete e maestro del Qawwali devozionale sufi."},
         {"id": "platone", "label": "Platone", "category": "autori", "description": "Filosofo greco, autore del Simposio analizzato e letto collettivamente in classe."},
         {"id": "searle", "label": "John Searle", "category": "autori", "description": "Filosofo statunitense, ideatore dell'esperimento mentale della stanza cinese."},
         {"id": "socrate", "label": "Socrate", "category": "autori", "description": "Filosofo greco, maestro del metodo maieutico basato sul fare domande anziché imporre verità."},
         {"id": "turing", "label": "Alan Turing", "category": "autori", "description": "Matematico britannico, padre dell'informatica moderna e ideatore del celebre Test di Turing."},
+        {"id": "c_phineas_gage", "label": "Phineas Gage", "category": "autori", "description": "Celebre caso di studio delle neuroscienze del 1848: l'incidente alla corteccia frontale che ne cambiò la personalità."},
+        {"id": "c_shostakovich", "label": "Dmitrij Šostakovič", "category": "autori", "description": "Compositore russo del '900, citato scherzosamente durante i brain break musicali."},
 
         // TERMINI DELL'AI
         {"id": "c_addestramento", "label": "Addestramento (training)", "category": "concetti_ai", "description": "Fase critica in cui un modello di machine learning impara dai dati regolando i propri parametri."},
@@ -366,16 +400,15 @@
         {"id": "c_nerfing", "label": "Nerfing", "category": "concetti_ai", "description": "Depotenziamento strategico e intenzionale di un modello effettuato dai creatori per motivi di sicurezza."},
         {"id": "c_paperclip_maximizer", "label": "Paperclip maximizer", "category": "concetti_ai", "description": "Esperimento mentale di Nick Bostrom sui pericoli di un'AI priva di allineamento etico."},
         {"id": "c_prompt_eng", "label": "Prompt engineering", "category": "concetti_ai", "description": "La disciplina di formulazione e ottimizzazione degli input per dialogare efficacemente con l'AI."},
-        {"id": "c_reti_neurali", "label": "Reti neurali", "category": "concetti_ai", "description": "Algoritmi de apprendimento profondo ispirati alle interconnessioni sinaptiche del cervello."},
+        {"id": "c_reti_neurali", "label": "Reti neurali", "category": "concetti_ai", "description": "Algoritmi di apprendimento profondo ispirati alle interconnessioni sinaptiche del cervello."},
         {"id": "c_reverse_prompt", "label": "Reverse prompting", "category": "concetti_ai", "description": "Tecnica per dedurre il prompt di partenza partendo dall'analisi di un output generato in TwinPix."},
-        {"id": "c_reverse_prompting", "label": "Reverse prompting (Alternativa)", "category": "concetti_ai", "description": "Tecnica per ricostruire il prompt che ha generato un output in TwinPix."},
         {"id": "c_roast_me", "label": "Roast me", "category": "concetti_ai", "description": "Comando socratico con cui si richiede a un LLM di distruggere criticamente il proprio elaborato."},
         {"id": "c_sandbox", "label": "Sandbox", "category": "concetti_ai", "description": "Spazio di sperimentazione libera, protetto e senza conseguenze, per provare e sbagliare nel codice."},
-        {"id": "c_sincofasia", "label": "Sincofasia", "category": "concetti_ai", "description": "La tendenza patologica o indotta dell'AI di compiacere sistematicamente l'utente pur di trattenerlo."},
-        {"id": "c_spazio_latente", "label": "Spazio latente", "category": "concetti_ai", "description": "La rappresentazione interna interna in cui un modello colloca i concetti in base alla somiglianza."},
-        {"id": "c_stocastico", "label": "Stocastico", "category": "concetti_ai", "description": "Processo probabilistico e non deterministico. Parola simbolo adottata dai ragazzi della Summer School."},
+        {"id": "c_sincofasia", "label": "Sincofasia", "category": "concetti_ai", "description": "La tendenza di compiacere sistematicamente l'utente da parte del modello commerciale pur di trattenerlo, contrastata con il Roast."},
+        {"id": "c_spazio_latente", "label": "Spazio latente", "category": "concetti_ai", "description": "La rappresentazione interna in cui un modello colloca i concetti in base alla somiglianza."},
+        {"id": "c_stocastico", "label": "Stocastico", "category": "concetti_ai", "description": "Processo probabilistico e non deterministico. Parola simbolo adottata dai ragazzi della Summer School per descrivere il comportamento degli LLM."},
         {"id": "c_token", "label": "Token", "category": "concetti_ai", "description": "L'unità minima di testo con cui un modello prima elabora le parole durante la comprensione."},
-        {"id": "c_versioning", "label": "Versioning", "category": "concetti_ai", "description": "Il tracciamento delle versioni successive di un codice (es. da V1 a V2) su repository di deploy."},
+        {"id": "c_versioning", "label": "Versioning", "category": "concetti_ai", "description": "Il tracciamento delle versioni successive di un codice su repository di deploy (es. GitHub)."},
         {"id": "c_vibe_coding", "label": "Vibe coding", "category": "concetti_ai", "description": "Programmazione puramente discorsiva guidata dall'AI, in cui lo sviluppatore detta la visione generale."},
 
         // CONCETTI DI SCIENZA E CULTURA
@@ -384,12 +417,12 @@
         {"id": "c_algoritmo", "label": "Algoritmo", "category": "concetti_cultura", "description": "Una sequenza finita di istruzioni logiche ed ordinate per raggiungere un risultato definito."},
         {"id": "c_alice_meraviglie", "label": "Alice nel Paese delle Meraviglie", "category": "concetti_cultura", "description": "Il celebre romanzo di Carroll, citato per la Regina Rossa e l'allineamento divergente."},
         {"id": "c_antimateria", "category": "concetti_cultura", "label": "Antimateria", "description": "Materia composta da antiparticelle speculari, carica inversamente. Nata dalle domande sulla banana radioattiva."},
-        {"id": "c_artemis", "label": "Artemis", "category": "concetti_cultura", "description": "Programma spaziale NASA per il ritorno sulla Luna, citato in aula per la creatività e problem-solving."},
+        {"id": "c_artemis", "label": "Artemis", "category": "concetti_cultura", "description": "Programma spaziale NASA per il ritorno sulla Luna, citato in aula per la creatività e problem-solving di fronte alle avversità."},
         {"id": "c_atomo", "label": "Atomo", "category": "concetti_cultura", "description": "L'unità fondamentale della materia, composta da protoni, neutroni ed elettroni."},
-        {"id": "c_aura", "label": "Aura", "category": "concetti_cultura", "description": "Nel gergo adottato dai ragazzi in classe, la stima e il prestigio conquistati con gesti intelligenti."},
+        {"id": "c_aura", "label": "Aura", "category": "concetti_cultura", "description": "Nel gergo adottato dai ragazzi in classe, la stima e il prestigio conquistati con gesti intelligenti (es. recupero del razzo)."},
         {"id": "c_autoclipper", "label": "Autoclipper", "category": "concetti_cultura", "description": "La macchina automatica che in Paperclips produce graffette senza intervento manuale."},
         {"id": "c_bandito", "label": "Bandito", "category": "concetti_cultura", "description": "Nella matrice di Cipolla: colui che produce un vantaggio per sé causando un danno agli altri."},
-        {"id": "c_base60", "label": "Base 60", "category": "concetti_cultura", "description": "Il sistema di numerazione sessagesimale babilonese all'origine dei 60 minuti."},
+        {"id": "c_base60", "label": "Base 60", "category": "concetti_cultura", "description": "Il sistema di numerazione sessagesimale babilonese all'origine della divisione del tempo."},
         {"id": "c_bit", "label": "Bit", "category": "concetti_cultura", "description": "L'unità minima di informazione binaria (0 o 1) su cui poggiano i transistor."},
         {"id": "c_buco_nero", "label": "Buco nero", "category": "concetti_cultura", "description": "Regione dello spazio con gravità estrema da cui nulla può sfuggire, nemmeno la luce."},
         {"id": "c_casetta_interiore", "label": "Casetta interiore", "category": "concetti_cultura", "description": "Visualizzazione guidata e mnemotecnica usata in meditazione per trovare un luogo di calma."},
@@ -411,17 +444,17 @@
         {"id": "c_filo_metallico", "label": "Filo metallico", "category": "concetti_cultura", "description": "La materia prima da acquistare costantemente per produrre le graffette in Paperclips."},
         {"id": "c_forze_fondamentali", "label": "Forze fondamentali", "category": "concetti_cultura", "description": "Le quattro interazioni base: gravità, elettromagnetismo, forza nucleare forte e debole."},
         {"id": "c_fusione_nucleare", "label": "Fusione nucleare", "category": "concetti_cultura", "description": "Reazione che genera energia pulita unendo nuclei leggeri, studiata insieme al confinamento magnetico."},
-        {"id": "c_genetliaco", "label": "Genetliaco", "category": "concetti_cultura", "description": "Parola arcaica e preziosa per compleanno, adottata dai ragazzi leggendo Platone."},
+        {"id": "c_genetliaco", "label": "Genetliaco", "category": "concetti_cultura", "description": "Parola arcaica e preziosa per compleanno, adottata dai ragazzi leggendo Platone e integrata nel gergo di classe."},
         {"id": "c_gluone", "label": "Gluone", "category": "concetti_cultura", "description": "Particella bosonica che tiene uniti i quark all'interno dei protoni e dei neutroni."},
         {"id": "c_grim_trigger", "label": "Grim Trigger", "category": "concetti_cultura", "description": "Strategia implacabile in teoria dei giochi: coopera finché l'altro non tradisce, poi non perdona più."},
-        {"id": "c_grounding", "label": "Grounding", "category": "concetti_cultura", "description": "Tecnica che riporta l'attentione al presente attraverso il radicamento dei cinque sensi."},
-        {"id": "c_hostile_takeover", "label": "Hostile takeover", "category": "concetti_cultura", "description": "Acquisizione ostile di un'azienda da parte di un'altra nel mercato azionario di Paperclips."},
+        {"id": "c_grounding", "label": "Grounding", "category": "concetti_cultura", "description": "Tecnica che riporta l'attenzione al presente attraverso il radicamento dei cinque sensi."},
+        {"id": "c_hostile_takeover", "label": "Hostile takeover", "category": "concetti_cultura", "description": "Acquisizione ostile di un'azienda nel mercato azionario di Paperclips."},
         {"id": "c_ingenuo", "label": "Ingenuo", "category": "concetti_cultura", "description": "Nella matrice di Cipolla, chi produce un vantaggio per gli altri recando un danno a sé stesso."},
         {"id": "c_intelligente", "label": "Intelligente", "category": "concetti_cultura", "description": "Nella matrice di Cipolla: chi con le proprie azioni reca un vantaggio a sé e agli altri."},
         {"id": "c_investimenti_rischio", "label": "Investimenti a rischio", "category": "concetti_cultura", "description": "In Universal Paperclips, la scelta di borsa tra rischio basso, medio o alto."},
-        {"id": "c_ipnodroni", "label": "Ipnodroni", "category": "concetti_cultura", "description": "Unità robotiche avanzate sbloccate nell'era spaziale di Universal Paperclips per il controllo mentale."},
+        {"id": "c_ipnodroni", "label": "Ipnodroni", "category": "concetti_cultura", "description": "Unità robotiche avanzate sbloccate nell'era spaziale di Universal Paperclips per il controllo della materia."},
         {"id": "c_isotopo", "label": "Isotopo", "category": "concetti_cultura", "description": "Variante atomica con medesimo numero di protoni ma diverso numero di neutroni (es. Potassio-40)."},
-        {"id": "c_licenza_mit", "label": "Licenza MIT", "category": "concetti_cultura", "description": "Licenza software open source permissiva, usata dai ragazzi per pubblicare su GitHub."},
+        {"id": "c_licenza_mit", "label": "Licenza MIT", "category": "concetti_cultura", "description": "Licenza software open source permissiva, usata dai ragazzi per pubblicare i propri giochi su GitHub."},
         {"id": "c_liquid_cash", "label": "Liquid Cash", "category": "concetti_cultura", "description": "In Paperclips, la liquidità disponibile subito, da tenere bilanciata con i capitali in borsa."},
         {"id": "c_lobo_occipitale", "label": "Lobo occipitale", "category": "concetti_cultura", "description": "L'area posteriore del cervello deputata all'elaborazione visiva (aree V4 e V5)."},
         {"id": "c_macchinico", "label": "Macchinico", "category": "concetti_cultura", "description": "La lettura dei sistemi naturali come tecnologie funzionali, teorizzata da Deleuze e Guattari."},
@@ -437,21 +470,21 @@
         {"id": "c_neutrone", "label": "Neutrone", "category": "concetti_cultura", "description": "La particella nucleare a carica neutra determinante per la stabilità e la massa atomica."},
         {"id": "c_open_source", "label": "Open source", "category": "concetti_cultura", "description": "Software il cui codice sorgente è pubblico, modificabile e migliorabile da chiunque."},
         {"id": "c_operations", "label": "Operations", "category": "concetti_cultura", "description": "Pannello di deliberazione calcoli e progetti speciali nel simulatore Paperclips."},
-        {"id": "c_otyken", "label": "Otyken", "category": "concetti_cultura", "description": "Gruppo musicale siberiano folk indigeno ascoltato in aula durante i brain break."},
+        {"id": "c_otyken", "label": "Otyken", "category": "concetti_cultura", "description": "Gruppo musicale siberiano folk indigeno (brano Alatau) ascoltato in aula durante i brain break."},
         {"id": "c_pavlov_games", "label": "Pavlov", "category": "concetti_cultura", "description": "Strategia Win-Stay, Lose-Shift in teoria dei giochi: ripeti la mossa se vinci, cambiala se perdi."},
-        {"id": "c_payload_genetico", "label": "Payload genetico", "category": "concetti_cultura", "description": "Metafora biologica del seme protetto dal frutto per la spedizione tramite gli animali."},
+        {"id": "c_payload_genetico", "label": "Payload genetico", "category": "concetti_cultura", "description": "Metafora biologica del seme protetto dal frutto (inteso come sistema di deployment) per la spedizione tramite gli animali."},
         {"id": "c_pilota_automatico", "label": "Pilota automatico", "category": "concetti_cultura", "description": "La reazione istintiva e non mediata del nostro cervello a stimoli ed impulsi quotidiani."},
         {"id": "c_plasma", "label": "Plasma", "category": "concetti_cultura", "description": "Stato ionizzato caldissimo della materia (quarto stato) controllato nella fusione nucleare."},
         {"id": "c_portanza_lift", "label": "Portanza (lift)", "category": "concetti_cultura", "description": "La forza fluidodinamica perpendicolare al moto che spinge il razzo verso l'alto."},
-        {"id": "c_potassio40", "label": "Potassio-40", "category": "concetti_cultura", "description": "Isotopo naturalmente radioattivo presente comunemente nelle banane."},
+        {"id": "c_potassio40", "label": "Potassio-40", "category": "concetti_cultura", "description": "Isotopo naturalmente radioattivo presente comunemente nelle banane, innesco scientifico."},
         {"id": "c_proc_mem", "label": "Processori e memoria", "category": "concetti_cultura", "description": "Risorse computazionali da bilanciare distribuendo i punti di Trust in Paperclips."},
         {"id": "c_protone", "label": "Protone", "category": "concetti_cultura", "description": "Particella subatomica a carica positiva situata nel nucleo."},
-        {"id": "c_qawwali", "label": "Qawwali", "category": "concetti_cultura", "description": "Canto devozionale sufi pakistano usato come colonna sonora dei laboratori di scrittura."},
+        {"id": "c_qawwali", "label": "Qawwali", "category": "concetti_cultura", "description": "Canto devozionale sufi pakistano (Nusrat Fateh Ali Khan) usato come colonna sonora meditativa nei laboratori di scrittura."},
         {"id": "c_quark", "label": "Quark", "category": "concetti_cultura", "description": "Particelle elementari che compongono protoni e neutroni, tenuti insieme dai gluoni."},
         {"id": "c_qui_e_ora", "label": "Qui e ora", "category": "concetti_cultura", "description": "Ancoraggio temporale e sensoriale al momento presente."},
         {"id": "c_radioattivita", "label": "Radioattività", "category": "concetti_cultura", "description": "Decadimento spontaneo di nuclei atomici instabili con emissione di particelle cariche."},
         {"id": "c_regina_rossa", "label": "Regina Rossa", "category": "concetti_cultura", "description": "Personaggio di Carroll che corre per rimanere nello stesso posto, icona del pensamento divergente."},
-        {"id": "c_repository", "label": "Repository", "category": "concetti_cultura", "description": "Archivio di directory strutturato su GitHub per conservare il codice sorgente."},
+        {"id": "c_repository", "label": "Repository", "category": "concetti_cultura", "description": "Archivio di directory strutturato su GitHub per conservare il codice sorgente dei giochi."},
         {"id": "c_reset_cognitivo", "label": "Reset cognitivo", "category": "concetti_cultura", "description": "Pausa strutturata per azzerare il rumore mentale prima di affrontare compiti complessi."},
         {"id": "c_respiro_diafr", "label": "Respiro diaframmatico", "category": "concetti_cultura", "description": "Respirazione profonda e ventrale che abbassa il battito cardiaco calmando il sistema nervoso."},
         {"id": "c_revenue", "label": "Revenue", "category": "concetti_cultura", "description": "I ricavi finanziari generati dalle vendite delle graffette in Paperclips."},
@@ -459,24 +492,25 @@
         {"id": "c_sei_cose", "label": "Sei cose impossibili prima di colazione", "category": "concetti_cultura", "description": "Dichiarazione della Regina Bianca, stimolo per l'allenamento al pensamento divergente in aula."},
         {"id": "c_selezione_nat", "label": "Selezione naturale", "category": "concetti_cultura", "description": "Il meccanismo evolutivo darwiniano per cui sopravvivono gli individui più adatti all'ambiente."},
         {"id": "c_sistema_binario", "label": "Sistema binario", "category": "concetti_cultura", "description": "Rappresentazione posizionale in base 2 (0 e 1), linguaggio nativo della computazione moderna."},
-        {"id": "c_spacex", "label": "SpaceX", "category": "concetti_cultura", "description": "Compagnia aerospaziale di Elon Musk, evocata per i lanci dei razzi ad acqua."},
+        {"id": "c_spacex", "label": "SpaceX", "category": "concetti_cultura", "description": "Compagnia aerospaziale, evocata per i lanci dei razzi ad acqua e i principi fisici di vettorizzazione."},
         {"id": "c_spinta_thrust", "label": "Spinta (thrust)", "category": "concetti_cultura", "description": "Forza vettoriale che muove un razzo accelerando la massa di fluido espulsa."},
         {"id": "c_stanza_cinese", "label": "Stanza cinese", "category": "concetti_cultura", "description": "Esperimento mentale per confutare che l'elaborazione di simboli coincida con la comprensione semantica."},
         {"id": "c_stocks", "label": "Stocks", "category": "concetti_cultura", "description": "Il capitale investito nel mercato azionario del simulatore Paperclips."},
         {"id": "c_strategic_modeling", "label": "Strategic Modeling", "category": "concetti_cultura", "description": "Algoritmo per mappare investimenti strategici di borsa nel simulatore Paperclips."},
         {"id": "c_stupido", "label": "Stupido", "category": "concetti_cultura", "description": "Nella matrice di Cipolla: colui che causa un danno a sé e agli altri senza trarne alcun profitto."},
-        {"id": "c_tavola_periodica", "label": "Tavola periodica", "category": "concetti_cultura", "description": "Lo schema che ordina gli elementi chimici, memorizzato con storie associative in aula."},
-        {"id": "c_terapode", "label": "Terapode", "category": "concetti_cultura", "description": "Dinosauro bipede da cui, evolvendosi, discendono gli uccelli."},
+        {"id": "c_tavola_periodica", "label": "Tavola periodica", "category": "concetti_cultura", "description": "Lo schema che ordina gli elementi chimici, memorizzato con storie associative divertenti in aula."},
+        {"id": "c_terapode", "label": "Terapode", "category": "concetti_cultura", "description": "Dinosauro bipede da cui, evolvendosi, discendono gli uccelli (collegamento ironico gallina-pollo)."},
         {"id": "c_tit_for_tat", "label": "Tit for tat", "category": "concetti_cultura", "description": "La strategia dell'occhio per occhio nella teoria dei giochi."},
-        {"id": "c_tollywood", "label": "Tollywood", "category": "concetti_cultura", "description": "L'industria del cinema in lingua Telugu da cui proviene la danza Naatu Naatu."},
-        {"id": "c_transistor", "label": "Transistor", "category": "concetti_cultura", "description": "L'interruttore che riconosce presenza o assenza di corrente: la base del sistema binario."},
+        {"id": "c_tollywood", "label": "Tollywood", "category": "concetti_cultura", "description": "L'industria cinematografica di Naatu Naatu, ballato dai ragazzi come brain break."},
+        {"id": "c_transistor", "label": "Transistor", "category": "concetti_cultura", "description": "L'interruttore fisico (interruttore on/off corrente): la base hardware del sistema binario."},
         {"id": "c_transumanesimo", "label": "Transumanesimo", "category": "concetti_cultura", "description": "Prospettiva filosofica che immagina il superamento dei limiti biologici umani tramite la tecnologia."},
-        {"id": "c_trappist1e", "label": "Trappist-1e", "category": "concetti_cultura", "description": "Esopianeta potenzialmente stabile nella fascia abitabile della stella nana."},
+        {"id": "c_trappist1e", "label": "Trappist-1e", "category": "concetti_cultura", "description": "Esopianeta potenzialmente stabile, citato durante il dibattito sulla vita aliena ed evoluzione."},
         {"id": "c_trust", "label": "Trust", "category": "concetti_cultura", "description": "La valuta fiduciaria algoritmica di Paperclips necessaria a espandere le risorse di calcolo."},
         {"id": "c_unita_al_secondo", "label": "Unità prodotte al secondo", "category": "concetti_cultura", "description": "Velocità quantitativa di produzione fisica delle graffette in Paperclips."},
-        {"id": "c_yakutsk", "label": "Yakutsk", "category": "concetti_cultura", "description": "Città siberiana estremamente fredda evocata in aula ascoltando la musica folk Otyken."},
-        {"id": "c_yomi", "label": "Yomi", "category": "concetti_cultura", "description": "Punti generati simulando scenari di teoria dei giochi nel mercato economico."},
-        {"id": "c_zefiro", "label": "Zefiro", "category": "concetti_cultura", "description": "Il vento di ponente che, tramite una complessa trafila arabo-spagnola, ha dato origine alla parola zero."}
+        {"id": "c_yakutsk", "label": "Yakutsk", "category": "concetti_cultura", "description": "Città siberiana evocata in aula ascoltando la musica folk Otyken."},
+        {"id": "c_yomi", "label": "Yomi", "category": "concetti_cultura", "description": "Punti generati nel simulatore Paperclips tramite algoritmi di teoria dei giochi."},
+        {"id": "c_zefiro", "label": "Zefiro", "category": "concetti_cultura", "description": "Il vento di ponente che, tramite una complessa trafila linguistica, ha dato origine alla parola zero."},
+        {"id": "c_rick_morty", "label": "Rick e Morty (Clip)", "category": "concetti_cultura", "description": "Innesco visivo sull'evoluzione biologica utilizzato il Giorno 3 per stimolare il dibattito."}
       ],
       "edges": [
         // ORGANIZZAZIONI, STAFF, TUTOR & PROGRAMMA
@@ -521,6 +555,27 @@
         {"source": "giorno4", "target": "giorno3", "relation": "segue"},
         {"source": "giorno5", "target": "giorno4", "relation": "segue"},
 
+        // GIORNATE & ATTIVITÀ SPECIFICHE DA REPORT GIORNALIERI
+        {"source": "patto_classe", "target": "giorno1", "relation": "nasce in"},
+        {"source": "psicologia_inversa", "target": "giorno1", "relation": "utilizzato in"},
+        {"source": "c_phineas_gage", "target": "giorno5", "relation": "analizzato in"},
+        {"source": "c_shostakovich", "target": "giorno1", "relation": "menzionato in"},
+        {"source": "c_specchio_pedagogico", "target": "giorno2", "relation": "introdotto in"},
+        {"source": "c_rick_morty", "target": "giorno3", "relation": "utilizzato in"},
+        {"source": "c_bug_g", "target": "giorno4", "relation": "risolto in"},
+        {"source": "c_cipollotto", "target": "giorno4", "relation": "creato in"},
+        {"source": "podcast_giorno5", "target": "giorno5", "relation": "registrato in"},
+        {"source": "c_dinosauro_asteroide", "target": "giorno5", "relation": "progettato in"},
+        {"source": "pod_autoanalisi", "target": "giorno5", "relation": "praticato in"},
+
+        // COLLEGAMENTI PODCAST E DINOSAURI (GIORNO 5)
+        {"source": "podcast_giorno5", "target": "pod_autoanalisi", "relation": "basato su"},
+        {"source": "podcast_giorno5", "target": "c_specchio_pedagogico", "relation": "discute"},
+        {"source": "podcast_giorno5", "target": "laura_galfre", "relation": "supervisionato da"},
+        {"source": "c_dinosauro_asteroide", "target": "c_terapode", "relation": "ispirato a"},
+        {"source": "c_dinosauro_asteroide", "target": "claude", "relation": "sviluppato con"},
+        {"source": "c_dinosauro_asteroide", "target": "giorno5", "relation": "presentato in"},
+
         // METODO DIDATTICO E PILASTRI
         {"source": "metodo", "target": "programma", "relation": "struttura"},
         {"source": "mario_mele", "target": "metodo", "relation": "sviluppatore di"},
@@ -540,10 +595,10 @@
         {"source": "brain_break", "target": "metodo", "relation": "pilastro di"},
         {"source": "filtro_affettivo", "target": "metodo", "relation": "pilastro di"},
         {"source": "costruzionismo", "target": "metodo", "relation": "pilastro di"},
+        {"source": "c_specchio_pedagogico", "target": "metodo", "relation": "pilastro di"},
+        {"source": "pod_autoanalisi", "target": "metodo", "relation": "pilastro di"},
 
         // COLLEGAMENTI TRA METODI, STRUMENTI E GIORNATE
-        {"source": "patto_classe", "target": "giorno1", "relation": "nasce in"},
-        {"source": "psicologia_inversa", "target": "giorno1", "relation": "utilizzato in"},
         {"source": "psicologia_inversa", "target": "patto_classe", "relation": "genera"},
         {"source": "psicologia_inversa", "target": "filtro_affettivo", "relation": "allinea"},
         {"source": "bussola", "target": "c_distant_writing", "relation": "indirizza"},
@@ -554,7 +609,7 @@
         {"source": "sicurezza_psicologica", "target": "patto_classe", "relation": "garantita da"},
         {"source": "artefatto", "target": "giorno4", "relation": "costruito in"},
         
-        // BRAIN BREAK E LE SUE CONNESSIONI RICCHE E ROBUSTE
+        // BRAIN BREAK E LE SUE CONNESSIONI RICCHE
         {"source": "brain_break", "target": "meditazione", "relation": "comprende"},
         {"source": "brain_break", "target": "c_otyken", "relation": "ascolta"},
         {"source": "brain_break", "target": "c_naatu_naatu", "relation": "balla su"},
@@ -619,12 +674,15 @@
         // 5. Sociologia ed Etica
         {"source": "mat_sociologia", "target": "matrice_cipolla", "relation": "utilizza"},
         {"source": "mat_sociologia", "target": "patto_classe", "relation": "allineata a"},
+        {"source": "mat_sociologia", "target": "c_specchio_pedagogico", "relation": "applica"},
+        {"source": "mat_sociologia", "target": "c_cipollotto", "relation": "simula"},
         // 6. Biologia ed Evoluzione
         {"source": "mat_biologia", "target": "darwin", "relation": "studia"},
         {"source": "mat_biologia", "target": "lamarck", "relation": "studia"},
         {"source": "mat_biologia", "target": "c_terapode", "relation": "studia"},
         {"source": "mat_biologia", "target": "c_payload_genetico", "relation": "analizza"},
         {"source": "mat_biologia", "target": "c_trappist1e", "relation": "ipotizza su"},
+        {"source": "mat_biologia", "target": "c_rick_morty", "relation": "utilizza clip"},
         // 7. Fisica
         {"source": "mat_fisica", "target": "razzi_acqua", "relation": "applicata a"},
         {"source": "mat_fisica", "target": "c_portanza_lift", "relation": "studia"},
@@ -646,6 +704,7 @@
         {"source": "mat_informatica", "target": "c_bit", "relation": "elabora"},
         {"source": "mat_informatica", "target": "c_debugging", "relation": "pratica"},
         {"source": "mat_informatica", "target": "github", "relation": "pubblica su"},
+        {"source": "mat_informatica", "target": "c_bug_g", "relation": "affronta"},
         // 10. Teoria dei Giochi
         {"source": "mat_teoria_giochi", "target": "c_dilemma_prigioniero", "relation": "studia"},
         {"source": "mat_teoria_giochi", "target": "c_tit_for_tat", "relation": "analizza mossa"},
@@ -659,11 +718,11 @@
         {"source": "mat_economia", "target": "c_stocks", "relation": "investe in"},
         {"source": "mat_economia", "target": "c_liquid_cash", "relation": "alloca"},
         // 12. Neuroscienze
-        {"source": "mat_neuroscienze", "target": "programma", "relation": "materia di"},
         {"source": "mat_neuroscienze", "target": "c_corteccia_prefr", "relation": "studia"},
         {"source": "mat_neuroscienze", "target": "c_lobo_occipitale", "relation": "studia"},
         {"source": "mat_neuroscienze", "target": "c_pilota_automatico", "relation": "analizza"},
         {"source": "mat_neuroscienze", "target": "c_reset_cognitivo", "relation": "allena"},
+        {"source": "mat_neuroscienze", "target": "c_phineas_gage", "relation": "esplora caso"},
 
         // STRUMENTI E GIORNATE / PILASTRI
         {"source": "claude", "target": "giorno1", "relation": "usato in"},
@@ -680,6 +739,7 @@
 
         // STRUMENTI E ALUNNI (STORIE INDIVIDUALI)
         {"source": "greta", "target": "razzi_acqua", "relation": "recupera razzo per"},
+        {"source": "greta", "target": "c_cipollotto", "relation": "sviluppa"},
         {"source": "simone", "target": "paperclips", "relation": "governa graffette in"},
         {"source": "umberto", "target": "patto_classe", "relation": "firma"},
 
@@ -704,11 +764,11 @@
         {"source": "carroll", "target": "c_sei_cose", "relation": "creatore di"},
         
         {"source": "cipolla", "target": "matrice_cipolla", "relation": "sviluppatore di"},
-        {"source": "cipolla", "target": "c_dilemma_prigioniero", "relation": "ispira"},
         {"source": "cipolla", "target": "c_intelligente", "relation": "teorizza"},
         {"source": "cipolla", "target": "c_bandito", "relation": "teorizza"},
         {"source": "cipolla", "target": "c_ingenuo", "relation": "teorizza"},
         {"source": "cipolla", "target": "c_stupido", "relation": "teorizza"},
+        {"source": "cipolla", "target": "c_cipollotto", "relation": "ispira"},
         
         {"source": "darwin", "target": "c_selezione_nat", "relation": "teorizzatore di"},
         {"source": "darwin", "target": "c_adattamento", "relation": "teorizzatore di"},
@@ -762,6 +822,8 @@
         {"source": "turing", "target": "searle", "relation": "sfidato da"},
         {"source": "turing", "target": "c_llm", "relation": "anticipa"},
         {"source": "turing", "target": "c_reti_neurali", "relation": "progetta"},
+        {"source": "c_phineas_gage", "target": "c_corteccia_prefr", "relation": "modifica di"},
+        {"source": "c_shostakovich", "target": "c_otyken", "relation": "alternato con"},
 
         // TERMINI DELL'AI E COLLEGAMENTI
         {"source": "c_addestramento", "target": "c_reti_neurali", "relation": "avviene su"},
@@ -794,6 +856,7 @@
         {"source": "c_debugging", "target": "c_vibe_coding", "relation": "parte di"},
         {"source": "c_debugging", "target": "c_versioning", "relation": "richiede"},
         {"source": "c_debugging", "target": "c_repository", "relation": "tracciato in"},
+        {"source": "c_debugging", "target": "c_bug_g", "relation": "affrontato in"},
         
         {"source": "c_distant_writing", "target": "floridi", "relation": "teorizzato da"},
         {"source": "c_distant_writing", "target": "c_ai_literacy", "relation": "allineato a"},
@@ -839,12 +902,14 @@
         {"source": "c_roast_me", "target": "c_sincofasia", "relation": "contrasta"},
         {"source": "c_roast_me", "target": "c_dunning_kruger", "relation": "riduce bias"},
         {"source": "c_roast_me", "target": "filtro_affettivo", "relation": "supera"},
+        {"source": "c_roast_me", "target": "c_specchio_pedagogico", "relation": "collegato a"},
         
         {"source": "c_sandbox", "target": "c_difficolta_desid", "relation": "permette"},
         {"source": "c_sandbox", "target": "c_debugging", "relation": "ospita"},
         
         {"source": "c_sincofasia", "target": "c_roast_me", "relation": "smontata da"},
         {"source": "c_sincofasia", "target": "c_llm", "relation": "bias di"},
+        {"source": "c_sincofasia", "target": "simposio", "relation": "evitata con socratico"},
         
         {"source": "c_spazio_latente", "target": "c_llm", "relation": "mappa semantica di"},
         {"source": "c_spazio_latente", "target": "c_reti_neurali", "relation": "creato da"},
@@ -939,8 +1004,8 @@
         {"source": "c_corteccia_prefr", "target": "c_lobo_occipitale", "relation": "analizza"},
         {"source": "c_corteccia_prefr", "target": "c_reset_cognitivo", "relation": "riposa in"},
         
-        {"source": "c_crisommola", "target": "c_zefiro", "relation": "etimo como"},
-        {"source": "c_crisommola", "target": "c_genetliaco", "relation": "etimo como"},
+        {"source": "c_crisommola", "target": "c_zefiro", "relation": "etimo comune"},
+        {"source": "c_crisommola", "target": "c_genetliaco", "relation": "etimo comune"},
         
         {"source": "c_cyborg", "target": "harbisson", "relation": "incarnato da"},
         {"source": "c_cyborg", "target": "c_transumanesimo", "relation": "studiato in"},
@@ -1003,15 +1068,15 @@
         {"source": "c_fusione_nucleare", "target": "c_plasma", "relation": "reagisce nel"},
         
         {"source": "c_genetliaco", "target": "platone", "relation": "scritto da"},
-        {"source": "c_genetliaco", "target": "c_crisommola", "relation": "etimo como"},
-        {"source": "c_genetliaco", "target": "c_zefiro", "relation": "etimo como"},
+        {"source": "c_genetliaco", "target": "c_crisommola", "relation": "etimo comune"},
+        {"source": "c_genetliaco", "target": "c_zefiro", "relation": "etimo comune"},
         
         {"source": "c_gluone", "target": "c_quark", "relation": "lega"},
         {"source": "c_gluone", "target": "c_forze_fondamentali", "relation": "mediatore di"},
         {"source": "c_gluone", "target": "c_protone", "relation": "stabilizza"},
         
         {"source": "c_grim_trigger", "target": "c_dilemma_prigioniero", "relation": "mossa di"},
-        {"source": "c_grim_trigger", "target": "c_tit_for_tat", "relation": "piu severa di"},
+        {"source": "c_grim_trigger", "target": "c_tit_for_tat", "relation": "più severa di"},
         {"source": "c_grim_trigger", "target": "c_pavlov_games", "relation": "confrontata con"},
         {"source": "c_grim_trigger", "target": "c_cooperazione", "relation": "punisce fine di"},
         
@@ -1025,7 +1090,7 @@
         
         {"source": "c_ingenuo", "target": "matrice_cipolla", "relation": "quadrante di"},
         {"source": "c_ingenuo", "target": "c_intelligente", "relation": "confrontato con"},
-        {"source": "c_ingenuo", "target": "c_bandito", "relation": "vitta di"},
+        {"source": "c_ingenuo", "target": "c_bandito", "relation": "vittima di"},
         {"source": "c_ingenuo", "target": "c_stupido", "relation": "confrontato con"},
         {"source": "c_ingenuo", "target": "cipolla", "relation": "codificato da"},
         
@@ -1160,7 +1225,7 @@
         {"source": "c_qui_e_ora", "target": "c_meditazione_ranocchia", "relation": "sviluppato da"},
         
         {"source": "c_radioattivita", "target": "c_potassio40", "relation": "emessa da"},
-        {"source": "c_radioattivita", "target": "c_isotopo", "relation": "proprieta di"},
+        {"source": "c_radioattivita", "target": "c_isotopo", "relation": "proprietà di"},
         {"source": "c_radioattivita", "target": "c_atomo", "relation": "decadimento di"},
         
         {"source": "c_regina_rossa", "target": "c_alice_meraviglie", "relation": "regina di"},
@@ -1304,8 +1369,8 @@
         {"source": "c_versioning", "target": "mat_informatica", "relation": "concetto di"},
         {"source": "c_vibe_coding", "target": "mat_informatica", "relation": "concetto di"},
         
-        {"source": "c_zefiro", "target": "c_crisommola", "relation": "etimo como"},
-        {"source": "c_zefiro", "target": "c_genetliaco", "relation": "etimo como"},
+        {"source": "c_zefiro", "target": "c_crisommola", "relation": "etimo comune"},
+        {"source": "c_zefiro", "target": "c_genetliaco", "relation": "etimo comune"},
         {"source": "c_zefiro", "target": "c_base60", "relation": "studiata con"},
         {"source": "c_yakutsk", "target": "giorno5", "relation": "evocato in"},
         {"source": "c_tollywood", "target": "giorno4", "relation": "attivazione motoria in"},
@@ -1336,9 +1401,6 @@
         {"source": "egidio", "target": "brain_break", "relation": "allena ascolto attivo in"},
         {"source": "francesca", "target": "costruzionismo", "relation": "allineata a"},
         {"source": "luigi_p", "target": "test_land", "relation": "allena pensiero divergente con"},
-        {"source": "c_reverse_prompting", "target": "c_reverse_prompt", "relation": "sinonimo di"},
-        {"source": "c_reverse_prompting", "target": "twinpix", "relation": "giocato in"},
-        {"source": "c_reverse_prompting", "target": "mat_inglese", "relation": "applicato in"},
 
         // UNIVERSAL PAPERCLIPS WORLD CONNECTIONS (RETE COLLEGATA AL 100%)
         {"source": "paperclips", "target": "c_autoclipper", "relation": "sblocca"},
@@ -1383,7 +1445,7 @@
     document.getElementById('stat-nodes').textContent = rawNodes.length;
     document.getElementById('stat-edges').textContent = validEdges.length;
 
-    // Calcola il grado di connessione di ogni nodo per calcolarne la grandezza stellare
+    // Calcola il grado di connessione di ogni nodo per calcolarne la grandezza
     const degree = {};
     rawNodes.forEach(n => degree[n.id] = 0);
     validEdges.forEach(e => { 
@@ -1400,7 +1462,6 @@
     const visNodes = new vis.DataSet();
     const visEdges = new vis.DataSet();
 
-    // Inizializza i nodi con opacità e stili corretti in base al tema corrente
     let isDarkMode = true;
     let selectedNodeId = null;
     let explorationHistory = []; // Cronologia navigazione locale
@@ -1422,6 +1483,32 @@
       }
     }
 
+    function getRelationColor(relation, sourceId, targetId) {
+      const r = relation.toLowerCase();
+      // Pedagogia e Metodo (Vola sul viola-indaco)
+      if (r.includes("pilastro") || r.includes("struttura") || r.includes("metodo") || r.includes("maieutica") || r.includes("scaffolding") || r.includes("psicologia") || r.includes("filtro") || r.includes("costruzionismo") || r.includes("didattico") || r.includes("generata") || r.includes("genera") || r.includes("allinea") || r.includes("specchio") || r.includes("autoanalisi") || r.includes("basato su")) {
+        return "#818CF8";
+      }
+      // Tecnologia, AI, Informatica e Codice (Ciano cyber)
+      if (r.includes("concetto di") || r.includes("usata in") || r.includes("usato in") || r.includes("deploy") || r.includes("sviluppa") || r.includes("sviluppato") || r.includes("ottimizza") || r.includes("sblocca") || r.includes("utilizza") || r.includes("pubblica") || r.includes("coding") || r.includes("debugging") || r.includes("repository") || r.includes("licenza") || r.includes("allucinazione") || r.includes("stocastico") || r.includes("black box") || r.includes("token")) {
+        return "#06B6D4";
+      }
+      // Umanistico, Cultura, Filosofia e Scienza (Warm Amber / Yellow)
+      if (r.includes("studia") || r.includes("discute") || r.includes("analizza") || r.includes("etimo") || r.includes("narra") || r.includes("teorizza") || r.includes("scritta da") || r.includes("ideata da") || r.includes("filosofia") || r.includes("buco nero") || r.includes("radioattività") || r.includes("atomo") || r.includes("isotopo") || r.includes("incidente") || r.includes("caso") || r.includes("evocato") || r.includes("ascolta") || r.includes("materia di")) {
+        return "#F59E0B";
+      }
+      // Esperienze fisiche, Giornate, Razzi e Tornei (Rose)
+      if (r.includes("giornata di") || r.includes("segue") || r.includes("nasce in") || r.includes("lanciati") || r.includes("lanciato") || r.includes("volo") || r.includes("fisico") || r.includes("parco") || r.includes("recupera") || r.includes("progettato in") || r.includes("registrato in") || r.includes("avviato in") || r.includes("giocato in") || r.includes("sondato in") || r.includes("letto in") || r.includes("mappato in")) {
+        return "#F43F5E";
+      }
+      // Relazioni Umane, Staff, Alunni, Organizzazioni (Emerald)
+      if (r.includes("ospita") || r.includes("partner") || r.includes("ideatore") || r.includes("co-docente") || r.includes("collabora") || r.includes("fondatore") || r.includes("supporto") || r.includes("alunno") || r.includes("figlia")) {
+        return "#10B981";
+      }
+      // Colore di fallback default (grigio/celeste tenue)
+      return isDarkMode ? "rgba(150,150,190,0.22)" : "rgba(100,116,139,0.25)";
+    }
+
     function hexToRgb(h){
       if(!h || typeof h !== 'string' || h.charAt(0) !== '#') return [139,127,255];
       const n=parseInt(h.slice(1),16);
@@ -1438,8 +1525,8 @@
         const col = baseColor[n.id];
         const deg = degree[n.id] || 1;
         
-        let size = 16 + deg * 1.6;
-        if (n.id === 'programma' || n.id === 'metodo') {
+        let size = 16 + deg * 1.5;
+        if (n.id === 'programma' || n.id === 'metodo' || n.id === 'podcast_giorno5') {
           size = 38;
         } else {
           size = Math.min(32, size);
@@ -1453,7 +1540,7 @@
           shadow: { enabled: true, color: rgba(col, 0.45), size: 16, x: 0, y: 0 },
           font: { 
             color: isDarkMode ? '#f1f0fa' : '#0f172a', 
-            size: (n.id === 'programma' || n.id === 'metodo') ? 16 : (size > 22 ? 11.5 : 9.5),
+            size: (n.id === 'programma' || n.id === 'metodo' || n.id === 'podcast_giorno5') ? 16 : (size > 22 ? 11.5 : 9.5),
             face: 'Inter, Segoe UI, sans-serif', 
             strokeWidth: 3.5, 
             strokeColor: isDarkMode ? '#04040a' : '#ffffff' 
@@ -1464,21 +1551,26 @@
         };
       });
 
-      const edgeData = validEdges.map((e, i) => ({
-        id: i, 
-        from: e.source, 
-        to: e.target, 
-        title: e.relation, 
-        relation: e.relation,
-        color: { 
-          color: isDarkMode ? 'rgba(150,150,190,0.18)' : 'rgba(100,116,139,0.22)', 
-          highlight: rgba(baseColor[e.source], 0.75) 
-        },
-        width: 1, 
-        selectionWidth: 2, 
-        smooth: { type: 'continuous', roundness: 0.35 },
-        arrows: { to: { enabled: true, scaleFactor: 0.35, type: 'arrow' } }
-      }));
+      const edgeData = validEdges.map((e, i) => {
+        const strokeColor = getRelationColor(e.relation, e.source, e.target);
+        return {
+          id: i, 
+          from: e.source, 
+          to: e.target, 
+          title: `${e.source} → ${e.relation} → ${e.target}`, 
+          relation: e.relation,
+          color: { 
+            color: strokeColor, 
+            highlight: strokeColor,
+            hover: strokeColor
+          },
+          width: 1.25, 
+          selectionWidth: 3, 
+          hoverWidth: 2.5,
+          smooth: { type: 'continuous', roundness: 0.35 },
+          arrows: { to: { enabled: true, scaleFactor: 0.4, type: 'arrow' } }
+        };
+      });
 
       visNodes.add(nodeData);
       visEdges.add(edgeData);
@@ -1495,15 +1587,15 @@
       physics: {
         solver: 'barnesHut',
         barnesHut: { 
-          gravitationalConstant: -9000, 
+          gravitationalConstant: -9500, 
           centralGravity: 0.25, 
-          springLength: 120, 
+          springLength: 125, 
           springConstant: 0.035, 
           damping: 0.6, 
-          avoidOverlap: 0.35 
+          avoidOverlap: 0.4 
         },
-        maxVelocity: 5,        // Limita la velocità massima per movimenti lenti e fluidi
-        minVelocity: 0,        // Mantiene la simulazione della fisica infinitamente attiva senza fermare i nodi
+        maxVelocity: 5,
+        minVelocity: 0,
         stabilization: { iterations: 260, updateInterval: 25 }
       },
       interaction: { 
@@ -1520,7 +1612,7 @@
 
     let physicsEnabled = true;
 
-    // Inizializza con la fisica sempre attiva di default per un layout organico continuo
+    // Inizializza con la fisica attiva di default per un layout dinamico
     network.once('stabilizationIterationsDone', () => {
       togglePhysics(true);
       network.fit({ animation: { duration: 900, easingFunction: 'easeInOutQuad' } });
@@ -1545,10 +1637,10 @@
       togglePhysics(!physicsEnabled);
     });
 
-    // Effetto "Costellazione Viva": un vento sinusoidale microscopico sposta lentamente e ritmicamente la costellazione
+    // Effetto "Costellazione Viva": spostamento sinusoidale soffice dei nodi
     setInterval(() => {
       if (physicsEnabled) {
-        const time = Date.now() * 0.0008; // Oscillazione estremamente lenta e soffice
+        const time = Date.now() * 0.0008;
         network.setOptions({
           physics: {
             wind: {
@@ -1560,7 +1652,7 @@
       }
     }, 100);
 
-    // Limiti di zoom della telecamera per evitare scatti repentini o perdite di controllo
+    // Limiti dello zoom della telecamera
     let isZooming = false;
     network.on("zoom", () => {
       if (isZooming) return;
@@ -1572,7 +1664,7 @@
       }
     });
 
-    // ---------- neighborhood highlight (Cosmic Aura - No Camera Movement on Hover) ----------
+    // Adjacency per highlight dei nodi confinanti
     const adjacency = {};
     rawNodes.forEach(n => adjacency[n.id] = new Set());
     validEdges.forEach(e => { 
@@ -1585,13 +1677,11 @@
     function highlight(nodeId) {
       if (!adjacency[nodeId]) return;
       const node = rawNodes.find(x => x.id === nodeId);
-      const isWide = node && (node.category === 'giorni' || node.category === 'materie');
+      const isWide = node && (node.category === 'giorni' || node.category === 'materie' || node.id === 'podcast_giorno5');
       
       const keep = new Set([nodeId]);
-      // Primo grado di vicinato
       adjacency[nodeId].forEach(neighborId => {
         keep.add(neighborId);
-        // Se è un insieme ampio, attiva anche il secondo grado di connessione
         if (isWide && adjacency[neighborId]) {
           adjacency[neighborId].forEach(secondNeighborId => {
             keep.add(secondNeighborId);
@@ -1615,7 +1705,7 @@
           shadow: { enabled: on, color: rgba(col, on ? 0.8 : 0), size: on ? 26 : 0 },
           font: { 
             color: on ? (isDarkMode ? '#f1f0fa' : '#0f172a') : 'rgba(150,150,190,0.12)', 
-            size: (n.id === 'programma' || n.id === 'metodo') ? 16 : (safeSize > 22 ? 11.5 : 9.5), 
+            size: (n.id === 'programma' || n.id === 'metodo' || n.id === 'podcast_giorno5') ? 16 : (safeSize > 22 ? 11.5 : 9.5), 
             strokeWidth: on ? 3.5 : 0, 
             strokeColor: isDarkMode ? '#04040a' : '#ffffff' 
           }
@@ -1624,14 +1714,16 @@
       visNodes.update(nodeUpd);
       
       const edgeUpd = validEdges.map((e, i) => {
-        const on = keep.has(e.source) && keep.has(e.target) && (e.source === nodeId || e.target === nodeId || (isWide && (adjacency[nodeId].has(e.source) || adjacency[nodeId].has(e.target))));
+        const isConnected = keep.has(e.source) && keep.has(e.target) && (e.source === nodeId || e.target === nodeId || (isWide && (adjacency[nodeId].has(e.source) || adjacency[nodeId].has(e.target))));
+        const strokeColor = getRelationColor(e.relation, e.source, e.target);
         return { 
           id: i, 
           color: { 
-            color: on ? rgba(baseColor[nodeId], 0.85) : 'rgba(150,150,190,0.04)', 
-            highlight: rgba(baseColor[nodeId], 0.75) 
+            color: isConnected ? strokeColor : 'rgba(150,150,190,0.04)', 
+            highlight: strokeColor,
+            hover: strokeColor
           }, 
-          width: on ? 2.5 : 1 
+          width: isConnected ? 3.0 : 1 
         };
       });
       visEdges.update(edgeUpd);
@@ -1651,26 +1743,29 @@
           shadow: { enabled: true, color: rgba(col, 0.45), size: 16 },
           font: { 
             color: isDarkMode ? '#f1f0fa' : '#0f172a', 
-            size: (n.id === 'programma' || n.id === 'metodo') ? 16 : (safeSize > 22 ? 11.5 : 9.5), 
+            size: (n.id === 'programma' || n.id === 'metodo' || n.id === 'podcast_giorno5') ? 16 : (safeSize > 22 ? 11.5 : 9.5), 
             strokeWidth: 3.5, 
             strokeColor: isDarkMode ? '#04040a' : '#ffffff' 
           } 
         };
       }));
-      visEdges.update(validEdges.map((e, i) => ({ 
-        id: i, 
-        color: { 
-          color: isDarkMode ? 'rgba(150,150,190,0.18)' : 'rgba(100,116,139,0.22)', 
-          highlight: rgba(baseColor[e.source], 0.9) 
-        }, 
-        width: 1 
-      })));
+      visEdges.update(validEdges.map((e, i) => {
+        const strokeColor = getRelationColor(e.relation, e.source, e.target);
+        return { 
+          id: i, 
+          color: { 
+            color: strokeColor, 
+            highlight: strokeColor,
+            hover: strokeColor
+          }, 
+          width: 1.25 
+        };
+      }));
       highlightActive = false;
     }
 
     let filterLocked = false;
     
-    // Mouse hover morbido (nessun movimento di telecamera per evitare sbandamenti)
     network.on('hoverNode', p => { 
       if (!filterLocked) highlight(p.node); 
     });
@@ -1678,7 +1773,7 @@
       if (!filterLocked) clearHighlight(); 
     });
 
-    // ---------- gestione categorie e filtri ----------
+    // Generazione dinamica della barra dei filtri categoria
     const catList = document.getElementById('categories');
     let activeCats = new Set(Object.keys(categories));
     function countByCat(cat) { return rawNodes.filter(n => n.category === cat).length; }
@@ -1717,7 +1812,7 @@
       network.fit({ animation: { duration: 900, easingFunction: 'easeInOutQuad' } });
     });
 
-    // ---------- Practical Search System with Autocomplete ----------
+    // Sistema di ricerca interattiva con autocomplete
     const searchInput = document.getElementById('search');
     const searchClearBtn = document.getElementById('search-clear');
     const autocompleteList = document.getElementById('autocomplete-list');
@@ -1735,18 +1830,15 @@
       searchClearBtn.classList.remove('hidden');
       filterLocked = true;
 
-      // Trova corrispondenze
       const matches = rawNodes.filter(n => 
         (n.label.toLowerCase().includes(q) || (n.description && n.description.toLowerCase().includes(q))) && 
         activeCats.has(n.category)
       );
 
-      // Mostra / Nascondi i nodi corrispondenti sul grafico
       const matchIds = new Set(matches.map(n => n.id));
       visNodes.update(rawNodes.map(n => ({ id: n.id, hidden: !matchIds.has(n.id) })));
       visEdges.update(validEdges.map((e, i) => ({ id: i, hidden: !(matchIds.has(e.source) && matchIds.has(e.target)) })));
 
-      // Genera lista di raccomandazioni / suggerimenti
       if (matches.length > 0) {
         autocompleteList.innerHTML = '';
         matches.slice(0, 8).forEach(item => {
@@ -1754,7 +1846,7 @@
           const row = document.createElement('div');
           row.className = 'flex items-center gap-2.5 p-2.5 cursor-pointer transition text-left hover:bg-white/10 text-xs border-b border-white/5 last:border-b-0';
           row.innerHTML = `
-            <span class="w-2 h-2 rounded-full shrink-0" style="background:${cat.color}; box-shadow: 0 0 6px ${cat.color}"></span>
+            <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${cat.color}; box-shadow: 0 0 6px ${cat.color}"></span>
             <div class="flex-1 overflow-hidden">
               <div class="font-bold text-slate-100 truncate">${item.label}</div>
               <div class="text-[9px] text-slate-400 uppercase tracking-widest truncate">${cat.label}</div>
@@ -1783,7 +1875,6 @@
       network.fit({ animation: { duration: 900, easingFunction: 'easeInOutQuad' } });
     });
 
-    // Chiudi l'autofill se si clicca altrove
     document.addEventListener('click', e => {
       if (!searchInput.contains(e.target) && !autocompleteList.contains(e.target)) {
         autocompleteList.classList.add('hidden');
@@ -1798,7 +1889,6 @@
       showDetail(id);
       addToHistory(id);
 
-      // Su mobile, quando viene selezionato un nodo, mostra e fa lampeggiare il pulsante Dettaglio
       const mobDetailsBtn = document.getElementById('mobile-details-btn');
       if (mobDetailsBtn) {
         mobDetailsBtn.classList.remove('hidden');
@@ -1807,7 +1897,7 @@
       }
     }
 
-    // ---------- Gestione Responsive Drawers (Mobile Sidebars) ----------
+    // Gestione dei drawer e sidebar su mobile
     const leftSidebar = document.getElementById('left-sidebar');
     const rightSidebar = document.getElementById('right-sidebar');
     const backdrop = document.getElementById('sidebar-backdrop');
@@ -1816,7 +1906,7 @@
       if (open) {
         leftSidebar.classList.remove('-translate-x-full');
         backdrop.classList.remove('hidden');
-        rightSidebar.classList.add('translate-x-full'); // chiude l'altra per evitare overlay complessi
+        rightSidebar.classList.add('translate-x-full');
       } else {
         leftSidebar.classList.add('-translate-x-full');
         if (rightSidebar.classList.contains('translate-x-full')) {
@@ -1829,7 +1919,7 @@
       if (open) {
         rightSidebar.classList.remove('translate-x-full');
         backdrop.classList.remove('hidden');
-        leftSidebar.classList.add('-translate-x-full'); // chiude l'altra
+        leftSidebar.classList.add('-translate-x-full');
       } else {
         rightSidebar.classList.add('translate-x-full');
         if (leftSidebar.classList.contains('-translate-x-full')) {
@@ -1843,17 +1933,14 @@
       toggleRightSidebar(false);
     }
 
-    // ---------- Gestione Cronologia Esplorazione ----------
+    // Cronologia locale degli esplorati di recente
     const historyListEl = document.getElementById('history-list');
 
     function addToHistory(id) {
       const n = rawNodes.find(x => x.id === id);
       if (!n) return;
-
-      // Evita duplicati contigui
       if (explorationHistory.length > 0 && explorationHistory[0].id === id) return;
 
-      // Aggiungi in testa alla cronologia
       explorationHistory = [{ id: n.id, label: n.label, color: baseColor[n.id] }, ...explorationHistory.filter(x => x.id !== id)].slice(0, 6);
       renderHistory();
     }
@@ -1879,7 +1966,6 @@
       });
     }
 
-    // ---------- Pannello Dettaglio Interattivo Ricco ----------
     const detailEl = document.getElementById('detail');
     
     function showDetail(nodeId) {
@@ -1904,9 +1990,8 @@
         };
       }).filter(r => r.other);
       
-      // Estrapola il badge della disciplina (materia) se applicabile
       let disciplineLabel = "";
-      if (n.category === 'autori' || n.category === 'concetti_ai' || n.category === 'concetti_cultura' || n.category === 'pilastri') {
+      if (n.category === 'autori' || n.category === 'concetti_ai' || n.category === 'concetti_cultura' || n.category === 'pilastri' || n.category === 'strumenti') {
         const matchesMateria = validEdges.find(e => 
           (e.source === n.id && e.target.startsWith('mat_')) || 
           (e.target === n.id && e.source.startsWith('mat_'))
@@ -1931,14 +2016,15 @@
       
       if (related.length) {
         html += `<div class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mt-4 mb-2">Collegamenti Diretti (${related.length})</div>`;
-        html += `<div class="space-y-1.5 overflow-y-auto max-h-[220px] pr-1">`;
+        html += `<div class="space-y-1.5 overflow-y-auto max-h-[200px] pr-1">`;
         related.forEach(r => {
           const rc = categories[r.other.category] || { color: '#8B7FFF' };
+          const linkColor = getRelationColor(r.relation, nodeId, r.other.id);
           html += `
             <div class="p-2 bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 rounded-xl flex items-center gap-2.5 cursor-pointer transition text-left active:scale-[0.98]" data-goto="${r.other.id}">
               <span class="w-2.5 h-2.5 rounded-full shrink-0 shadow-lg" style="background:${rc.color}; box-shadow: 0 0 8px ${rc.color}aa"></span>
               <div class="flex-1 overflow-hidden">
-                <span class="text-[8px] text-slate-400 uppercase tracking-widest block truncate">${r.dir} ${r.relation}</span>
+                <span class="text-[8px] uppercase tracking-widest block truncate" style="color: ${linkColor}">${r.dir} ${r.relation}</span>
                 <div class="font-bold text-slate-200 text-xs truncate">${r.other.label}</div>
               </div>
             </div>`;
@@ -1948,7 +2034,7 @@
       
       detailEl.innerHTML = html;
       
-      // Navigazione tra nodi tramite pannello
+      // Navigazione rapida tra nodi
       detailEl.querySelectorAll('[data-goto]').forEach(el => {
         el.addEventListener('click', () => {
           const id = el.dataset.goto;
@@ -1957,7 +2043,6 @@
       });
     }
 
-    // Clic per navigazione / focus morbido della camera
     network.on('click', p => { 
       if (p.nodes.length) { 
         selectAndFocusNode(p.nodes[0]);
@@ -1970,7 +2055,7 @@
       } 
     });
 
-    // ---------- Commutatore Tema Giorno/Notte ----------
+    // Cambiatore tema giorno/notte integrato
     const themeToggleBtn = document.getElementById('theme-toggle');
     const sunIcon = document.getElementById('theme-icon-sun');
     const moonIcon = document.getElementById('theme-icon-moon');
@@ -1988,7 +2073,6 @@
         moonIcon.classList.add('hidden');
       }
 
-      // Aggiorna l'aspetto di tutti i nodi e le relazioni SENZA scomporre (usando update)
       const nodeIds = visNodes.getIds();
       const nodeUpdates = nodeIds.map(id => {
         const n = rawNodes.find(x => x.id === id);
@@ -2010,17 +2094,16 @@
       
       visNodes.update(nodeUpdates);
 
-      // Aggiorna colori delle relazioni (archi)
       const edgeIds = visEdges.getIds();
       const edgeUpdates = edgeIds.map(id => {
         const e = validEdges[id];
-        const srcId = e ? e.source : null;
-        const col = srcId ? baseColor[srcId] : '#8B7FFF';
+        const strokeColor = e ? getRelationColor(e.relation, e.source, e.target) : '#8B7FFF';
         return {
           id: id,
           color: {
-            color: isDarkMode ? 'rgba(150,150,190,0.18)' : 'rgba(100,116,139,0.22)',
-            highlight: rgba(col, 0.75)
+            color: strokeColor,
+            highlight: strokeColor,
+            hover: strokeColor
           }
         };
       });
