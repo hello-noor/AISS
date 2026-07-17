@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Cipollotto e le Leggi della Stupidità</title>
+<style>
+  @font-face {
+    font-family: 'RetroFallback';
+    src: local('Courier New');
+  }
+  * { box-sizing: border-box; }
+  html,body {
+    margin:0; padding:0; height:100%;
+    background:#0a0a1a;
+    font-family: 'Press Start 2P', 'Courier New', monospace;
+    color:#fff;
+    overflow:hidden;
+    -webkit-font-smoothing: none;
+  }
+  #wrap {
+    width:100%; height:100%;
+    display:flex; align-items:center; justify-content:center;
+  }
+  #stage {
+    position:relative;
+    width:640px; height:480px;
+    max-width:98vw; max-height:98vh;
+    aspect-ratio: 640/480;
+    background:#000;
+    border:6px solid #3a2b1a;
+    outline:6px solid #7a5230;
+    box-shadow:0 0 0 4px #000, 0 10px 30px rgba(0,0,0,.6);
+    image-rendering: pixelated;
+  }
+  canvas#scene {
+    position:absolute; top:0; left:0; width:100%; height:100%;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
+  .layer {
+    position:absolute; left:0; top:0; width:100%; height:100%;
+    pointer-events:none;
+  }
+  .hud {
+    position:absolute; top:0; left:0; right:0;
+    display:flex; justify-content:space-between;
+    font-size:10px; letter-spacing:1px;
+    text-shadow:2px 2px 0 #000;
+    pointer-events:none;
+    background:rgba(10,10,26,0.55);
+    padding:8px;
+  }
+  .hearts span { color:#ff4d6d; margin-right:2px; }
+  .hearts span.empty { color:#3a2b3a; }
+  #titleScreen, #endScreen, #overScreen {
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    background:radial-gradient(ellipse at center, #1a2f5c 0%, #0a0a1a 80%);
+    text-align:center; padding:20px;
+  }
+  #titleScreen h1, #endScreen h1, #overScreen h1 {
+    font-size:20px; color:#ffd54f; text-shadow:3px 3px 0 #7a3b00;
+    margin-bottom:14px; line-height:1.6;
+  }
+  #titleScreen p, #endScreen p, #overScreen p {
+    font-size:9px; color:#cfd8ff; line-height:1.9; max-width:480px;
+  }
+  .blinker { animation: blink 1s steps(1) infinite; margin-top:22px; font-size:11px; color:#fff; }
+  @keyframes blink { 50% { opacity:0; } }
+  button.retro {
+    font-family:inherit; font-size:9px; color:#fff; cursor:pointer;
+    background:#c0392b; border:none; padding:8px 14px;
+    border-bottom:4px solid #6e1c12; border-right:3px solid #6e1c12;
+    margin:4px; letter-spacing:1px;
+  }
+  button.retro:active { border-bottom:2px solid #6e1c12; border-right:1px solid #6e1c12; transform:translateY(3px); }
+  button.retro.blue { background:#2266cc; border-color:#123a6e; }
+  button.retro.green { background:#2f9e44; border-color:#1a5c27; }
+  #dialogueBox {
+    position:absolute; left:16px; right:16px; bottom:6px;
+    min-height:86px;
+    background:#0d1b2a; border:3px solid #fff; box-shadow: inset 0 0 0 3px #123;
+    padding:10px 13px; font-size:11px; line-height:1.6; color:#eaf2ff;
+    display:none;
+  }
+  #dialogueBox .who { color:#ffd54f; margin-bottom:8px; display:block; }
+  #choices { margin-top:7px; display:flex; flex-wrap:wrap; gap:6px; }
+  #choices button { flex:1 1 45%; text-align:left; font-size:9px; padding:7px 10px; }
+  #nextBtnRow { text-align:right; margin-top:6px; }
+  #matrixOverlay {
+    position:absolute; top:60px; left:50%; transform:translateX(-50%);
+    width:190px; background:#0d1b2a; border:3px solid #ffd54f; padding:6px;
+    display:none; font-size:5px; line-height:1.2;
+  }
+  #matrixGrid { display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; gap:3px; margin-top:4px; }
+  #matrixGrid div {
+    background:#1a2f4a; padding:6px 3px; text-align:center; border:1px solid #33507a;
+  }
+  #matrixGrid div.correct { background:#2f9e44; border-color:#a4e8a4; color:#fff; }
+  #matrixGrid div.wrong { background:#c0392b; border-color:#ffb3b3; color:#fff; }
+  #lawBanner {
+    position:absolute; top:34px; left:50%; transform:translateX(-50%);
+    font-size:9px; color:#ffd54f; text-shadow:2px 2px 0 #000; text-align:center;
+    background:rgba(10,10,26,0.75); padding:4px 10px; border:2px solid #ffd54f;
+    display:none; white-space:nowrap;
+  }
+  #muteBtn {
+    position:absolute; bottom:8px; right:8px; font-size:8px;
+    background:#333; color:#fff; border:2px solid #666; padding:6px 8px; cursor:pointer;
+    font-family:inherit;
+  }
+  #recap { text-align:left; font-size:8px; line-height:1.8; max-width:520px; max-height:220px; overflow-y:auto; margin-top:10px; }
+  #recap div { margin-bottom:8px; }
+  .lawtag { color:#ffd54f; }
+  #runUI {
+    position:absolute; bottom:14px; left:0; right:0;
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+  }
+  #runHint {
+    font-size:8px; color:#fff; text-shadow:2px 2px 0 #000;
+    background:rgba(10,10,26,0.6); padding:5px 9px; text-align:center;
+  }
+  #jumpBtn { font-size:12px; padding:12px 22px; }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="stage">
+    <canvas id="scene" width="640" height="480"></canvas>
+
+    <div id="titleScreen">
+      <h1>CIPOLLOTTO<br>e le Leggi della<br>Stupidità Umana</h1>
+      <p>Un'avventura 8-bit ispirata alle Leggi Fondamentali della Stupidità Umana di Carlo M. Cipolla. Attraversa il villaggio, incontra intelligenti, sprovveduti, banditi e stupidi... e imparali a riconoscerli prima che sia troppo tardi.</p>
+      <button class="retro" id="startBtn">▶ INIZIA L'AVVENTURA</button>
+    </div>
+
+    <div class="layer" id="hudLayer">
+      <div class="hud">
+        <div class="hearts" id="heartsBox"></div>
+        <div id="levelLabel">LIVELLO 0/6</div>
+        <div id="scoreLabel">SAGGEZZA: 0</div>
+      </div>
+      <div id="lawBanner"></div>
+    </div>
+
+    <div id="matrixOverlay">
+      <div style="text-align:center; color:#ffd54f;">LA MATRICE DI CIPOLLA</div>
+      <div id="matrixGrid">
+        <div id="cell-sprovveduto">SPROVVEDUTO<br><small>perde lui, guadagnano gli altri</small></div>
+        <div id="cell-intelligente">INTELLIGENTE<br><small>guadagnano entrambi</small></div>
+        <div id="cell-stupido">STUPIDO<br><small>perdono entrambi</small></div>
+        <div id="cell-bandito">BANDITO<br><small>guadagna lui, perdono gli altri</small></div>
+      </div>
+    </div>
+
+    <div id="dialogueBox">
+      <span class="who" id="dlgWho"></span>
+      <span id="dlgText"></span>
+      <div id="choices"></div>
+      <div id="nextBtnRow"></div>
+    </div>
+
+    <div id="runUI" style="display:none;">
+      <div id="runHint">PREMI SPAZIO O TOCCA "SALTA!" PER SUPERARE GLI OSTACOLI</div>
+      <button class="retro" id="jumpBtn">⬆ SALTA!</button>
+    </div>
+
+    <div id="endScreen" style="display:none;">
+      <h1>FINE DEL VIAGGIO</h1>
+      <p id="endSummary"></p>
+      <div id="recap"></div>
+      <button class="retro green" id="restartBtn2">▶ RIGIOCA</button>
+    </div>
+
+    <div id="overScreen" style="display:none;">
+      <h1>SOPRAFFATTO DALLA<br>STUPIDITÀ!</h1>
+      <p>Come insegna la Quarta Legge: chi non è stupido sottovaluta sempre il potenziale nocivo degli stupidi. Ritenta, sarai più prudente.</p>
+      <button class="retro" id="restartBtn">▶ RITENTA</button>
+    </div>
+
+    <button id="muteBtn">🔊 AUDIO</button>
+  </div>
+</div>
+
+<script>
+/* ============ AUDIO: tiny 8-bit chiptune engine (original melody) ============ */
+let actx = null, musicOn = true, musicTimer = null, musicStep = 0;
+const melody = [523,523,0,523,0,392,523,0,659,0,0,0,392,0,0,0,
+                 523,523,0,523,0,392,523,0,659,0,0,0,523,0,0,0,
+                 587,587,0,587,0,494,587,0,698,0,880,0,0,0,0,0,
+                 659,0,523,0,440,0,392,0,349,0,392,0,440,0,0,0];
+const bass   = [131,0,131,0,196,0,196,0,175,0,175,0,196,0,196,0,
+                131,0,131,0,196,0,196,0,175,0,175,0,196,0,196,0,
+                147,0,147,0,220,0,220,0,196,0,196,0,220,0,220,0,
+                131,0,131,0,175,0,175,0,147,0,147,0,131,0,131,0];
+
+function beep(freq, dur, type, vol){
+  if(!actx || !freq || !musicOn) return;
+  const osc = actx.createOscillator();
+  const gain = actx.createGain();
+  osc.type = type;
+  osc.frequency.value = freq;
+  gain.gain.setValueAtTime(vol, actx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + dur);
+  osc.connect(gain); gain.connect(actx.destination);
+  osc.start();
+  osc.stop(actx.currentTime + dur);
+}
+function musicTick(){
+  if(musicOn){
+    beep(melody[musicStep % melody.length], 0.14, 'square', 0.05);
+    beep(bass[musicStep % bass.length], 0.16, 'triangle', 0.06);
+  }
+  musicStep++;
+}
+function startMusic(){
+  if(!actx) actx = new (window.AudioContext||window.webkitAudioContext)();
+  if(musicTimer) clearInterval(musicTimer);
+  musicTimer = setInterval(musicTick, 150);
+}
+function sfx(type){
+  if(!actx) return;
+  if(type==='correct'){ beep(880,0.08,'square',0.08); setTimeout(()=>beep(1174,0.12,'square',0.08),80); }
+  if(type==='wrong'){ beep(196,0.2,'sawtooth',0.08); setTimeout(()=>beep(140,0.25,'sawtooth',0.08),100); }
+  if(type==='step'){ beep(300+Math.random()*80,0.04,'square',0.03); }
+  if(type==='select'){ beep(660,0.06,'square',0.06); }
+  if(type==='jump'){ beep(520,0.09,'square',0.06); setTimeout(()=>beep(700,0.07,'square',0.05),60); }
+  if(type==='dig'){ beep(150,0.12,'square',0.05); }
+  if(type==='popup'){ beep(740,0.06,'triangle',0.06); setTimeout(()=>beep(980,0.09,'triangle',0.06),70); }
+}
+document.getElementById('muteBtn').onclick = ()=>{
+  musicOn = !musicOn;
+  document.getElementById('muteBtn').textContent = musicOn ? '🔊 AUDIO' : '🔇 MUTO';
+};
+
+/* ============ CANVAS SETUP ============ */
+const canvas = document.getElementById('scene');
+const ctx = canvas.getContext('2d');
+ctx.imageSmoothingEnabled = false;
+const W = canvas.width, H = canvas.height;
+
+let bgOffset = 0;
+let playerX = 60, playerHop = 0, walking = false, npcX = 480;
+let frame = 0;
+let dustParticles = [];
+
+/* Interactive jump-path (percorso a ostacoli) */
+const PLAYER_TRACK_X = 150;
+let inRunPhase = false;
+let runObstacles = [];
+let runObstaclesTotal = 3;
+let runObstaclesSpawned = 0;
+let runSpawnTimer = 0;
+let runSpawnInterval = 70;
+const runSpeed = 5;
+let onRunComplete = null;
+let isOnGround = true;
+let jumpVelocity = 0;
+const GRAVITY = 2.4;
+const JUMP_FORCE = -23;
+let playerJumpY = 0;
+
+function spawnDust(x,y,color,count){
+  count = count || 6;
+  for(let i=0;i<count;i++){
+    dustParticles.push({
+      x:x+(Math.random()*10-5), y:y+(Math.random()*6-3),
+      vx:(Math.random()*2-1), vy:-Math.random()*2-1,
+      life: 18+Math.random()*10, color:color
+    });
+  }
+}
+function triggerJump(){
+  if(inRunPhase && isOnGround){
+    isOnGround = false;
+    jumpVelocity = JUMP_FORCE;
+    sfx('jump');
+  }
+}
+function showRunUI(){ document.getElementById('runUI').style.display='block'; }
+function hideRunUI(){ document.getElementById('runUI').style.display='none'; }
+document.addEventListener('keydown', e=>{
+  if(e.code === 'Space'){ e.preventDefault(); triggerJump(); }
+});
+
+function drawSky(){
+  const grad = ctx.createLinearGradient(0,0,0,H);
+  grad.addColorStop(0,'#4aa8ff');
+  grad.addColorStop(1,'#bfe8ff');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0,0,W,H);
+  // sun
+  ctx.fillStyle = '#fff3b0';
+  ctx.fillRect(40,40,48,48);
+  ctx.fillStyle = '#ffd54f';
+  ctx.fillRect(48,48,32,32);
+  // clouds (parallax)
+  ctx.fillStyle = '#ffffff';
+  for(let i=0;i<4;i++){
+    const cx = ((i*220 - bgOffset*0.3) % (W+200)) - 100;
+    drawCloud(cx, 70 + (i%2)*40);
+  }
+}
+function drawCloud(x,y){
+  ctx.fillRect(x,y,60,16);
+  ctx.fillRect(x+12,y-10,40,16);
+  ctx.fillRect(x+30,y-16,24,12);
+}
+function drawHills(){
+  ctx.fillStyle = '#5fbf5f';
+  for(let i=0;i<5;i++){
+    const hx = ((i*260 - bgOffset*0.6) % (W+300)) - 150;
+    ctx.beginPath();
+    ctx.moveTo(hx,300);
+    ctx.lineTo(hx+90,220);
+    ctx.lineTo(hx+180,300);
+    ctx.fill();
+  }
+}
+function drawGround(){
+  ctx.fillStyle = '#8a5a2b';
+  ctx.fillRect(0,300,W,180);
+  ctx.fillStyle = '#6b3f18';
+  const tile = 24;
+  const off = Math.floor(bgOffset) % tile;
+  for(let x=-off; x<W; x+=tile){
+    for(let y=300; y<H; y+=tile){
+      ctx.strokeStyle = '#4a2c10';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x,y,tile,tile);
+    }
+  }
+  ctx.fillStyle = '#4fae4f';
+  ctx.fillRect(0,292,W,10);
+}
+function drawBush(x,y,scale){
+  ctx.fillStyle = '#2f8f2f';
+  ctx.fillRect(x,y,18*scale,12*scale);
+  ctx.fillRect(x-6*scale,y+4*scale,10*scale,8*scale);
+  ctx.fillRect(x+14*scale,y+4*scale,10*scale,8*scale);
+}
+
+/* onion hero sprite, drawn procedurally, two "hop" poses */
+function drawOnionHero(x, y, hop, facing, extraYOffset){
+  extraYOffset = extraYOffset || 0;
+  ctx.save();
+  ctx.translate(x,y + extraYOffset);
+  const squish = 1 - Math.abs(Math.sin(hop))*0.12;
+  ctx.translate(0, Math.abs(Math.sin(hop))*-10);
+  // shadow
+  ctx.fillStyle = 'rgba(0,0,0,0.25)';
+  ctx.beginPath(); ctx.ellipse(0, 46, 20, 6, 0,0,Math.PI*2); ctx.fill();
+  // legs
+  ctx.fillStyle = '#3a2b1a';
+  const legOffset = Math.sin(hop)*6;
+  ctx.fillRect(-14, 30, 10, 14 - legOffset);
+  ctx.fillRect(4, 30, 10, 14 + legOffset);
+  // body (onion bulb)
+  ctx.fillStyle = '#f7e7b4';
+  ctx.beginPath();
+  ctx.ellipse(0, 4, 26*squish, 30/squish, 0,0,Math.PI*2);
+  ctx.fill();
+  ctx.strokeStyle = '#d8b25a'; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.ellipse(0,4,26*squish,30/squish,0,0,Math.PI*2); ctx.stroke();
+  // sprout
+  ctx.fillStyle = '#4fae4f';
+  ctx.fillRect(-4,-40,4,16);
+  ctx.fillRect(4,-38,4,14);
+  // face
+  ctx.fillStyle = '#2b1a0a';
+  const blink = (frame%140<6) ? 1 : 6;
+  ctx.fillRect(-10*facing-4,-2,6,blink);
+  ctx.fillRect(4*facing-2,-2,6,blink);
+  ctx.fillRect(-6,10,12,3); // mouth
+  // cap
+  ctx.fillStyle = '#c0392b';
+  ctx.beginPath(); ctx.ellipse(0,-16,20,8,0,0,Math.PI*2); ctx.fill();
+  ctx.fillRect(-18,-20,36,8);
+  ctx.restore();
+}
+
+/* generic NPC villager sprite, color-customizable */
+function drawVillager(x,y,hatColor,bodyColor,bob){
+  ctx.save();
+  ctx.translate(x, y + Math.sin(bob)*4);
+  ctx.fillStyle='rgba(0,0,0,0.25)';
+  ctx.beginPath(); ctx.ellipse(0,46,20,6,0,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#e8b98a';
+  ctx.fillRect(-10,-6,20,24); // head/neck area skin
+  ctx.fillStyle = bodyColor;
+  ctx.fillRect(-16,16,32,26); // tunic
+  ctx.fillStyle = '#2b1a0a';
+  ctx.fillRect(-6,0,4,4); ctx.fillRect(4,0,4,4); // eyes
+  ctx.fillRect(-4,10,8,2); // mouth
+  ctx.fillStyle = hatColor;
+  ctx.beginPath(); ctx.ellipse(0,-14,16,8,0,0,Math.PI*2); ctx.fill();
+  ctx.fillRect(-14,-16,28,6);
+  ctx.restore();
+}
+
+function renderScene(){
+  drawSky();
+  drawHills();
+  drawGround();
+  drawBush(60,286,1.4);
+  drawBush(560,282,1.1);
+  drawBush(300,290,1.6);
+
+  // obstacles approaching along the path
+  runObstacles.forEach(o=>{
+    ctx.fillStyle = '#8a8a8a';
+    ctx.fillRect(o.x-11, 274, 26, 34);
+    ctx.fillStyle = '#a9a9a9';
+    ctx.fillRect(o.x-11, 274, 26, 6);
+    ctx.fillStyle = '#5f5f5f';
+    ctx.fillRect(o.x-11, 300, 26, 8);
+  });
+
+  if(state.showNpc){
+    drawVillager(npcX, 268, state.npcHatColor, state.npcBodyColor, frame/25);
+  }
+
+  drawOnionHero(playerX, 268, playerHop, 1, playerJumpY);
+
+  // dust particles
+  dustParticles.forEach(p=>{
+    ctx.fillStyle = p.color;
+    ctx.fillRect(p.x, p.y, 3, 3);
+  });
+}
+
+/* ============ GAME DATA ============ */
+const HAT_COLORS = ['#2266cc','#7a3fae','#e07b39','#3f8f6f','#b03fae','#cc4444'];
+const encounters = [
+  {
+    name:"Il Vecchio Fabbro Ubriaco",
+    law:"PRIMA LEGGE",
+    lawText:"Sempre e inevitabilmente ognuno di noi sottovaluta il numero di individui stupidi in circolazione.",
+    story:"Il fabbro, senza alcun motivo, ha appena rovesciato un carro di ferri infuocati sulla strada del mercato. Non ne ha ricavato nulla: ha perso il carico e ora deve pagare i danni. Il villaggio è nel caos.",
+    correct:'stupido',
+    explain:"Ha causato un danno agli altri senza alcun guadagno per sé, anzi perdendoci pure lui: è la definizione stessa di STUPIDO secondo Cipolla. E come dice la Prima Legge, ne troverai molti più di quanti pensi."
+  },
+  {
+    name:"La Dama Istruita",
+    law:"SECONDA LEGGE",
+    lawText:"La probabilità che una persona sia stupida è indipendente da qualsiasi altra sua caratteristica.",
+    story:"Nonostante i suoi titoli e la sua eleganza, la dama ha appena firmato un contratto senza leggerlo, rovinando sia i suoi affari che quelli del suo socio, senza alcun vantaggio per nessuno.",
+    correct:'stupido',
+    explain:"Istruzione, ricchezza o rango non proteggono dalla stupidità: la Seconda Legge dice che il tasso di stupidità è costante in ogni gruppo sociale, dai nobili ai contadini."
+  },
+  {
+    name:"Il Cavaliere Generoso",
+    law:"LA MATRICE",
+    lawText:"La matrice di Cipolla misura il guadagno o la perdita per sé e per gli altri.",
+    story:"Il cavaliere ha donato tutto il suo tesoro per salvare il villaggio da un'inondazione, restando lui stesso in povertà. Il villaggio ora prospera, ma lui ha perso tutto.",
+    correct:'sprovveduto',
+    explain:"Perdita per sé, guadagno per gli altri: questo è lo SPROVVEDUTO (o 'ingenuo'), non uno stupido! Cipolla lo distingue chiaramente: chi si sacrifica senza calcolo non è stupido, è solo... poco previdente."
+  },
+  {
+    name:"Il Mercante Astuto",
+    law:"LA MATRICE",
+    lawText:"La matrice di Cipolla misura il guadagno o la perdita per sé e per gli altri.",
+    story:"Il mercante ha venduto grano avariato spacciandolo per fresco, intascando una fortuna mentre l'intero villaggio si ammalava.",
+    correct:'bandito',
+    explain:"Guadagno per sé, perdita per gli altri: è un BANDITO. Razionale, calcolatore, dannoso — ma prevedibile. Con un bandito, almeno, sai cosa aspettarti."
+  },
+  {
+    name:"La Guaritrice Saggia",
+    law:"LA MATRICE",
+    lawText:"La matrice di Cipolla misura il guadagno o la perdita per sé e per gli altri.",
+    story:"La guaritrice ha curato l'intero villaggio dalla peste, guadagnando una giusta paga e la gratitudine di tutti. Tutti ci hanno guadagnato.",
+    correct:'intelligente',
+    explain:"Guadagno per sé, guadagno per gli altri: questa è la persona INTELLIGENTE secondo Cipolla. Le azioni più preziose per la società, dice Cipolla, sono quelle a somma positiva."
+  }
+];
+const boss = {
+  name:"Il Buffone Supremo",
+  law:"QUARTA E QUINTA LEGGE",
+  lawText:"I non-stupidi sottovalutano sempre il potere nocivo degli stupidi, che sono il tipo di persona più pericoloso che esista.",
+  story:"Il Buffone semina caos ovunque vada: incendia granai, rovescia carri, insulta alleati — senza alcun piano, senza alcun guadagno, nemmeno per sé. Il villaggio si chiede come affrontarlo.",
+  question:"Qual è la strategia più saggia secondo Cipolla per gestire una persona stupida?",
+  choicesBoss:[
+    {text:"Ragionare con lui con calma e logica", ok:false, fb:"Non funziona: lo stupido agisce senza un piano razionale, quindi non è raggiungibile con argomentazioni logiche."},
+    {text:"Ignorarlo e sperare che smetta da solo", ok:false, fb:"Rischioso: Cipolla avverte che sottovalutiamo sempre il potenziale nocivo di uno stupido — ignorarlo non basta a proteggersi."},
+    {text:"Riconoscerne per tempo il potenziale distruttivo ed evitare di entrare nella sua orbita d'azione", ok:true, fb:"Esatto! Non puoi prevedere né correggere le azioni di uno stupido. La difesa migliore è riconoscerlo presto e restare fuori dalla sua traiettoria di danno."},
+    {text:"Allearsi con lui per usarlo a proprio vantaggio", ok:false, fb:"Pericolosissimo: uno stupido è dannoso in modo casuale e imprevedibile, persino per i suoi alleati — non è uno strumento controllabile."}
+  ]
+};
+
+/* ============ GAME STATE ============ */
+const state = {
+  idx:0, score:0, lives:3, showNpc:false,
+  npcHatColor:'#2266cc', npcBodyColor:'#996633', phase:'title', results:[]
+};
+
+function updateHUD(){
+  document.getElementById('levelLabel').textContent = 'LIVELLO ' + Math.min(state.idx, encounters.length+1) + '/' + (encounters.length+1);
+  document.getElementById('scoreLabel').textContent = 'SAGGEZZA: ' + state.score;
+  const hb = document.getElementById('heartsBox');
+  hb.innerHTML = '';
+  for(let i=0;i<3;i++){
+    const s = document.createElement('span');
+    s.textContent = '♥';
+    if(i>=state.lives) s.className='empty';
+    hb.appendChild(s);
+  }
+}
+
+function showLawBanner(law){
+  const b = document.getElementById('lawBanner');
+  b.textContent = law;
+  b.style.display='block';
+}
+function hideLawBanner(){ document.getElementById('lawBanner').style.display='none'; }
+
+function startEncounterWalk(cb, obstacleCount){
+  state.showNpc = false;
+  playerX = PLAYER_TRACK_X;
+  isOnGround = true; jumpVelocity = 0; playerJumpY = 0;
+  runObstacles = []; runObstaclesSpawned = 0; runSpawnTimer = 0;
+  runObstaclesTotal = obstacleCount || 3;
+  walking = true;
+  inRunPhase = true;
+  showRunUI();
+
+  onRunComplete = ()=>{
+    npcX = 720;
+    state.showNpc = true;
+    state.npcHatColor = HAT_COLORS[state.idx % HAT_COLORS.length];
+    const iv = setInterval(()=>{
+      if(playerX < 300){ playerX += 6; sfx('step'); }
+      if(npcX > 470){ npcX -= 5; }
+      if(playerX >= 300 && npcX <= 470){
+        clearInterval(iv);
+        walking = false;
+        cb();
+      }
+    }, 30);
+  };
+}
+
+function resetWalkPositions(){ /* posizione iniziale gestita da startEncounterWalk */ }
+
+function showDialogue(who, text, choicesArr, onNext){
+  const box = document.getElementById('dialogueBox');
+  box.style.display='block';
+  document.getElementById('dlgWho').textContent = who;
+  document.getElementById('dlgText').textContent = text;
+  const cWrap = document.getElementById('choices');
+  const nWrap = document.getElementById('nextBtnRow');
+  cWrap.innerHTML=''; nWrap.innerHTML='';
+  if(choicesArr){
+    choicesArr.forEach(c=>{
+      const btn = document.createElement('button');
+      btn.className='retro blue';
+      btn.textContent = c.text;
+      btn.onclick = ()=>{ sfx('select'); c.action(); };
+      cWrap.appendChild(btn);
+    });
+  }
+  if(onNext){
+    const btn = document.createElement('button');
+    btn.className='retro green';
+    btn.textContent = 'CONTINUA ▶';
+    btn.onclick = ()=>{ sfx('select'); onNext(); };
+    nWrap.appendChild(btn);
+  }
+}
+function hideDialogue(){ document.getElementById('dialogueBox').style.display='none'; }
+
+function showMatrix(correctType, chosenType){
+  const overlay = document.getElementById('matrixOverlay');
+  overlay.style.display='block';
+  ['sprovveduto','intelligente','stupido','bandito'].forEach(t=>{
+    const el = document.getElementById('cell-'+t);
+    el.classList.remove('correct','wrong');
+    if(t===correctType) el.classList.add('correct');
+    else if(t===chosenType) el.classList.add('wrong');
+  });
+}
+function hideMatrix(){ document.getElementById('matrixOverlay').style.display='none'; }
+
+function runEncounter(){
+  const enc = encounters[state.idx];
+  if(!enc){ runBoss(); return; }
+  showLawBanner(enc.law);
+  resetWalkPositions();
+  hideDialogue(); hideMatrix();
+  updateHUD();
+  startEncounterWalk(()=>{
+    showDialogue(enc.name, enc.story, null, ()=>{
+      showDialogue(enc.name, "Che tipo di persona è, secondo la classificazione di Cipolla?", [
+        {text:'Intelligente', action:()=>answer('intelligente', enc)},
+        {text:'Sprovveduto', action:()=>answer('sprovveduto', enc)},
+        {text:'Bandito', action:()=>answer('bandito', enc)},
+        {text:'Stupido', action:()=>answer('stupido', enc)}
+      ], null);
+    });
+  });
+}
+
+function answer(chosen, enc){
+  const correct = chosen === enc.correct;
+  showMatrix(enc.correct, chosen);
+  if(correct){ state.score += 20; sfx('correct'); }
+  else { state.lives -= 1; sfx('wrong'); }
+  updateHUD();
+  state.results.push({name:enc.name, law:enc.law, correct});
+  showDialogue(enc.name, (correct ? "✔ CORRETTO! " : "✘ NON PROPRIO. ") + enc.explain, null, ()=>{
+    hideMatrix();
+    if(state.lives <= 0){ gameOver(); return; }
+    state.idx++;
+    runEncounter();
+  });
+}
+
+function runBoss(){
+  showLawBanner(boss.law);
+  resetWalkPositions();
+  hideDialogue(); hideMatrix();
+  state.npcHatColor = '#ffd54f';
+  startEncounterWalk(()=>{
+    showDialogue(boss.name, boss.story, null, ()=>{
+      showDialogue(boss.name, boss.question, boss.choicesBoss.map(c=>({
+        text:c.text,
+        action:()=>bossAnswer(c)
+      })), null);
+    });
+  }, 4);
+}
+function bossAnswer(c){
+  if(c.ok){ state.score += 40; sfx('correct'); }
+  else { state.lives -= 1; sfx('wrong'); }
+  updateHUD();
+  state.results.push({name:boss.name, law:boss.law, correct:c.ok});
+  showDialogue(boss.name, (c.ok?"✔ SAGGIA SCELTA! ":"✘ ATTENZIONE. ") + c.fb, null, ()=>{
+    if(state.lives<=0){ gameOver(); return; }
+    endGame();
+  });
+}
+
+function gameOver(){
+  hideDialogue(); hideMatrix(); hideLawBanner();
+  document.getElementById('overScreen').style.display='flex';
+}
+function endGame(){
+  hideDialogue(); hideMatrix(); hideLawBanner();
+  const es = document.getElementById('endScreen');
+  document.getElementById('endSummary').textContent =
+    'Hai concluso il viaggio con ' + state.score + ' punti Saggezza e ' + state.lives + ' vite rimaste. '+
+    'Ecco cosa hai imparato lungo la strada:';
+  const recap = document.getElementById('recap');
+  recap.innerHTML='';
+  const laws = [
+    "1ª Legge — Sottovalutiamo sempre il numero di stupidi in circolazione.",
+    "2ª Legge — La probabilità che una persona sia stupida è indipendente da ogni sua altra caratteristica.",
+    "3ª Legge — Uno stupido causa un danno ad altri senza guadagno per sé, spesso perdendoci pure lui.",
+    "4ª Legge — I non-stupidi sottovalutano sempre il potenziale nocivo degli stupidi.",
+    "5ª Legge — La persona stupida è il tipo di persona più pericoloso che esista."
+  ];
+  laws.forEach(l=>{
+    const d = document.createElement('div');
+    d.innerHTML = '<span class="lawtag">▸</span> ' + l;
+    recap.appendChild(d);
+  });
+  es.style.display='flex';
+}
+
+function resetGame(){
+  state.idx=0; state.score=0; state.lives=3; state.results=[]; state.showNpc=false;
+  inRunPhase = false; runObstacles = []; hideRunUI();
+  document.getElementById('overScreen').style.display='none';
+  document.getElementById('endScreen').style.display='none';
+  updateHUD();
+  runEncounter();
+}
+
+/* ============ MAIN LOOP ============ */
+function loop(){
+  frame++;
+  bgOffset += walking ? 3 : 0.4;
+  playerHop += walking ? 0.35 : 0.05;
+
+  if(inRunPhase){
+    // spawn obstacles
+    runSpawnTimer++;
+    if(runObstaclesSpawned < runObstaclesTotal && runSpawnTimer > runSpawnInterval){
+      runObstacles.push({x:700, prevX:700, resolved:false});
+      runObstaclesSpawned++;
+      runSpawnTimer = 0;
+      runSpawnInterval = 55 + Math.random()*35;
+    }
+    // move obstacles
+    runObstacles.forEach(o=>{ o.prevX = o.x; o.x -= runSpeed; });
+    // detect crossing = the exact moment an obstacle reaches Cipollotto
+    runObstacles.forEach(o=>{
+      if(!o.resolved && o.prevX >= PLAYER_TRACK_X && o.x < PLAYER_TRACK_X){
+        o.resolved = true;
+        if(playerJumpY <= -20){
+          state.score += 5;
+          spawnDust(PLAYER_TRACK_X, 310, '#ffd54f', 5);
+        } else {
+          state.lives -= 1;
+          spawnDust(PLAYER_TRACK_X, 300, '#c0392b', 8);
+          sfx('wrong');
+        }
+        updateHUD();
+        if(state.lives <= 0){
+          inRunPhase = false;
+          hideRunUI();
+          gameOver();
+        }
+      }
+    });
+    runObstacles = runObstacles.filter(o=>o.x > -60);
+    // path complete
+    if(inRunPhase && runObstaclesSpawned >= runObstaclesTotal && runObstacles.length === 0){
+      inRunPhase = false;
+      hideRunUI();
+      if(onRunComplete){ const cb = onRunComplete; onRunComplete = null; cb(); }
+    }
+  }
+
+  // jump physics (gravity pulls Cipollotto back down)
+  if(!isOnGround){
+    playerJumpY += jumpVelocity;
+    jumpVelocity += GRAVITY;
+    if(playerJumpY >= 0){ playerJumpY = 0; isOnGround = true; jumpVelocity = 0; }
+  }
+
+  // dust particle physics
+  dustParticles.forEach(p=>{ p.x += p.vx; p.y += p.vy; p.vy += 0.15; p.life--; });
+  dustParticles = dustParticles.filter(p=>p.life > 0);
+
+  renderScene();
+  requestAnimationFrame(loop);
+}
+
+document.getElementById('startBtn').onclick = ()=>{
+  document.getElementById('titleScreen').style.display='none';
+  startMusic();
+  updateHUD();
+  runEncounter();
+};
+document.getElementById('restartBtn').onclick = resetGame;
+document.getElementById('restartBtn2').onclick = resetGame;
+document.getElementById('jumpBtn').onclick = triggerJump;
+
+loop();
+</script>
+</body>
+</html>

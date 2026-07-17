@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L'Ascesa — Cronaca Evolutiva</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#141d17;
+    --panel:#1c2a20;
+    --panel-alt:#22301f;
+    --ink:#e9e1c8;
+    --muted:#98a58b;
+    --gold:#c79a4b;
+    --gold-dim:#8a6f3a;
+    --rust:#9a4a2e;
+    --rust-bright:#c9603a;
+    --teal:#4a7a6e;
+    --line: rgba(233,225,200,0.14);
+    --shadow: 0 10px 30px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse at 15% -10%, rgba(199,154,75,0.10), transparent 55%),
+      radial-gradient(ellipse at 100% 110%, rgba(74,122,110,0.12), transparent 50%),
+      var(--bg);
+    color:var(--ink);
+    font-family:'Bitter', serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  #app{
+    max-width:1080px;
+    margin:0 auto;
+    padding:28px 20px 60px;
+  }
+
+  /* ---------- Header & timeline ---------- */
+  header.top{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom:18px;
+    flex-wrap:wrap;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin:0 0 4px;
+  }
+  h1.title{
+    font-size:clamp(28px,4vw,40px);
+    margin:0;
+    font-weight:900;
+    letter-spacing:-0.01em;
+    color:var(--ink);
+  }
+  .run-score{
+    text-align:right;
+    font-family:'IBM Plex Mono', monospace;
+    color:var(--muted);
+    font-size:12px;
+  }
+  .run-score b{color:var(--gold); font-size:16px; display:block;}
+
+  .strata{
+    display:flex;
+    gap:6px;
+    margin-bottom:26px;
+  }
+  .strata-era{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .strata-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--muted);
+    display:flex;
+    justify-content:space-between;
+  }
+  .strata-era.current .strata-label{color:var(--gold);}
+  .strata-ticks{display:flex; gap:3px;}
+  .tick{
+    height:10px;
+    flex:1;
+    background:rgba(233,225,200,0.08);
+    border-radius:2px;
+    transition:background .3s;
+  }
+  .tick.filled{background:var(--era-color, var(--gold));}
+  .tick.boss{border-radius:2px; box-shadow:inset 0 0 0 1px rgba(0,0,0,0.25);}
+
+  /* ---------- Layout ---------- */
+  .stage{
+    display:grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap:20px;
+    align-items:start;
+  }
+  @media (max-width:760px){
+    .stage{grid-template-columns:1fr;}
+  }
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    box-shadow:var(--shadow);
+  }
+
+  /* ---------- Event panel ---------- */
+  .event-panel{
+    padding:26px;
+    min-height:420px;
+    display:flex;
+    flex-direction:column;
+  }
+  .event-kicker{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin:0 0 8px;
+  }
+  .event-title{
+    font-size:24px;
+    font-weight:700;
+    margin:0 0 10px;
+    line-height:1.25;
+  }
+  .event-desc{
+    color:var(--muted);
+    line-height:1.6;
+    margin:0 0 22px;
+    font-size:15px;
+  }
+  .choices{
+    display:grid;
+    gap:12px;
+    margin-top:auto;
+  }
+  .choice-btn{
+    background:var(--panel-alt);
+    border:1px solid var(--line);
+    color:var(--ink);
+    text-align:left;
+    padding:14px 16px;
+    border-radius:8px;
+    cursor:pointer;
+    font-family:'Bitter', serif;
+    font-size:15px;
+    transition:transform .12s, border-color .12s, background .12s;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+  }
+  .choice-btn:hover{border-color:var(--gold); background:#283a26;}
+  .choice-btn:focus-visible{outline:2px solid var(--gold); outline-offset:2px;}
+  .choice-btn:active{transform:scale(0.99);}
+  .choice-sub{font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--muted); white-space:nowrap;}
+
+  .trait-cards{
+    display:grid;
+    gap:12px;
+  }
+  .trait-card{
+    background:var(--panel-alt);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:14px 16px;
+    cursor:pointer;
+    transition:transform .12s, border-color .12s;
+  }
+  .trait-card:hover{transform:translateY(-2px);}
+  .trait-card:focus-visible{outline:2px solid var(--gold); outline-offset:2px;}
+  .trait-card.common{border-left:4px solid var(--muted);}
+  .trait-card.rara{border-left:4px solid var(--teal);}
+  .trait-card.leggendaria{border-left:4px solid var(--gold);}
+  .trait-name{font-weight:700; font-size:16px; margin:0 0 4px; display:flex; justify-content:space-between; gap:8px;}
+  .trait-rarity{font-family:'IBM Plex Mono', monospace; font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted);}
+  .trait-desc{color:var(--muted); font-size:13px; margin:0 0 8px; line-height:1.5;}
+  .trait-effects{display:flex; gap:10px; flex-wrap:wrap; font-family:'IBM Plex Mono', monospace; font-size:11px;}
+  .eff-pos{color:#9fc98a;}
+  .eff-neg{color:var(--rust-bright);}
+
+  .run-log{
+    margin-top:16px;
+    border-top:1px dashed var(--line);
+    padding-top:12px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--muted);
+    max-height:110px;
+    overflow-y:auto;
+  }
+  .run-log div{padding:2px 0;}
+
+  /* ---------- Combat ---------- */
+  .combat-vs{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:14px;
+    margin-bottom:16px;
+  }
+  .enemy-block{flex:1;}
+  .enemy-name{font-weight:700; font-size:16px; margin-bottom:6px;}
+  .bar-outer{background:rgba(0,0,0,0.3); border-radius:6px; height:10px; overflow:hidden;}
+  .bar-inner{height:100%; background:linear-gradient(90deg, var(--rust), var(--rust-bright)); transition:width .3s;}
+  .bar-inner.self{background:linear-gradient(90deg, #4f7a3e, #7ea852);}
+  .hp-num{font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--muted); margin-top:4px;}
+  .combat-actions{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:14px;}
+  .combat-actions button{
+    background:var(--panel-alt); border:1px solid var(--line); color:var(--ink);
+    padding:12px 8px; border-radius:8px; cursor:pointer; font-family:'Bitter',serif; font-size:14px;
+  }
+  .combat-actions button:hover{border-color:var(--gold);}
+  .combat-actions button:focus-visible{outline:2px solid var(--gold); outline-offset:2px;}
+
+  /* ---------- Side panel ---------- */
+  .side-panel{padding:22px; display:flex; flex-direction:column; gap:16px;}
+  .fossil-frame{
+    background:radial-gradient(circle at 50% 30%, rgba(199,154,75,0.10), transparent 60%), var(--panel-alt);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:10px;
+  }
+  .creature-wrap{
+    transform-origin:50% 60%;
+    animation: breathe 4.5s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce){
+    .creature-wrap{animation:none;}
+  }
+  @keyframes breathe{
+    0%,100%{ transform:scale(1); }
+    50%{ transform:scale(1.015); }
+  }
+  .tag-massive .creature-wrap{ transform:scale(1.1); }
+  .tag-legs .g-legs{ transform:scaleY(1.12); transform-origin:60px 118px; }
+  #dino .g-armor,#dino .g-teeth,#dino .g-crest,#dino .g-feather,#dino .g-camo,
+  #dino .g-venom,#dino .g-burrow,#dino .g-brain,#dino .g-tailspike,#dino .g-night,
+  #dino .g-wings,#dino .g-pack{ opacity:0; transition:opacity .4s; }
+  .tag-armor .g-armor,.tag-teeth .g-teeth,.tag-crest .g-crest,.tag-feather .g-feather,
+  .tag-camo .g-camo,.tag-venom .g-venom,.tag-burrow .g-burrow,.tag-brain .g-brain,
+  .tag-tailspike .g-tailspike,.tag-night .g-night,.tag-wings .g-wings,.tag-pack .g-pack{ opacity:1; }
+  .body-part{fill:var(--gold);}
+
+  .stat-grid{display:grid; grid-template-columns:1fr; gap:8px;}
+  .stat-row{
+    display:flex; align-items:center; justify-content:space-between;
+    font-family:'IBM Plex Mono', monospace; font-size:12px;
+    padding:6px 2px; border-bottom:1px solid var(--line);
+  }
+  .stat-row .k{color:var(--muted); letter-spacing:.05em; text-transform:uppercase; font-size:10px;}
+  .stat-row .v{color:var(--ink); font-size:14px;}
+  .hp-track{margin-top:2px;}
+
+  .traits-title{
+    font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:.1em;
+    text-transform:uppercase; color:var(--muted); margin:4px 0 0;
+  }
+  .trait-badges{display:flex; flex-wrap:wrap; gap:6px;}
+  .badge{
+    font-family:'IBM Plex Mono', monospace; font-size:10.5px;
+    background:var(--panel-alt); border:1px solid var(--line); border-radius:20px;
+    padding:4px 9px; color:var(--ink); cursor:default;
+  }
+  .badge.empty{color:var(--muted); border-style:dashed;}
+
+  /* ---------- Screens ---------- */
+  .screen{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:50px 36px;
+    text-align:center;
+    box-shadow:var(--shadow);
+  }
+  .screen h2{font-size:30px; margin:0 0 12px;}
+  .screen p{color:var(--muted); line-height:1.7; max-width:520px; margin:0 auto 26px; font-size:15px;}
+  .screen .stats-recap{
+    display:flex; justify-content:center; gap:26px; margin-bottom:30px; flex-wrap:wrap;
+  }
+  .screen .stats-recap div{text-align:center;}
+  .screen .stats-recap b{display:block; font-size:22px; color:var(--gold); font-family:'IBM Plex Mono',monospace;}
+  .screen .stats-recap span{font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted);}
+  .primary-btn{
+    background:var(--gold); color:#1c1406; border:none; font-weight:700;
+    font-family:'Bitter',serif; font-size:16px; padding:14px 30px; border-radius:8px; cursor:pointer;
+  }
+  .primary-btn:hover{background:#d8ac5c;}
+  .primary-btn:focus-visible{outline:2px solid var(--ink); outline-offset:2px;}
+
+  .footer-note{
+    text-align:center; color:var(--muted); font-family:'IBM Plex Mono', monospace;
+    font-size:11px; margin-top:30px; opacity:.7;
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* ===================== DATI DI GIOCO ===================== */
+
+const ERAS = [
+  { id:'triassico', name:'Triassico', color:'#b07a3e',
+    predators:[
+      {name:'Postosuchus solitario', hp:22, atk:6, def:2, spd:5},
+      {name:'Branco di Coelophysis', hp:18, atk:7, def:1, spd:7},
+      {name:'Herrerasaurus in agguato', hp:24, atk:5, def:3, spd:4},
+    ],
+    boss:{name:'Postosuchus Alfa', hp:42, atk:9, def:4, spd:5,
+      desc:'Il predatore dominante del Triassico blocca il passo, mascelle spalancate.'},
+    envScenarios:[
+      { title:'La piana si spacca nella siccità',
+        desc:'Le pozze d\'acqua si prosciugano sotto un sole spietato. Il branco osserva ogni tua mossa.',
+        options:[
+          {label:'Percorri lunghe distanze in fretta', stat:'spd', th:9},
+          {label:'Scava rifugio nel fango residuo', stat:'adapt', th:8},
+        ]},
+      { title:'Tremore sotto le zampe',
+        desc:'La terra trema: un vulcano lontano si è svegliato. La cenere oscura il cielo.',
+        options:[
+          {label:'Fuggi verso l\'altura rocciosa', stat:'spd', th:8},
+          {label:'Resisti immobile, mimetizzato nella cenere', stat:'adapt', th:9},
+        ]},
+    ],
+  },
+  { id:'giurassico', name:'Giurassico', color:'#3d5a3d',
+    predators:[
+      {name:'Ceratosaurus famelico', hp:30, atk:8, def:3, spd:6},
+      {name:'Sciame di Compsognathus', hp:20, atk:6, def:1, spd:9},
+      {name:'Allosaurus in caccia', hp:34, atk:9, def:4, spd:5},
+    ],
+    boss:{name:'Allosaurus Dominante', hp:58, atk:12, def:5, spd:6,
+      desc:'Il re della foresta giurassica ti ha isolato tra le felci gigantesche.'},
+    envScenarios:[
+      { title:'La foresta di conifere brucia',
+        desc:'Un incendio spontaneo divora la vegetazione secca. Il fumo acceca.',
+        options:[
+          {label:'Sprint attraverso il fronte di fiamme', stat:'spd', th:11},
+          {label:'Individua un corso d\'acqua per ripararti', stat:'adapt', th:10},
+        ]},
+      { title:'Una palude inghiotte il sentiero',
+        desc:'Il terreno cede in un acquitrino di torba. Ogni passo rischia di essere l\'ultimo.',
+        options:[
+          {label:'Balza da zolla a zolla', stat:'spd', th:10},
+          {label:'Segui l\'istinto e fiuta il terreno solido', stat:'adapt', th:11},
+        ]},
+    ],
+  },
+  { id:'cretaceo', name:'Cretaceo', color:'#3e6e68',
+    predators:[
+      {name:'Branco di Deinonychus', hp:32, atk:10, def:3, spd:9},
+      {name:'Tyrannosaurus giovane', hp:40, atk:11, def:5, spd:6},
+      {name:'Spinosaurus dei fiumi', hp:38, atk:9, def:6, spd:5},
+    ],
+    boss:{name:'Tyrannosaurus Rex', hp:75, atk:15, def:6, spd:6,
+      desc:'L\'apex predator del Cretaceo ti ha trovato nella piana aperta. Non c\'è dove nascondersi.'},
+    envScenarios:[
+      { title:'Le ceneri vulcaniche velano il sole',
+        desc:'Un lungo inverno vulcanico raffredda il continente. Il cibo scarseggia.',
+        options:[
+          {label:'Migra rapidamente verso sud', stat:'spd', th:12},
+          {label:'Adatta il metabolismo al freddo', stat:'adapt', th:12},
+        ]},
+      { title:'Il livello del mare si ritira all\'improvviso',
+        desc:'Le coste si prosciugano in poche ore. Qualcosa di enorme si muove all\'orizzonte.',
+        options:[
+          {label:'Corri verso l\'entroterra', stat:'spd', th:13},
+          {label:'Osserva e comprendi il pattern della marea', stat:'adapt', th:12},
+        ]},
+    ],
+  },
+];
+
+const TRAITS = [
+  {id:'armor', tag:'armor', name:'Placche Ossee', rarity:'comune',
+    desc:'Osteodermi corazzano il dorso contro morsi e artigli.', eff:{def:3}},
+  {id:'teeth', tag:'teeth', name:'Denti Serrati', rarity:'comune',
+    desc:'Lame dentellate lacerano la carne con ogni morso.', eff:{atk:3}},
+  {id:'legs', tag:'legs', name:'Zampe Posteriori Lunghe', rarity:'comune',
+    desc:'Falcate più ampie per fuggire o inseguire.', eff:{spd:3}},
+  {id:'feather', tag:'feather', name:'Piumaggio Isolante', rarity:'comune',
+    desc:'Filamenti piumati trattengono il calore corporeo.', eff:{adapt:3}},
+  {id:'crest', tag:'crest', name:'Cresta Ossea', rarity:'comune',
+    desc:'Una cresta rigida intimidisce i rivali e protegge il cranio.', eff:{atk:2, def:1}},
+  {id:'hide', tag:'hide', name:'Pelle Spessa', rarity:'comune',
+    desc:'Uno strato coriaceo assorbe colpi e disidratazione.', eff:{hp:8, def:1}},
+  {id:'pack', tag:'pack', name:'Istinto di Branco', rarity:'rara',
+    desc:'Coordini gli attacchi con i tuoi simili.', eff:{atk:2, spd:1}},
+  {id:'camo', tag:'camo', name:'Squame Mimetiche', rarity:'rara',
+    desc:'Pattern che si confondono con sottobosco e roccia.', eff:{spd:2, adapt:2}},
+  {id:'venom', tag:'venom', name:'Morso Velenoso', rarity:'rara',
+    desc:'Ghiandole tossiche rendono ogni ferita letale nel tempo.', eff:{atk:4}},
+  {id:'burrow', tag:'burrow', name:'Artigli da Scavo', rarity:'rara', survival:true,
+    desc:'Puoi scavare rifugi profondi: preziosi quando il cielo cadrà.', eff:{adapt:4}},
+  {id:'brain', tag:'brain', name:'Cervello Sviluppato', rarity:'leggendaria',
+    desc:'Un\'intelligenza superiore anticipa il pericolo.', eff:{adapt:3, spd:1}},
+  {id:'tailspike', tag:'tailspike', name:'Coda Aculeata', rarity:'rara',
+    desc:'Una frustata di coda può spezzare un\'ossa.', eff:{atk:2, def:2}},
+  {id:'night', tag:'night', name:'Vista Notturna', rarity:'rara',
+    desc:'Cacci e sopravvivi anche senza luce.', eff:{spd:2, adapt:2}},
+  {id:'massive', tag:'massive', name:'Mole Massiccia', rarity:'leggendaria',
+    desc:'Una taglia imponente scoraggia i predatori, ma appesantisce il passo.', eff:{hp:14, atk:3, spd:-3}},
+  {id:'wings', tag:'wings', name:'Proto-Ali Piumate', rarity:'leggendaria', survival:true,
+    desc:'Membra allungate che un giorno impareranno a planare.', eff:{spd:4}},
+];
+
+/* ===================== STATO ===================== */
+
+function freshState(){
+  return {
+    screen:'intro',
+    eraIdx:0,
+    round:0, // 0,1,2 = incontri, 3 = boss
+    hp:30, maxHp:30, atk:6, def:4, spd:5, adapt:4,
+    traits:[],
+    traitPool: TRAITS.map(t=>t.id),
+    log:[],
+    combat:null,
+    pendingEncounter:null,
+    deathCause:'',
+    victory:false,
+  };
+}
+let S = freshState();
+
+function addLog(msg){
+  S.log.unshift(msg);
+  if(S.log.length>6) S.log.pop();
+}
+function clamp(v,a,b){ return Math.max(a, Math.min(b,v)); }
+function rand(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+
+/* ===================== MOTORE DI GIOCO ===================== */
+
+function startRun(){
+  S = freshState();
+  S.screen='run';
+  nextEncounter();
+  render();
+}
+
+function traitTagClasses(){
+  return S.traits.map(id=>'tag-'+id).join(' ');
+}
+
+function applyTrait(traitId){
+  const t = TRAITS.find(x=>x.id===traitId);
+  if(!t) return;
+  S.traits.push(traitId);
+  S.traitPool = S.traitPool.filter(id=>id!==traitId);
+  if(t.eff.hp) { S.maxHp += t.eff.hp; S.hp += t.eff.hp; }
+  if(t.eff.atk) S.atk += t.eff.atk;
+  if(t.eff.def) S.def = Math.max(0, S.def + t.eff.def);
+  if(t.eff.spd) S.spd = Math.max(1, S.spd + t.eff.spd);
+  if(t.eff.adapt) S.adapt += t.eff.adapt;
+  addLog('Evoluzione: ' + t.name + ' acquisita.');
+  S.pendingEncounter = {type:'resolved', text: t.name + ' si fissa nel tuo genoma. ' + t.desc};
+  render();
+}
+
+function nextEncounter(){
+  S.combat = null;
+  const era = ERAS[S.eraIdx];
+  if(S.round < 3){
+    const roll = Math.random();
+    let type;
+    if(roll < 0.35) type='mutation';
+    else if(roll < 0.65) type='combat';
+    else if(roll < 0.90) type='environment';
+    else type='rest';
+    if(type==='mutation' && S.traitPool.length===0) type='rest';
+    buildEncounter(type, era);
+  } else {
+    buildEncounter('boss', era);
+  }
+  render();
+}
+
+function buildEncounter(type, era){
+  if(type==='mutation'){
+    const pool = [...S.traitPool];
+    const picks=[];
+    while(picks.length<3 && pool.length){
+      const i = rand(0,pool.length-1);
+      picks.push(pool.splice(i,1)[0]);
+    }
+    S.pendingEncounter = {type:'mutation', picks};
+  } else if(type==='rest'){
+    S.pendingEncounter = {type:'rest'};
+  } else if(type==='environment'){
+    const sc = era.envScenarios[rand(0,era.envScenarios.length-1)];
+    S.pendingEncounter = {type:'environment', scenario: sc};
+  } else if(type==='combat' || type==='boss'){
+    const template = type==='boss' ? era.boss : era.predators[rand(0,era.predators.length-1)];
+    S.combat = {
+      isBoss: type==='boss',
+      enemyName: template.name,
+      enemyDesc: template.desc || null,
+      hp: template.hp, maxHp: template.hp,
+      atk: template.atk, def: template.def, spd: template.spd,
+      defending:false,
+    };
+    S.pendingEncounter = {type: type==='boss' ? 'boss' : 'combat'};
+    addLog((type==='boss' ? 'Scontro decisivo: ' : 'Incontro: ') + template.name + '.');
+  }
+}
+
+function resolveEnvironment(option){
+  const roll = rand(1,6) + S[option.stat];
+  const success = roll >= option.th;
+  let text;
+  if(success){
+    const gain = option.stat==='spd' ? 'spd' : 'adapt';
+    S[gain] += 1;
+    text = 'Ce l\'hai fatta. L\'esperienza affina il tuo istinto (+1 ' + (gain==='spd'?'Velocità':'Adattamento') + ').';
+  } else {
+    const dmg = rand(3,7);
+    S.hp = Math.max(0, S.hp - dmg);
+    text = 'Non basta. La prova lascia il segno (-' + dmg + ' PV).';
+  }
+  addLog(text);
+  S.pendingEncounter = {type:'resolved', text};
+  if(S.hp<=0){ triggerGameOver('Le forze ti abbandonano durante la prova.'); return; }
+  render();
+}
+
+function restNode(){
+  const heal = Math.round(S.maxHp*0.25);
+  S.hp = Math.min(S.maxHp, S.hp+heal);
+  const text = 'Trovi un angolo tranquillo per riprendere fiato (+' + heal + ' PV).';
+  addLog(text);
+  S.pendingEncounter = {type:'resolved', text};
+  render();
+}
+
+function combatAction(action){
+  const c = S.combat;
+  if(!c) return;
+  if(action==='attack'){
+    const dmg = Math.max(1, S.atk + rand(-1,2) - c.def);
+    c.hp = Math.max(0, c.hp-dmg);
+    addLog('Attacchi: ' + dmg + ' danni a ' + c.enemyName + '.');
+    c.defending=false;
+    if(c.hp<=0){ winCombat(); return; }
+    enemyTurn();
+  } else if(action==='defend'){
+    c.defending=true;
+    const heal = 2;
+    S.hp = Math.min(S.maxHp, S.hp+heal);
+    addLog('Ti raccogli in difesa (+' + heal + ' PV).');
+    enemyTurn();
+  } else if(action==='flee'){
+    const chance = clamp(40 + (S.spd-c.spd)*5, 5, 90);
+    if(rand(1,100) <= chance){
+      addLog('Sfuggi nella vegetazione. ' + c.enemyName + ' perde le tue tracce.');
+      S.pendingEncounter = {type:'resolved', text:'Sei riuscito a dileguarti senza scontro.'};
+      S.combat=null;
+      render();
+      return;
+    } else {
+      addLog('Il tentativo di fuga fallisce: ' + c.enemyName + ' reagisce.');
+      enemyTurn(true);
+    }
+  }
+}
+
+function enemyTurn(bonus){
+  const c = S.combat;
+  if(!c) return;
+  let dmg = Math.max(1, c.atk - S.def);
+  if(c.defending) dmg = Math.ceil(dmg*0.4);
+  if(bonus) dmg = Math.ceil(dmg*1.3);
+  S.hp = Math.max(0, S.hp - dmg);
+  addLog(c.enemyName + ' ti colpisce: -' + dmg + ' PV.');
+  c.defending=false;
+  if(S.hp<=0){ triggerGameOver('Abbattuto da ' + c.enemyName + '.'); return; }
+  render();
+}
+
+function winCombat(){
+  const c = S.combat;
+  addLog(c.enemyName + ' è stato respinto.');
+  S.pendingEncounter = {type:'resolved', text: c.isBoss
+    ? 'Hai prevalso sul predatore dominante di questa era.'
+    : 'Il predatore si ritira, ferito.'};
+  S.combat=null;
+  render();
+}
+
+function continueRun(){
+  S.pendingEncounter=null;
+  if(S.round < 3){
+    S.round += 1;
+    nextEncounter();
+  } else {
+    // boss appena superato
+    if(S.eraIdx < ERAS.length-1){
+      S.eraIdx += 1;
+      S.round = 0;
+      S.pendingEncounter = {type:'era-transition'};
+      render();
+    } else {
+      S.pendingEncounter = {type:'extinction-intro'};
+      render();
+    }
+  }
+}
+
+function faceExtinction(){
+  const survivalTraits = S.traits.filter(id => TRAITS.find(t=>t.id===id).survival).length;
+  const score = S.adapt*2 + survivalTraits*15 + rand(0,20);
+  const threshold = 55;
+  if(score >= threshold){
+    S.victory = true;
+    S.screen='end';
+  } else {
+    S.deathCause = 'Estinto dall\'impatto: l\'adattamento non è bastato.';
+    S.screen='end';
+    S.victory=false;
+  }
+  render();
+}
+
+function triggerGameOver(cause){
+  S.deathCause = cause;
+  S.victory=false;
+  S.screen='end';
+  render();
+}
+
+function computeScore(){
+  return S.eraIdx*100 + S.round*20 + S.traits.length*15 + (S.victory?250:0);
+}
+
+/* ===================== RENDER ===================== */
+
+function eraProgressHTML(){
+  return ERAS.map((era, idx) => {
+    const isCurrent = idx===S.eraIdx && S.screen==='run';
+    const isPast = idx < S.eraIdx || S.screen==='end';
+    let ticks = '';
+    for(let i=0;i<4;i++){
+      let filled = isPast || (isCurrent && i < S.round) || (isCurrent && i===3 && S.round===3 && S.pendingEncounter && S.pendingEncounter.type!=='boss' && S.pendingEncounter.type!=='resolved');
+      if(isPast) filled = true;
+      if(isCurrent && i < S.round) filled = true;
+      const bossClass = i===3 ? 'boss' : '';
+      ticks += `<div class="tick ${filled?'filled':''} ${bossClass}" style="--era-color:${era.color}"></div>`;
+    }
+    return `<div class="strata-era ${isCurrent?'current':''}">
+      <div class="strata-label"><span>${era.name}</span></div>
+      <div class="strata-ticks">${ticks}</div>
+    </div>`;
+  }).join('') + `<div class="strata-era ${S.pendingEncounter && (S.pendingEncounter.type==='extinction-intro') ? 'current':''}">
+      <div class="strata-label"><span>Estinzione</span></div>
+      <div class="strata-ticks"><div class="tick ${S.screen==='end'?'filled':''}" style="--era-color:#5a1f1f"></div></div>
+    </div>`;
+}
+
+function dinoSVG(){
+  return `
+  <svg viewBox="0 0 240 170" width="100%" height="auto" id="dino" aria-label="La tua stirpe">
+    <g class="creature-wrap">
+      <g class="g-pack" transform="translate(-14,10) scale(0.85)" opacity="0.3">
+        <polygon class="body-part" points="10,95 55,80 60,100 15,110"/>
+        <ellipse cx="110" cy="90" rx="48" ry="32" class="body-part"/>
+      </g>
+      <polygon class="body-part" points="10,95 55,80 60,100 15,110"/>
+      <polygon class="g-tailspike" points="4,92 -4,100 4,108 12,100" fill="#3a2c1a"/>
+      <polygon class="g-feather" points="22,88 30,78 34,92 24,96" fill="var(--rust-bright)"/>
+      <g class="g-legs">
+        <polygon class="body-part" points="70,120 85,120 90,155 78,155"/>
+        <polygon class="body-part" points="95,122 108,122 112,155 100,155"/>
+      </g>
+      <ellipse class="g-burrow" cx="90" cy="160" rx="26" ry="6" fill="#3a2c1a" opacity="0.6"/>
+      <ellipse cx="110" cy="90" rx="48" ry="32" class="body-part"/>
+      <g class="g-armor" fill="#5c6b57">
+        <rect x="80" y="60" width="10" height="8" rx="2"/>
+        <rect x="96" y="56" width="10" height="8" rx="2"/>
+        <rect x="112" y="55" width="10" height="8" rx="2"/>
+        <rect x="128" y="58" width="10" height="8" rx="2"/>
+      </g>
+      <g class="g-camo" fill="#7ea852" opacity="0.55">
+        <circle cx="95" cy="85" r="6"/>
+        <circle cx="118" cy="98" r="5"/>
+        <circle cx="130" cy="80" r="4"/>
+      </g>
+      <polygon class="g-wings" points="75,58 122,38 132,72 90,82" fill="var(--teal)" opacity="0.55"/>
+      <polygon class="body-part" points="130,95 145,105 138,112 126,104"/>
+      <polygon class="body-part" points="145,70 175,45 182,55 155,80"/>
+      <g class="g-feather" transform="translate(0,0)">
+        <polygon points="150,58 158,48 162,62 152,66" fill="var(--rust-bright)"/>
+      </g>
+      <g class="g-head">
+        <path class="body-part" d="M170,40 L200,35 L210,45 L205,55 L180,60 Z"/>
+        <ellipse class="g-brain" cx="184" cy="30" rx="9" ry="6" fill="var(--gold-dim)"/>
+        <polygon class="g-crest" points="184,30 194,14 200,32" fill="var(--gold-dim)"/>
+        <g class="g-teeth" fill="#ece6d6">
+          <polygon points="203,48 208,47 205,52"/>
+          <polygon points="207,46 211,46 208,51"/>
+        </g>
+        <circle class="g-venom" cx="207" cy="49" r="6" fill="#5c9a4a" opacity="0.5"/>
+        <circle cx="192" cy="45" r="2.6" fill="var(--bg)"/>
+        <circle class="g-night" cx="192" cy="45" r="7" fill="#e8d24a" opacity="0.35"/>
+      </g>
+    </g>
+  </svg>`;
+}
+
+function statRowsHTML(){
+  const rows = [
+    ['PV', S.hp + ' / ' + S.maxHp],
+    ['Attacco', S.atk],
+    ['Difesa', S.def],
+    ['Velocità', S.spd],
+    ['Adattamento', S.adapt],
+  ];
+  return rows.map(([k,v])=>`<div class="stat-row"><span class="k">${k}</span><span class="v">${v}</span></div>`).join('');
+}
+
+function sidePanelHTML(){
+  const hpPct = clamp(Math.round(S.hp/S.maxHp*100),0,100);
+  const badges = S.traits.length
+    ? S.traits.map(id=>{
+        const t = TRAITS.find(x=>x.id===id);
+        return `<span class="badge" title="${t.desc}">${t.name}</span>`;
+      }).join('')
+    : `<span class="badge empty">nessun adattamento ancora</span>`;
+  return `
+  <div class="panel side-panel ${traitTagClasses()}">
+    <div class="fossil-frame">${dinoSVG()}</div>
+    <div class="hp-track">
+      <div class="bar-outer"><div class="bar-inner self" style="width:${hpPct}%"></div></div>
+      <div class="hp-num">${S.hp} / ${S.maxHp} PV</div>
+    </div>
+    <div class="stat-grid">${statRowsHTML()}</div>
+    <div>
+      <p class="traits-title">Adattamenti (${S.traits.length})</p>
+      <div class="trait-badges">${badges}</div>
+    </div>
+  </div>`;
+}
+
+function rarityLabel(r){ return r; }
+
+function eventPanelHTML(){
+  const era = ERAS[S.eraIdx];
+  let inner = '';
+  const pe = S.pendingEncounter;
+
+  if(pe && pe.type==='resolved'){
+    inner = `
+      <p class="event-kicker">Esito</p>
+      <h2 class="event-title">Si volta pagina</h2>
+      <p class="event-desc">${pe.text}</p>
+      <div class="choices"><button class="choice-btn" onclick="continueRun()"><span>Continua</span></button></div>`;
+  } else if(pe && pe.type==='era-transition'){
+    inner = `
+      <p class="event-kicker">Nuova era</p>
+      <h2 class="event-title">Sei entrato nel ${era.name}</h2>
+      <p class="event-desc">Il mondo cambia intorno a te. Nuovi predatori, nuove pressioni, nuove occasioni per evolvere.</p>
+      <div class="choices"><button class="choice-btn" onclick="startEraRound()"><span>Avanza</span></button></div>`;
+  } else if(pe && pe.type==='extinction-intro'){
+    inner = `
+      <p class="event-kicker">66 milioni di anni fa</p>
+      <h2 class="event-title">Il cielo si accende</h2>
+      <p class="event-desc">Un bagliore attraversa l'atmosfera. La stirpe che hai forgiato sta per affrontare la prova più dura: l'impatto che ridisegnerà la vita sulla Terra. Ciò che sei diventato deciderà chi resta.</p>
+      <div class="choices"><button class="choice-btn" onclick="faceExtinction()"><span>Affronta l'estinzione</span></button></div>`;
+  } else if(pe && pe.type==='mutation'){
+    inner = `
+      <p class="event-kicker">Nodo evolutivo — ${era.name}</p>
+      <h2 class="event-title">La selezione naturale offre una via</h2>
+      <p class="event-desc">Scegli l'adattamento che la tua stirpe porterà per sempre. Non potrai tornare indietro.</p>
+      <div class="trait-cards">
+        ${pe.picks.map(id=>{
+          const t = TRAITS.find(x=>x.id===id);
+          const effs = Object.entries(t.eff).map(([k,v])=>{
+            const label = {hp:'PV',atk:'ATT',def:'DIF',spd:'VEL',adapt:'ADAT'}[k];
+            const cls = v>0 ? 'eff-pos' : 'eff-neg';
+            return `<span class="${cls}">${v>0?'+':''}${v} ${label}</span>`;
+          }).join('');
+          return `<div class="trait-card ${t.rarity}" tabindex="0" role="button" onclick="applyTrait('${t.id}')" onkeydown="if(event.key==='Enter')applyTrait('${t.id}')">
+            <p class="trait-name">${t.name} <span class="trait-rarity">${rarityLabel(t.rarity)}</span></p>
+            <p class="trait-desc">${t.desc}</p>
+            <div class="trait-effects">${effs}</div>
+          </div>`;
+        }).join('')}
+      </div>`;
+  } else if(pe && pe.type==='rest'){
+    inner = `
+      <p class="event-kicker">Tregua — ${era.name}</p>
+      <h2 class="event-title">Un riparo tranquillo</h2>
+      <p class="event-desc">Per un momento, nessun predatore ti minaccia. Puoi riprendere fiato prima di proseguire.</p>
+      <div class="choices"><button class="choice-btn" onclick="restNode()"><span>Riposa</span></button></div>`;
+  } else if(pe && pe.type==='environment'){
+    const sc = pe.scenario;
+    inner = `
+      <p class="event-kicker">Pressione ambientale — ${era.name}</p>
+      <h2 class="event-title">${sc.title}</h2>
+      <p class="event-desc">${sc.desc}</p>
+      <div class="choices">
+        ${sc.options.map(o=>`<button class="choice-btn" onclick='resolveEnvironment(${JSON.stringify(o)})'>
+          <span>${o.label}</span><span class="choice-sub">${o.stat==='spd'?'VEL':'ADAT'} ≥ ${o.th}</span>
+        </button>`).join('')}
+      </div>`;
+  } else if(pe && (pe.type==='combat' || pe.type==='boss')){
+    const c = S.combat;
+    inner = `
+      <p class="event-kicker">${c.isBoss ? 'Scontro decisivo — '+era.name : 'Incontro — '+era.name}</p>
+      <h2 class="event-title">${c.enemyName}</h2>
+      ${c.enemyDesc ? `<p class="event-desc">${c.enemyDesc}</p>` : `<p class="event-desc">Un predatore ti ha individuato. Decidi in fretta.</p>`}
+      <div class="combat-vs">
+        <div class="enemy-block">
+          <div class="enemy-name">${c.enemyName}</div>
+          <div class="bar-outer"><div class="bar-inner" style="width:${clamp(Math.round(c.hp/c.maxHp*100),0,100)}%"></div></div>
+          <div class="hp-num">${c.hp} / ${c.maxHp} PV</div>
+        </div>
+      </div>
+      <div class="combat-actions">
+        <button onclick="combatAction('attack')">Attacca</button>
+        <button onclick="combatAction('defend')">Difendi</button>
+        <button onclick="combatAction('flee')">Fuggi</button>
+      </div>`;
+  }
+
+  const log = S.log.length ? `<div class="run-log">${S.log.map(l=>`<div>· ${l}</div>`).join('')}</div>` : '';
+
+  return `<div class="panel event-panel">${inner}${log}</div>`;
+}
+
+function startEraRound(){
+  S.pendingEncounter=null;
+  nextEncounter();
+}
+
+function introScreenHTML(){
+  return `
+  <div class="screen">
+    <p class="eyebrow" style="text-align:center;">Cronaca evolutiva roguelike</p>
+    <h2>L'Ascesa</h2>
+    <p>Sei una piccola specie all'alba dei dinosauri. Attraversa Triassico, Giurassico e Cretaceo:
+    scegli adattamenti, sopravvivi ai predatori, resisti alle catastrofi. Alla fine, il cielo
+    si spaccherà — e solo ciò che avrai scelto di diventare deciderà se la tua stirpe vedrà
+    l'alba successiva. Ogni run è diversa. Non c'è modo di tornare indietro su un adattamento.</p>
+    <button class="primary-btn" onclick="startRun()">Inizia l'evoluzione</button>
+  </div>`;
+}
+
+function endScreenHTML(){
+  const score = computeScore();
+  return `
+  <div class="screen">
+    <p class="eyebrow" style="text-align:center;">${S.victory ? 'Sopravvissuto' : 'Estinto'}</p>
+    <h2>${S.victory ? 'La tua stirpe attraversa il confine' : 'La linea si spezza qui'}</h2>
+    <p>${S.victory
+      ? 'Mentre i giganti scompaiono, i tuoi discendenti — piccoli, adattabili, tenaci — sopravvivono nell\'ombra del nuovo mondo. Un giorno, da loro, nasceranno uccelli e mammiferi.'
+      : (S.deathCause || 'Il tempo si ferma qui per la tua discendenza.')}</p>
+    <div class="stats-recap">
+      <div><b>${ERAS[S.eraIdx].name}</b><span>Era raggiunta</span></div>
+      <div><b>${S.traits.length}</b><span>Adattamenti</span></div>
+      <div><b>${score}</b><span>Punteggio</span></div>
+    </div>
+    <button class="primary-btn" onclick="startRun()">Nuova run</button>
+  </div>`;
+}
+
+function render(){
+  const app = document.getElementById('app');
+  let body;
+  if(S.screen==='intro') body = introScreenHTML();
+  else if(S.screen==='end') body = endScreenHTML();
+  else {
+    body = `<div class="stage">${eventPanelHTML()}${sidePanelHTML()}</div>`;
+  }
+  app.innerHTML = `
+    <header class="top">
+      <div>
+        <p class="eyebrow">Registro fossile — run in corso</p>
+        <h1 class="title">L'Ascesa</h1>
+      </div>
+      <div class="run-score mono">Punteggio stimato<b>${S.screen==='intro' ? '—' : computeScore()}</b></div>
+    </header>
+    <div class="strata">${eraProgressHTML()}</div>
+    ${body}
+    <p class="footer-note">Roguelike evolutivo · nessun salvataggio tra le run · ogni scelta è permanente</p>
+  `;
+}
+
+render();
+</script>
+</body>
+</html>

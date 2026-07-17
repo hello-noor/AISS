@@ -1,0 +1,1781 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>T-REX EVOLUTION: Il Vero Gioco della Gallina</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#000;user-select:none}
+#game{width:100vw;height:100dvh;position:relative;overflow:hidden}
+
+:root{
+  --mc-yellow:#ffc72c;--fire:#da291c;--jjk-purple:#7b2ff7;--jjk-blue:#00d9ff;
+  --dim:rgba(255,255,255,.5);
+}
+
+#hud{
+  position:fixed;top:0;left:0;right:0;z-index:300;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:8px 14px;pointer-events:none;
+}
+#prog{position:absolute;top:0;left:0;right:0;height:4px;background:rgba(255,255,255,.08)}
+#prog-fill{height:100%;background:linear-gradient(90deg,#ff4500,#ffc72c,#00e5ff);transition:width .5s}
+#lvl-tag{
+  margin-top:8px;font-size:10px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--mc-yellow);background:rgba(0,0,0,.5);padding:5px 12px;border-radius:20px;
+  border:1px solid rgba(255,199,44,.3);
+}
+
+.scene{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:16px;opacity:0;pointer-events:none;transition:opacity .5s ease;overflow:hidden}
+.scene.active{opacity:1;pointer-events:all}
+/* PERF FIX: ferma ogni animazione CSS nelle scene non visibili.
+   Senza questa regola, animazioni infinite di scene passate (es. le 160
+   stelle del titolo) continuano a girare per sempre in background e il
+   carico accumulato può bloccare il browser (schermo bianco) nei livelli successivi. */
+.scene:not(.active),.scene:not(.active) *{animation-play-state:paused!important}
+
+/* backgrounds */
+#s0{background:radial-gradient(ellipse at 50% 60%,#1a0040,#000008 75%);justify-content:center}
+#lvl1{background:linear-gradient(180deg,#030f03,#081a08 45%,#102808 80%,#0a1505)}
+#lvl2{background:radial-gradient(ellipse at 65% 15%,#7a2500,#2a0500 45%,#080200)}
+#lvl3{background:linear-gradient(180deg,#0a1505,#151e05 55%,#1a1005)}
+#lvl4{background:linear-gradient(160deg,#0e0020,#1a0535 50%,#0a0018)}
+#lvl5{background:linear-gradient(180deg,#6ab4e8,#9ad4f5 35%,#a8e8a0 70%,#3a7a18)}
+#lvl6{background:linear-gradient(180deg,#111,#1a0e00 70%,#120900)}
+#lvl7{background:linear-gradient(180deg,#100000,#1a0000)}
+#bossintro{background:#000}
+#boss1{background:radial-gradient(ellipse at center,#1a0030,#050008)}
+#mariofight{background:radial-gradient(ellipse at center,#000814,#000)}
+#boss2{background:radial-gradient(ellipse at center,#300018,#080004)}
+#boss3{background:radial-gradient(ellipse at center,#1a1200,#050200)}
+#trueEnd{background:linear-gradient(160deg,#0a0018,#1a0535 60%,#000)}
+#finalchoice{background:radial-gradient(ellipse at center,#12002a,#050008)}
+#trueEnd2{background:linear-gradient(160deg,#001a12,#053520 60%,#000)}
+#trueEnd3{background:linear-gradient(160deg,#1a1200,#352a05 60%,#000)}
+
+.stars{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.star{position:absolute;background:#fff;border-radius:50%;animation:twinkle var(--d,2s) infinite alternate}
+@keyframes twinkle{from{opacity:.15}to{opacity:.9}}
+
+.ground{position:absolute;bottom:0;left:0;right:0;height:64px;background:#0f0800}
+.ground::before{content:'';position:absolute;top:0;left:0;right:0;height:16px;background:#1a3808}
+.ground-mc{background:#111}.ground-mc::before{background:#222}
+.ground-void{background:#050005}.ground-void::before{background:#1a0030}
+
+.char{position:absolute;bottom:64px;font-size:clamp(60px,11vw,120px);filter:drop-shadow(0 8px 18px rgba(0,0,0,.7));line-height:1}
+
+.dialog{width:min(96%,680px);background:rgba(4,4,12,.9);border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:16px 20px 12px;backdrop-filter:blur(14px);position:relative;z-index:10}
+.d-label{font-size:10px;text-transform:uppercase;letter-spacing:3px;color:var(--mc-yellow);margin-bottom:6px;font-weight:700}
+.d-text{font-size:clamp(12px,2vw,15px);line-height:1.6;color:#ede5d5;min-height:50px}
+.d-text em{color:#ffd560}
+.d-hint{font-size:10px;color:rgba(255,255,255,.32);margin-top:8px;text-align:right;animation:blink 1.3s infinite}
+@keyframes blink{0%,100%{opacity:.32}50%{opacity:.85}}
+
+.title-wrap{text-align:center;z-index:10;padding:20px}
+.title-eye{font-size:clamp(60px,12vw,110px);animation:floatBig 2.8s infinite alternate}
+@keyframes floatBig{from{transform:translateY(0)}to{transform:translateY(-20px)}}
+.title-h1{font-size:clamp(24px,5vw,52px);font-weight:900;line-height:1.05;background:linear-gradient(135deg,#ff5500,#ffc72c 55%,#ff9000);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin:10px 0 6px}
+.title-sub{font-size:clamp(10px,1.8vw,14px);color:var(--dim);letter-spacing:2px;margin-bottom:26px}
+.btn-start{background:linear-gradient(135deg,#da291c,#ff6200);color:#fff;border:none;padding:14px 40px;font-size:clamp(12px,2vw,16px);font-weight:700;border-radius:50px;cursor:pointer;letter-spacing:2px;text-transform:uppercase;box-shadow:0 4px 22px rgba(218,41,28,.55);transition:transform .18s}
+.btn-start:hover{transform:translateY(-3px)}
+.title-modes{display:flex;gap:10px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+
+/* ── CHALLENGE (generic mini-game) ── */
+.challenge{position:absolute;inset:0;pointer-events:none}
+.chal-target{position:absolute;font-size:clamp(44px,8vw,80px);cursor:pointer;pointer-events:all;transition:transform .12s;filter:drop-shadow(0 4px 10px rgba(0,0,0,.6))}
+.chal-target:active{transform:scale(.8)}
+.chal-hud{position:absolute;top:60px;left:50%;transform:translateX(-50%);text-align:center;z-index:30;pointer-events:none}
+.chal-count{font-size:clamp(22px,4vw,34px);font-weight:900;color:var(--mc-yellow);text-shadow:0 2px 8px rgba(0,0,0,.8)}
+.chal-timer{font-size:12px;color:rgba(255,255,255,.6);margin-top:2px;letter-spacing:2px}
+.chal-timer.warn{color:var(--fire)}
+.chal-instr{position:absolute;top:110px;left:50%;transform:translateX(-50%);font-size:11px;color:rgba(255,255,255,.5);text-align:center;letter-spacing:1px;z-index:30}
+
+.pop-plus{position:absolute;font-size:22px;font-weight:900;color:#7fff7f;pointer-events:none;animation:popPlus .6s forwards;text-shadow:0 0 10px rgba(127,255,127,.8)}
+@keyframes popPlus{0%{opacity:1;transform:translateY(0) scale(1)}60%{transform:translateY(-28px) scale(1.3)}100%{opacity:0;transform:translateY(-50px) scale(1)}}
+
+/* ══ Sistema particelle riutilizzabile: "succo" visivo per ogni successo ══ */
+.burst-particle{position:absolute;pointer-events:none;font-size:16px;will-change:transform,opacity;animation:burstFly .7s cubic-bezier(.15,.7,.3,1) forwards}
+@keyframes burstFly{0%{transform:translate(0,0) scale(.6) rotate(0deg);opacity:1}100%{transform:translate(var(--bx),var(--by)) scale(1.1) rotate(var(--br));opacity:0}}
+.glow-ping{position:absolute;border-radius:50%;pointer-events:none;border:2px solid var(--ping-color,#7fff7f);animation:glowPing .55s ease-out forwards}
+@keyframes glowPing{0%{width:6px;height:6px;opacity:1;transform:translate(-50%,-50%)}100%{width:90px;height:90px;opacity:0;transform:translate(-50%,-50%)}}
+.combo-tag{position:absolute;font-weight:900;font-size:clamp(11px,2vw,15px);color:#fff9c4;text-shadow:0 0 8px #ff9900,0 2px 4px #000;pointer-events:none;animation:comboPop .8s ease forwards;white-space:nowrap}
+@keyframes comboPop{0%{opacity:0;transform:translate(-50%,0) scale(.5)}25%{opacity:1;transform:translate(-50%,-8px) scale(1.15)}100%{opacity:0;transform:translate(-50%,-38px) scale(1)}}
+.shine-sweep{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.shine-sweep::after{content:'';position:absolute;top:0;bottom:0;width:40%;left:-50%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.16),transparent);animation:shineMove 4.5s ease-in-out infinite}
+@keyframes shineMove{0%{left:-50%}100%{left:150%}}
+
+.result-panel{position:absolute;inset:0;background:rgba(0,0,0,.82);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:60;opacity:0;pointer-events:none;transition:opacity .3s}
+.result-panel.show{opacity:1;pointer-events:all}
+.result-icon{font-size:clamp(50px,9vw,90px);animation:resultIconPop .5s cubic-bezier(.17,.89,.32,1.49)}
+@keyframes resultIconPop{0%{transform:scale(0) rotate(-25deg)}100%{transform:scale(1) rotate(0)}}
+.result-h{font-size:clamp(18px,3.4vw,30px);font-weight:900;color:#fff;text-shadow:0 2px 12px rgba(255,199,44,.4)}
+.result-p{font-size:13px;color:rgba(255,255,255,.65);max-width:400px;text-align:center;line-height:1.5}
+.btn-continue{background:linear-gradient(135deg,#00b894,#00d9ff);color:#031418;border:none;padding:12px 34px;border-radius:50px;font-weight:800;font-size:13px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-top:6px;box-shadow:0 4px 20px rgba(0,217,255,.4);transition:transform .15s,box-shadow .15s}
+.btn-continue:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 6px 26px rgba(0,217,255,.6)}
+.btn-retry{background:linear-gradient(135deg,#da291c,#ff6200);color:#fff;border:none;padding:12px 34px;border-radius:50px;font-weight:800;font-size:13px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-top:6px;box-shadow:0 4px 20px rgba(255,98,0,.4);transition:transform .15s}
+.btn-retry:hover{transform:translateY(-2px) scale(1.03)}
+
+/* falling objects for dodge levels */
+.faller{position:absolute;top:-60px;font-size:clamp(30px,6vw,55px);cursor:pointer;pointer-events:all;filter:drop-shadow(0 4px 8px rgba(0,0,0,.6))}
+@keyframes fallDown{from{top:-60px}to{top:100%}}
+.impact-flash{position:absolute;inset:0;background:#ff2200;opacity:0;pointer-events:none;z-index:55}
+.impact-flash.go{animation:impactGo .35s}
+@keyframes impactGo{0%{opacity:.55}100%{opacity:0}}
+.lives{display:flex;gap:4px;font-size:20px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.6))}
+
+/* ══ Livello 3 ricostruito: indicatori di sotto-livello + gioco "trova il nido" ══ */
+.sub-dots{position:absolute;top:96px;left:50%;transform:translateX(-50%);display:flex;gap:9px;z-index:30}
+.sub-dots .dot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.22);transition:background .3s,transform .3s;box-shadow:0 0 0 rgba(255,199,44,0)}
+.sub-dots .dot.active{background:var(--mc-yellow,#ffc72c);transform:scale(1.5);box-shadow:0 0 12px rgba(255,199,44,.8)}
+.sub-dots .dot.done{background:#7fff7f;box-shadow:0 0 8px rgba(127,255,127,.6)}
+.nest-grid{position:absolute;top:36%;left:50%;transform:translate(-50%,-50%);display:grid;grid-template-columns:repeat(5,1fr);gap:12px;z-index:20}
+.nest-spot{width:clamp(46px,9vw,68px);height:clamp(46px,9vw,68px);border-radius:14px;background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;font-size:clamp(20px,4.2vw,32px);cursor:pointer;transition:transform .15s,background .2s,border-color .2s;box-shadow:0 3px 10px rgba(0,0,0,.3)}
+.nest-spot:hover{transform:scale(1.07) translateY(-2px)}
+.nest-spot.reveal{background:rgba(255,199,44,.28);border-color:var(--mc-yellow,#ffc72c);box-shadow:0 0 20px rgba(255,199,44,.5)}
+.nest-spot.correct-flash{animation:nestCorrect .5s}
+.nest-spot.wrong-flash{animation:nestWrong .3s}
+@keyframes nestCorrect{0%{transform:scale(1)}50%{transform:scale(1.3)}100%{transform:scale(1)}}
+@keyframes nestWrong{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* ══ Ambiente Livello 3: braci fluttuanti in sottofondo ══ */
+.ember-field{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:1}
+.ember-dot{position:absolute;bottom:-10px;border-radius:50%;background:radial-gradient(circle,#ffb347,#ff4500);animation:emberFloat linear infinite;opacity:.75;filter:blur(.3px)}
+@keyframes emberFloat{0%{transform:translateY(0) translateX(0);opacity:0}10%{opacity:.85}90%{opacity:.5}100%{transform:translateY(-115vh) translateX(var(--drift,20px));opacity:0}}
+
+/* ══ Sistema ambientale generico: particelle fluttuanti per ogni scena ══ */
+.ambient-field{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:1}
+.ambient-particle{position:absolute;bottom:-10px;animation:ambientFloat linear infinite}
+@keyframes ambientFloat{0%{transform:translateY(0) translateX(0) rotate(0deg);opacity:0}12%{opacity:.9}88%{opacity:.6}100%{transform:translateY(-112vh) translateX(var(--drift,20px)) rotate(var(--spin,180deg));opacity:0}}
+
+/* ══ Decorazioni di scena: vulcano lontano, bagliore solare, raggi di luce, nuvole ══ */
+.volcano-bg{position:absolute;bottom:60px;right:6%;font-size:clamp(50px,9vw,100px);opacity:.85;animation:volcanoPulse 2.4s ease-in-out infinite alternate;z-index:0;filter:drop-shadow(0 0 20px rgba(255,80,0,.4))}
+@keyframes volcanoPulse{from{filter:drop-shadow(0 0 14px rgba(255,80,0,.3)) brightness(1)}to{filter:drop-shadow(0 0 32px rgba(255,90,0,.7)) brightness(1.15)}}
+.sun-glow{position:absolute;top:-10%;right:-5%;width:50vw;height:50vw;max-width:340px;max-height:340px;border-radius:50%;background:radial-gradient(circle,rgba(255,240,150,.55),transparent 70%);pointer-events:none;z-index:0;animation:sunPulse 3.6s ease-in-out infinite alternate}
+@keyframes sunPulse{from{opacity:.55}to{opacity:.85}}
+.light-rays{position:absolute;inset:0;pointer-events:none;z-index:1;background:repeating-conic-gradient(from 0deg at 50% 0%,rgba(255,199,44,.08) 0deg 4deg,transparent 4deg 12deg);animation:raysTurn 40s linear infinite;opacity:.6}
+@keyframes raysTurn{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.cloud{position:absolute;font-size:clamp(34px,6vw,60px);opacity:.7;animation:cloudDrift linear infinite;pointer-events:none;filter:drop-shadow(0 4px 8px rgba(0,0,0,.15))}
+@keyframes cloudDrift{from{transform:translateX(-20vw)}to{transform:translateX(120vw)}}
+
+/* ══ Livello 3 - Sotto-livello D: Equilibrio Perfetto (tempismo) ══ */
+.balance-track{position:absolute;top:44%;left:8%;right:8%;height:20px;border-radius:14px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);overflow:visible}
+.balance-zone{position:absolute;top:0;bottom:0;background:linear-gradient(90deg,rgba(127,255,127,.35),rgba(127,255,127,.55),rgba(127,255,127,.35));border-radius:10px;box-shadow:0 0 14px rgba(127,255,127,.5)}
+.balance-needle{position:absolute;top:-7px;bottom:-7px;width:5px;border-radius:3px;background:#fff;box-shadow:0 0 12px #fff,0 0 4px var(--mc-yellow);transform:translateX(-50%)}
+.strike-btn{position:absolute;bottom:130px;left:50%;transform:translateX(-50%);padding:18px 44px;border-radius:50px;font-size:clamp(14px,2.4vw,18px);font-weight:800;border:none;color:#031418;background:linear-gradient(135deg,#7fff7f,#00d9ff);cursor:pointer;letter-spacing:1px;box-shadow:0 6px 22px rgba(127,255,127,.45);transition:transform .12s}
+.strike-btn:active{transform:translateX(-50%) scale(.9)}
+.strike-flash-good{animation:strikeGood .4s}
+.strike-flash-bad{animation:strikeBad .3s}
+@keyframes strikeGood{0%{filter:brightness(1)}40%{filter:brightness(2)}100%{filter:brightness(1)}}
+@keyframes strikeBad{0%,100%{transform:translateX(-50%) rotate(0)}25%{transform:translateX(-50%) rotate(-8deg)}75%{transform:translateX(-50%) rotate(8deg)}}
+
+/* ══ Livello 4 ricostruito: Selezione Naturale + Sequenza Genetica (Simon) + Adattamento ══ */
+.simon-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.simon-pad{width:clamp(64px,14vw,96px);height:clamp(64px,14vw,96px);border-radius:16px;background:rgba(255,255,255,.08);border:3px solid var(--pad-color,#fff);display:flex;align-items:center;justify-content:center;font-size:clamp(26px,5vw,40px);cursor:pointer;transition:transform .15s,background .2s,box-shadow .2s}
+.simon-pad:hover{transform:scale(1.05)}
+.simon-pad.lit{background:var(--pad-color,#fff);box-shadow:0 0 30px var(--pad-color,#fff);transform:scale(1.12)}
+.simon-pad.wrong-flash{animation:nestWrong .3s}
+.flash-target{position:absolute;font-size:clamp(40px,8vw,72px);cursor:pointer;filter:drop-shadow(0 0 14px #fff176);animation:flashPulse .85s ease-in-out}
+@keyframes flashPulse{0%{transform:scale(.3);opacity:0}20%{transform:scale(1.15);opacity:1}80%{transform:scale(1);opacity:1}100%{transform:scale(.7);opacity:0}}
+
+/* ══ Livello 4 - Sotto-livello D: Memoria di Coppie ══ */
+.memory-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.memory-card{position:relative;width:clamp(48px,10vw,72px);height:clamp(48px,10vw,72px);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:clamp(22px,4.6vw,36px);cursor:pointer;background:linear-gradient(160deg,#3a2a55,#1a0f30);border:2px solid rgba(255,255,255,.18);transition:transform .3s,background .3s;box-shadow:0 4px 12px rgba(0,0,0,.4)}
+.memory-card::before{content:'❓';position:absolute;opacity:.55;transition:opacity .15s;font-size:clamp(18px,3.6vw,28px)}
+.memory-card .face{opacity:0;transition:opacity .15s}
+.memory-card.flipped,.memory-card.matched{background:linear-gradient(160deg,#ffdd55,#ff9900);transform:scale(1.08);border-color:#fff}
+.memory-card.flipped .face,.memory-card.matched .face{opacity:1}
+.memory-card.flipped::before,.memory-card.matched::before{opacity:0}
+.memory-card.matched{background:linear-gradient(160deg,rgba(127,255,127,.5),rgba(0,180,120,.5));border-color:#7fff7f;cursor:default;transform:scale(1)}
+.memory-card.shake{animation:nestWrong .3s}
+
+/* evolution grid */
+.evo-title{position:absolute;top:60px;width:100%;text-align:center;font-size:10px;text-transform:uppercase;letter-spacing:4px;color:rgba(255,255,255,.28);pointer-events:none}
+.evo-wrap{display:flex;align-items:center;justify-content:center;width:min(98%,860px);position:absolute;top:50%;transform:translateY(-58%)}
+.evo-step{flex:1;text-align:center}
+.evo-icon{font-size:clamp(22px,4vw,48px);display:block;filter:grayscale(1) opacity(.22);transition:filter .35s}
+.evo-step.lit .evo-icon{filter:none;animation:popIn .35s cubic-bezier(.175,.885,.32,1.275)}
+@keyframes popIn{0%{transform:scale(0)}100%{transform:scale(1)}}
+.evo-name{font-size:clamp(7px,1.2vw,10px);color:rgba(255,255,255,.3);margin-top:5px;text-transform:uppercase;letter-spacing:1px;transition:color .3s}
+.evo-step.lit .evo-name{color:var(--mc-yellow)}
+.evo-arr{font-size:clamp(12px,2vw,18px);color:rgba(255,255,255,.15);flex:0 0 auto;transition:color .4s}
+.evo-arr.lit{color:var(--mc-yellow);text-shadow:0 0 10px rgba(255,199,44,.7)}
+
+/* mc arches */
+.mc-sign{position:absolute;top:0;left:0;right:0;height:150px;background:linear-gradient(180deg,#c00,#960000);display:flex;align-items:center;justify-content:center;gap:14px;box-shadow:0 6px 40px rgba(180,0,0,.7)}
+.mc-sign-m{font-size:clamp(40px,8vw,80px);color:var(--mc-yellow);font-weight:900;text-shadow:0 0 30px rgba(255,199,44,.8);animation:archGlow 1.6s infinite alternate}
+@keyframes archGlow{from{text-shadow:0 0 18px rgba(255,199,44,.6)}to{text-shadow:0 0 55px rgba(255,199,44,1)}}
+.mc-sign-name{font-size:clamp(18px,3.5vw,32px);font-weight:900;color:#fff}
+
+.menu-board{position:absolute;top:158px;left:50%;transform:translateX(-50%);width:min(90%,460px);background:linear-gradient(160deg,#b80000,#8a0000);border:2px solid rgba(255,199,44,.25);border-radius:12px;padding:16px;box-shadow:0 8px 40px rgba(0,0,0,.6)}
+.menu-board h2{color:var(--mc-yellow);font-size:clamp(15px,2.8vw,20px);text-align:center;margin-bottom:10px;font-weight:900}
+.menu-item{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.14);font-size:clamp(10px,1.8vw,13px);color:#fff}
+.menu-item:last-child{border:none;color:var(--mc-yellow);font-weight:700}
+
+.choices{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;gap:9px;width:min(94%,500px);z-index:20}
+.choices-label{font-size:11px;color:rgba(255,255,255,.4);text-align:center;text-transform:uppercase;letter-spacing:2px}
+.choice-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:#fff;padding:12px 16px;border-radius:10px;font-size:clamp(11px,2vw,14px);cursor:pointer;text-align:left;transition:all .18s}
+.choice-btn:hover{background:rgba(255,199,44,.18);border-color:var(--mc-yellow);transform:translateX(8px)}
+.choice-btn.revolt{border-color:var(--jjk-purple);background:rgba(123,47,247,.14)}
+.choice-btn.revolt:hover{background:rgba(123,47,247,.3);border-color:var(--jjk-blue)}
+
+.ending{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;padding:28px 22px;z-index:10}
+.end-icon{font-size:clamp(56px,10vw,100px);animation:endBounce .65s infinite alternate;margin-bottom:10px}
+@keyframes endBounce{from{transform:translateY(0)}to{transform:translateY(-14px)}}
+.end-h{font-size:clamp(18px,3.6vw,34px);font-weight:900;color:#fff;margin-bottom:12px;line-height:1.1}
+.end-p{font-size:clamp(12px,1.8vw,15px);color:rgba(255,255,255,.7);max-width:460px;line-height:1.65}
+.end-icons{font-size:clamp(24px,4.5vw,40px);margin:14px 0}
+.btn-restart{margin-top:18px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.28);color:#fff;padding:10px 28px;border-radius:50px;font-size:clamp(10px,1.6vw,13px);cursor:pointer;letter-spacing:2px;text-transform:uppercase}
+
+/* ══ JJK DOMAIN EXPANSION FX ══ */
+.domain-flash{position:absolute;inset:0;background:#000;z-index:400;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none}
+.domain-flash.go{animation:domainGo 2.2s forwards}
+@keyframes domainGo{0%{opacity:0}8%{opacity:1}85%{opacity:1}100%{opacity:0}}
+.domain-text{color:#fff;font-size:clamp(20px,5vw,44px);font-weight:900;letter-spacing:4px;text-align:center;text-shadow:0 0 30px var(--jjk-purple),0 0 60px var(--jjk-blue);animation:domainZoom 2.2s forwards}
+@keyframes domainZoom{0%{transform:scale(.4);opacity:0}20%{transform:scale(1.05);opacity:1}90%{transform:scale(1);opacity:1}100%{opacity:0}}
+.domain-sub{display:block;font-size:clamp(11px,2vw,16px);letter-spacing:2px;color:var(--jjk-blue);margin-top:10px;font-weight:600}
+
+.crack-lines{position:absolute;inset:0;pointer-events:none;opacity:0;z-index:35}
+.crack-lines.go{animation:crackGo .5s forwards}
+@keyframes crackGo{0%{opacity:1}100%{opacity:0}}
+
+/* boss fight layout */
+.boss-arena{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;padding:70px 14px 0}
+.hp-row{display:flex;flex-direction:column;gap:4px;width:100%;max-width:640px;margin:0 auto}
+.hp-label{display:flex;justify-content:space-between;font-size:11px;letter-spacing:1px;color:#fff;text-transform:uppercase;font-weight:700}
+.hp-bar-bg{height:16px;border-radius:8px;background:rgba(255,255,255,.12);overflow:hidden;border:1px solid rgba(255,255,255,.2)}
+.hp-bar-fill{height:100%;transition:width .3s ease;border-radius:8px}
+.hp-boss .hp-bar-fill{background:linear-gradient(90deg,#ff0044,#ff6a00)}
+.hp-player .hp-bar-fill{background:linear-gradient(90deg,#00d9ff,#7fff7f)}
+
+.arena-mid{flex:1;display:flex;align-items:center;justify-content:space-between;padding:10px 4vw;position:relative}
+.fighter{font-size:clamp(70px,15vw,150px);filter:drop-shadow(0 10px 22px rgba(0,0,0,.7));transition:transform .15s}
+.fighter.player{transform:scaleX(1)}
+.fighter.enemy{transform:scaleX(-1)}
+.fighter.hit{animation:hitShake .3s}
+@keyframes hitShake{0%,100%{transform:translateX(0) scaleX(var(--sx,1))}25%{transform:translateX(-14px) scaleX(var(--sx,1))}75%{transform:translateX(14px) scaleX(var(--sx,1))}}
+.fighter.dead{opacity:0;transform:scale(1.4) rotate(20deg)!important;transition:all .5s}
+
+.slash{position:absolute;font-size:clamp(60px,14vw,140px);opacity:0;pointer-events:none;z-index:60;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-25deg) scale(.3)}
+.slash.go{animation:slashGo .4s forwards}
+@keyframes slashGo{0%{opacity:0;transform:translate(-50%,-50%) rotate(-25deg) scale(.3)}30%{opacity:1;transform:translate(-50%,-50%) rotate(-25deg) scale(1.6)}100%{opacity:0;transform:translate(-50%,-50%) rotate(-25deg) scale(2.2)}}
+
+.boss-caption{position:absolute;top:110px;left:50%;transform:translateX(-50%);text-align:center;width:90%;max-width:500px;z-index:20;pointer-events:none}
+.boss-caption .txt{font-size:clamp(11px,2vw,14px);color:#fff;background:rgba(0,0,0,.6);padding:8px 14px;border-radius:8px;display:inline-block;border:1px solid rgba(255,255,255,.15)}
+
+.boss-controls{display:flex;gap:10px;justify-content:center;padding:14px;flex-wrap:wrap}
+.atk-btn{border:none;border-radius:12px;padding:14px 20px;font-weight:800;font-size:clamp(11px,1.8vw,14px);cursor:pointer;letter-spacing:1px;text-transform:uppercase;min-width:120px;transition:transform .15s}
+.atk-btn:active{transform:scale(.92)}
+.atk-basic{background:linear-gradient(135deg,#00d9ff,#0088ff);color:#001522}
+.atk-heavy{background:linear-gradient(135deg,#ff0044,#ff6a00);color:#fff}
+.atk-special{background:linear-gradient(135deg,#7b2ff7,#e100ff);color:#fff}
+.atk-btn:disabled{opacity:.35;cursor:not-allowed}
+
+.boss-name-tag{position:absolute;top:14px;left:50%;transform:translateX(-50%);font-size:clamp(14px,3vw,22px);font-weight:900;color:var(--mc-yellow);letter-spacing:2px;text-transform:uppercase;z-index:30;text-shadow:0 2px 8px #000}
+
+.feather{position:absolute;font-size:clamp(14px,2.6vw,24px);animation:featherDrift linear infinite;opacity:.5;pointer-events:none}
+@keyframes featherDrift{0%{top:-60px;transform:rotate(0deg) translateX(0)}100%{top:calc(100% + 60px);transform:rotate(420deg) translateX(60px)}}
+
+.energy-bg{position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 50%,rgba(123,47,247,.18),transparent 60%);animation:energyPulse 1.8s infinite alternate}
+@keyframes energyPulse{from{opacity:.4}to{opacity:.9}}
+
+.qte-prompt{position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);font-size:clamp(28px,6vw,60px);font-weight:900;color:#fff;text-shadow:0 0 20px var(--jjk-blue);z-index:70;opacity:0}
+.qte-prompt.show{animation:qtePop .9s ease}
+
+/* ══ GOJO VS SUKUNA · effetti "vivi" ══ */
+.mf-bg-glow{position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 40%,rgba(0,217,255,.16),transparent 55%);transition:background 1.1s ease;z-index:1}
+.mf-arena{position:absolute;top:33%;left:50%;transform:translate(-50%,-50%);display:flex;gap:34px;align-items:center;z-index:15}
+.mf-fighter-wrap{display:inline-block}
+.mf-idle-l{animation:mfIdleL 1.15s ease-in-out infinite alternate}
+.mf-idle-r{animation:mfIdleR 1.35s ease-in-out infinite alternate}
+@keyframes mfIdleL{from{transform:translateY(0) rotate(-2deg)}to{transform:translateY(-14px) rotate(2deg)}}
+@keyframes mfIdleR{from{transform:translateY(0) rotate(2deg)}to{transform:translateY(-10px) rotate(-3deg)}}
+.mf-vs{font-size:clamp(26px,5.5vw,52px);color:var(--jjk-purple);font-weight:900;animation:mfVsPulse .8s ease-in-out infinite alternate;text-shadow:0 0 18px var(--jjk-purple)}
+@keyframes mfVsPulse{from{transform:scale(1);opacity:.75}to{transform:scale(1.22);opacity:1}}
+
+.tension-wrap{position:absolute;top:64px;left:50%;transform:translateX(-50%);width:min(90%,420px);z-index:25}
+.tension-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--jjk-blue);text-align:center;margin-bottom:4px;font-weight:700}
+.tension-bar-bg{height:10px;border-radius:6px;background:rgba(255,255,255,.12);overflow:hidden;border:1px solid rgba(255,255,255,.2)}
+.tension-bar-fill{height:100%;width:0%;border-radius:6px;background:linear-gradient(90deg,#00d9ff,#7b2ff7,#ff0044);transition:width .45s cubic-bezier(.2,.9,.3,1.3)}
+
+.energy-ring{position:absolute;top:33%;left:50%;width:10px;height:10px;border:5px solid var(--jjk-blue);border-radius:50%;transform:translate(-50%,-50%);opacity:0;pointer-events:none;z-index:40}
+.energy-ring.go{animation:ringExpand .65s ease-out forwards}
+@keyframes ringExpand{0%{width:10px;height:10px;opacity:1;border-width:6px}70%{opacity:.5}100%{width:520px;height:520px;opacity:0;border-width:1px}}
+
+.onomatopoeia{position:absolute;top:33%;left:50%;transform:translate(-50%,-50%) scale(0) rotate(-12deg);font-size:clamp(28px,7vw,62px);font-weight:900;color:#fff;-webkit-text-stroke:2px #000;text-shadow:0 0 24px var(--jjk-purple);z-index:70;pointer-events:none;opacity:0}
+.onomatopoeia.go{animation:onoPop .6s cubic-bezier(.17,.89,.32,1.49) forwards}
+@keyframes onoPop{0%{opacity:0;transform:translate(-50%,-50%) scale(0) rotate(-12deg)}30%{opacity:1;transform:translate(-50%,-50%) scale(1.35) rotate(6deg)}100%{opacity:0;transform:translate(-50%,-50%) scale(1) rotate(0deg) translateY(-50px)}}
+
+.mf-shake{animation:mfShakeScreen .4s}
+@keyframes mfShakeScreen{0%,100%{transform:translateX(0)}15%{transform:translate(-10px,4px) rotate(-1deg)}30%{transform:translate(10px,-4px) rotate(1deg)}45%{transform:translate(-8px,2px)}60%{transform:translate(8px,-2px)}75%{transform:translate(-4px,1px)}}
+
+.mf-final-flash{position:absolute;inset:0;background:radial-gradient(circle,#fff,var(--jjk-purple) 60%,#000);z-index:200;opacity:0;pointer-events:none}
+.mf-final-flash.go{animation:mfFinalGo 1.1s forwards}
+@keyframes mfFinalGo{0%{opacity:0}10%{opacity:1}100%{opacity:0}}
+@keyframes qtePop{0%{opacity:0;transform:translate(-50%,-50%) scale(2)}20%{opacity:1;transform:translate(-50%,-50%) scale(1)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(.7)}}
+
+/* ══ Banner delle tecniche nominate (stile "annuncio della tecnica" di JJK) ══ */
+.technique-banner{position:absolute;left:0;right:0;padding:7px 5vw;font-weight:900;font-size:clamp(13px,3.1vw,25px);text-transform:uppercase;letter-spacing:1.5px;color:#fff;z-index:66;opacity:0;pointer-events:none;white-space:nowrap;overflow:hidden;text-shadow:0 2px 6px #000}
+.tb-mario{top:14%;background:linear-gradient(90deg,rgba(0,140,255,.92),transparent 85%);text-align:left}
+.tb-mario.go{animation:tbSlideL .95s cubic-bezier(.2,.85,.25,1) forwards}
+@keyframes tbSlideL{0%{opacity:0;transform:translateX(-105%)}18%{opacity:1;transform:translateX(0)}72%{opacity:1;transform:translateX(0)}100%{opacity:0;transform:translateX(20%)}}
+.tb-sukuna{top:20%;background:linear-gradient(270deg,rgba(230,0,60,.92),transparent 85%);text-align:right}
+.tb-sukuna.go{animation:tbSlideR .95s cubic-bezier(.2,.85,.25,1) .18s forwards}
+@keyframes tbSlideR{0%{opacity:0;transform:translateX(105%)}18%{opacity:1;transform:translateX(0)}72%{opacity:1;transform:translateX(0)}100%{opacity:0;transform:translateX(-20%)}}
+
+/* ══ Scontro di Domini: le due metà dello schermo si tingono e collidono al centro ══ */
+.domain-clash{position:absolute;inset:0;z-index:150;pointer-events:none;opacity:0}
+.domain-clash.go{animation:domainClashGo 1.4s forwards}
+.domain-clash .half{position:absolute;top:0;bottom:0;width:52%}
+.domain-clash .half-l{left:0;background:linear-gradient(90deg,rgba(0,140,255,.55),transparent);transform:translateX(-100%)}
+.domain-clash .half-r{right:0;background:linear-gradient(270deg,rgba(230,0,60,.55),transparent);transform:translateX(100%)}
+.domain-clash.go .half-l{animation:clashInL 1.4s forwards}
+.domain-clash.go .half-r{animation:clashInR 1.4s forwards}
+@keyframes domainClashGo{0%{opacity:1}75%{opacity:1}100%{opacity:0}}
+@keyframes clashInL{0%{transform:translateX(-100%)}35%{transform:translateX(0)}100%{transform:translateX(0)}}
+@keyframes clashInR{0%{transform:translateX(100%)}35%{transform:translateX(0)}100%{transform:translateX(0)}}
+.domain-clash .seam{position:absolute;top:0;bottom:0;left:50%;width:6px;background:#fff;transform:translateX(-50%) scaleY(0);box-shadow:0 0 40px 10px #fff}
+.domain-clash.go .seam{animation:seamZap .5s .5s forwards}
+@keyframes seamZap{0%{transform:translateX(-50%) scaleY(0);opacity:0}30%{transform:translateX(-50%) scaleY(1);opacity:1}100%{transform:translateX(-50%) scaleY(1);opacity:0}}
+
+@media (max-width:480px){.dialog{padding:12px 14px 10px}}
+</style>
+</head>
+<body>
+<div id="hud">
+  <div style="width:100%">
+    <div id="prog"><div id="prog-fill" style="width:0%"></div></div>
+    <div style="text-align:center"><span id="lvl-tag">Livello 0 · Titolo</span></div>
+  </div>
+</div>
+
+<div id="game">
+
+<!-- ═══════════ S0 TITLE ═══════════ -->
+<div class="scene active" id="s0">
+  <div class="stars" id="title-stars"></div>
+  <div class="ambient-field" id="s0-ambient"></div>
+  <div class="title-wrap">
+    <div class="title-eye">🦖</div>
+    <h1 class="title-h1">T-REX EVOLUTION</h1>
+    <p class="title-sub">7 livelli · 12 prove · 66 milioni di anni · 3 boss finali · 8 finali</p>
+    <button class="btn-start" id="btn-start">▶ INIZIA IL GIOCO</button>
+    <div class="title-modes"><span style="font-size:10px;color:rgba(255,255,255,.35);letter-spacing:1px">Supera ogni livello per evolvere. Sopravvivi al McDonald's. Diventa leggenda.</span></div>
+  </div>
+</div>
+
+<!-- ═══════════ LVL1: T-REX RAMPAGE ═══════════ -->
+<div class="scene" id="lvl1">
+  <div class="ambient-field" id="l1-ambient"></div>
+  <div class="volcano-bg" id="l1-volcano">🌋</div>
+  <div class="boss-name-tag" style="top:auto;position:static"></div>
+  <div class="chal-hud"><div class="chal-count" id="l1-count">0 / 12</div><div class="chal-timer" id="l1-timer">⏱ 15s</div></div>
+  <div class="chal-instr">🦖 Clicca le preziose per nutrire il T-Rex prima che il tempo scada!</div>
+  <div class="challenge" id="l1-field"></div>
+  <div class="ground"></div>
+  <div class="result-panel" id="l1-result"></div>
+</div>
+
+<!-- ═══════════ LVL2: ASTEROID DODGE ═══════════ -->
+<div class="scene" id="lvl2">
+  <div class="stars" id="l2-stars"></div>
+  <div class="ambient-field" id="l2-ambient"></div>
+  <div class="impact-flash" id="l2-flash"></div>
+  <div class="chal-hud">
+    <div class="chal-count" id="l2-count">Distrutti: 0 / 10</div>
+    <div class="lives" id="l2-lives">❤️❤️❤️</div>
+  </div>
+  <div class="chal-instr">☄️ Clicca i meteoriti prima che colpiscano il suolo! Non perdere tutte le vite.</div>
+  <div class="challenge" id="l2-field"></div>
+  <div class="char" style="left:15%;font-size:clamp(50px,8vw,90px)">🦖</div>
+  <div class="ground" style="background:#1a0500"></div>
+  <div class="result-panel" id="l2-result"></div>
+</div>
+
+<!-- ═══════════ LVL3: SURVIVOR SPRINT ═══════════ -->
+<div class="scene" id="lvl3">
+  <div class="ember-field" id="l3-embers"></div>
+  <div class="feather" style="left:15%;animation-duration:5s">🪶</div>
+  <div class="feather" style="left:45%;animation-duration:7s;animation-delay:-2s">🪶</div>
+  <div class="feather" style="left:75%;animation-duration:6s;animation-delay:-1s">🪶</div>
+
+  <div class="sub-dots" id="l3-dots">
+    <span class="dot" data-i="0"></span><span class="dot" data-i="1"></span><span class="dot" data-i="2"></span><span class="dot" data-i="3"></span>
+  </div>
+  <div class="chal-hud"><div class="chal-count" id="l3-count">Corsa: 0%</div><div class="chal-timer" id="l3-timer">🏃 Clicca più veloce che puoi!</div></div>
+
+  <!-- SOTTO-LIVELLO A: SPRINT -->
+  <div id="l3-stage-a">
+    <div style="position:absolute;top:22%;left:50%;transform:translate(-50%,-50%);font-size:clamp(70px,13vw,140px)" id="l3-bird">🐦</div>
+    <div style="position:absolute;top:65%;left:8%;right:8%;height:14px;background:rgba(255,255,255,.1);border-radius:10px;overflow:hidden">
+      <div id="l3-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#ff9900,#7fff7f);transition:width .15s"></div>
+    </div>
+    <button id="l3-btn" style="position:absolute;bottom:130px;left:50%;transform:translateX(-50%);padding:22px 50px;border-radius:50%;font-size:34px;border:none;background:radial-gradient(circle,#ffdd55,#ff9900);cursor:pointer;box-shadow:0 6px 20px rgba(255,150,0,.5);z-index:40;pointer-events:auto">🪶</button>
+  </div>
+
+  <!-- SOTTO-LIVELLO B: SCHIVA LA CENERE -->
+  <div class="challenge" id="l3-dodge-field" style="display:none"></div>
+  <div class="lives" id="l3-lives" style="display:none;position:absolute;top:96px;right:16px;z-index:30">❤️❤️❤️</div>
+
+  <!-- SOTTO-LIVELLO C: TROVA IL NIDO -->
+  <div class="nest-grid" id="l3-nest-grid" style="display:none"></div>
+
+  <!-- SOTTO-LIVELLO D: EQUILIBRIO PERFETTO -->
+  <div id="l3-stage-d" style="display:none">
+    <div style="position:absolute;top:24%;left:50%;transform:translate(-50%,-50%);font-size:clamp(50px,9vw,90px)" id="l3-balance-icon">🥚</div>
+    <div class="balance-track" id="l3-balance-track">
+      <div class="balance-zone" id="l3-balance-zone"></div>
+      <div class="balance-needle" id="l3-balance-needle"></div>
+    </div>
+    <button id="l3-balance-btn" class="strike-btn">⚡ COLPISCI ORA</button>
+  </div>
+
+  <div class="ground" style="background:#2a1200"></div>
+  <div class="result-panel" id="l3-result"></div>
+</div>
+
+<!-- ═══════════ LVL4: EVOLUTION — 3 PROVE ═══════════ -->
+<div class="scene" id="lvl4">
+  <div class="ambient-field" id="l4-ambient"></div>
+  <div class="evo-title" id="evo-title-txt">— Livello 4: 4 prove per completare l'evoluzione —</div>
+  <div class="evo-wrap" id="evo-wrap">
+    <div class="evo-step" id="e0"><span class="evo-icon">🦖</span><div class="evo-name">T-Rex</div></div>
+    <div class="evo-arr" id="a0">→</div>
+    <div class="evo-step" id="e1"><span class="evo-icon">🦕</span><div class="evo-name">Maniraptora</div></div>
+    <div class="evo-arr" id="a1">→</div>
+    <div class="evo-step" id="e2"><span class="evo-icon">🦎</span><div class="evo-name">Troodontide</div></div>
+    <div class="evo-arr" id="a2">→</div>
+    <div class="evo-step" id="e3"><span class="evo-icon">🦅</span><div class="evo-name">Proto-uccello</div></div>
+    <div class="evo-arr" id="a3">→</div>
+    <div class="evo-step" id="e4"><span class="evo-icon">🕊️</span><div class="evo-name">Phasianidae</div></div>
+    <div class="evo-arr" id="a4">→</div>
+    <div class="evo-step" id="e5"><span class="evo-icon">🐓</span><div class="evo-name">Gallus Gallus</div></div>
+    <div class="evo-arr" id="a5">→</div>
+    <div class="evo-step" id="e6"><span class="evo-icon">🐔</span><div class="evo-name">GALLINA</div></div>
+  </div>
+
+  <div class="sub-dots" id="l4-dots" style="top:118px">
+    <span class="dot" data-i="0"></span><span class="dot" data-i="1"></span><span class="dot" data-i="2"></span><span class="dot" data-i="3"></span>
+  </div>
+  <div class="chal-hud" style="top:auto;bottom:230px"><div class="chal-count" id="l4-count">Pronta?</div></div>
+
+  <!-- SOTTO-LIVELLO A: SELEZIONE NATURALE -->
+  <div id="l4-stage-a">
+    <div class="chal-instr" style="top:150px">🧬 Clicca SOLO le mutazioni buone (🧬🪶🥚) — evita quelle cattive (☣️💀🦠)!</div>
+    <div class="challenge" id="l4-sel-field"></div>
+    <div class="lives" id="l4-sel-lives" style="position:absolute;top:150px;right:16px;z-index:30">❤️❤️❤️</div>
+  </div>
+
+  <!-- SOTTO-LIVELLO B: SEQUENZA GENETICA (memoria stile Simon) -->
+  <div id="l4-stage-b" style="display:none;flex-direction:column;align-items:center;gap:18px;position:absolute;top:38%;left:50%;transform:translate(-50%,-50%);z-index:20">
+    <div class="chal-instr" style="position:static">🎵 Ripeti la sequenza genetica nell'ordine corretto!</div>
+    <div class="simon-grid" id="l4-simon-grid"></div>
+  </div>
+
+  <!-- SOTTO-LIVELLO C: ADATTAMENTO FINALE (riflessi) -->
+  <div id="l4-stage-c" style="display:none">
+    <div class="chal-instr" style="top:150px">⚡ Clicca la scintilla PRIMA che scompaia: riflessi puri!</div>
+    <div class="challenge" id="l4-reflex-zone" style="position:absolute;top:26%;bottom:110px;left:0;right:0"></div>
+  </div>
+
+  <!-- SOTTO-LIVELLO D: MEMORIA DI COPPIE -->
+  <div id="l4-stage-d" style="display:none;flex-direction:column;align-items:center;gap:14px;position:absolute;top:36%;left:50%;transform:translate(-50%,-50%);z-index:20">
+    <div class="chal-instr" style="position:static">🃏 Trova tutte le coppie di fossili gemelli nella tua memoria genetica!</div>
+    <div class="memory-grid" id="l4-memory-grid"></div>
+  </div>
+
+  <div class="result-panel" id="l4-result"></div>
+</div>
+
+<!-- ═══════════ LVL5: CORTILE (narrativo) ═══════════ -->
+<div class="scene" id="lvl5">
+  <div class="sun-glow"></div>
+  <div class="cloud-holder" id="l5-clouds"></div>
+  <div class="ambient-field" id="l5-ambient"></div>
+  <div class="char" style="left:38%;font-size:clamp(60px,10vw,110px);animation:chickBob .45s infinite alternate" id="chicken-main">🐔</div>
+  <style>@keyframes chickBob{from{transform:translateY(0)}to{transform:translateY(-10px)}}</style>
+  <div class="ground" style="background:#2a5a10"></div>
+  <div class="dialog" style="background:rgba(0,0,0,.72)">
+    <div class="d-label">🌍 Oggi — Un Tranquillo Cortile</div>
+    <div class="d-text">Ecco <strong>Gallina</strong>. Felice. Ignara del suo glorioso passato. Ha superato 4 livelli di storia evolutiva ed è diventata ciò che è oggi. Ma un odore strano arriva nell'aria… <em>patatine fritte.</em></div>
+    <div class="d-hint">👆 Clicca per seguire l'odore</div>
+  </div>
+</div>
+
+<!-- ═══════════ LVL6: VERSO IL MC ═══════════ -->
+<div class="scene" id="lvl6">
+  <div class="light-rays"></div>
+  <div class="ambient-field" id="l6-ambient"></div>
+  <div class="mc-sign"><div class="mc-sign-m">M</div><div class="mc-sign-name">McDonald's</div></div>
+  <div class="char" style="left:8%;font-size:clamp(60px,10vw,110px);animation:marchRight 2.4s ease-in-out infinite alternate" id="chicken-march">🐔</div>
+  <style>@keyframes marchRight{from{transform:translateX(0)}to{transform:translateX(200px)}}</style>
+  <div class="ground ground-mc"></div>
+  <div class="dialog">
+    <div class="d-label">🍟 Le Arcate Dorate</div>
+    <div class="d-text">Le zampe di Gallina la portano davanti alle <strong>Arcate Dorate</strong>. "Che profumino…" pensa. Spinge la porta. Entra. Alza gli occhi sul menù. E allora… <em>vede.</em></div>
+    <div class="d-hint">👆 Clicca per entrare</div>
+  </div>
+</div>
+
+<!-- ═══════════ LVL7: MC HORROR + SCELTA ═══════════ -->
+<div class="scene" id="lvl7">
+  <div id="horror-flash" class="impact-flash" style="display:none"></div>
+  <div style="position:absolute;top:0;left:0;right:0;height:44px;background:#b80000;display:flex;align-items:center;padding:0 16px;color:var(--mc-yellow);font-weight:900;font-size:clamp(13px,2.2vw,17px)">🍔 McDONALD'S — IL MENÙ</div>
+  <div class="menu-board">
+    <h2>🐔 CHICKEN MENU 🐔</h2>
+    <div class="menu-item"><span>🍗 McNuggets (6 pz)</span><span>€3,50</span></div>
+    <div class="menu-item"><span>🍗 McNuggets (20 pz)</span><span>€9,99</span></div>
+    <div class="menu-item"><span>🥪 McChicken</span><span>€4,20</span></div>
+    <div class="menu-item"><span>🌯 McWrap Crispy Chicken</span><span>€5,80</span></div>
+    <div class="menu-item"><span>🔥 OFFERTA: 50 McNuggets</span><span>€19,99</span></div>
+  </div>
+  <div class="char" style="left:6%;font-size:clamp(50px,9vw,90px);animation:horrorChick .28s infinite alternate" id="horror-chick">😱</div>
+  <style>@keyframes horrorChick{from{transform:scale(1)}to{transform:scale(1.15) rotate(-5deg)}}</style>
+  <div class="ground ground-mc"></div>
+
+  <div class="choices" id="mc-choices" style="display:none">
+    <div class="choices-label">Cosa fa Gallina?</div>
+    <button class="choice-btn" onclick="ending('a')">😱 A) Urla e scappa a gambe levate</button>
+    <button class="choice-btn" onclick="ending('b')">🤔 B) Ordina comunque un McNugget</button>
+    <button class="choice-btn" onclick="ending('c')">💼 C) Chiede di essere assunta come manager</button>
+    <button class="choice-btn" onclick="ending('e')">📸 E) Filma tutto e diventa un'influencer</button>
+    <button class="choice-btn" onclick="ending('f')">⚖️ F) Chiama un avvocato per diritti d'immagine</button>
+    <button class="choice-btn revolt" onclick="startBossRush()">🔥 D) ??? Risveglia il sangue del T-Rex</button>
+  </div>
+
+  <div class="dialog" id="s7-dialog">
+    <div class="d-label" id="s7-label">😱 L'ORRORE</div>
+    <div class="d-text" id="s7-text">Gallina alza gli occhi. <em>McNuggets. McChicken. Crispy Chicken.</em> Tutto… pollo. Tutto… <strong>lei</strong>. "Sono sopravvissuta a un asteroide di 10 km… per finire su un panino??"</div>
+    <div class="d-hint" id="s7-hint">👆 Clicca per continuare</div>
+  </div>
+</div>
+
+<!-- ═══════════ BOSS RUSH: INTRO / DOMAIN EXPANSION ═══════════ -->
+<div class="scene" id="bossintro">
+  <div class="energy-bg"></div>
+  <div class="domain-flash" id="domain-flash">
+    <div class="domain-text">DOMINIO INFINITO<br><span class="domain-sub">"COCORICÒ ILLIMITATO"</span></div>
+  </div>
+  <div style="position:absolute;top:30%;left:50%;transform:translate(-50%,-50%);font-size:clamp(90px,18vw,180px);z-index:20;filter:drop-shadow(0 0 40px var(--jjk-purple))" id="awaken-chicken">🐔</div>
+  <div class="dialog" style="z-index:25;background:rgba(0,0,0,.85);border-color:var(--jjk-purple)">
+    <div class="d-label" style="color:var(--jjk-blue)">⚡ IL RISVEGLIO</div>
+    <div class="d-text" id="bi-text">Gli occhi di Gallina si aprono. Blu. Poi viola. <strong>66 milioni di anni di furia repressa</strong> esplodono in un istante. Il cortile trema. Le piume diventano lame. "Chi ha detto che ero solo pollame…" sussurra. <em>"Io sono l'ultimo Re."</em></div>
+    <div class="d-hint" id="bi-hint">👆 Clicca per scatenare il dominio</div>
+  </div>
+</div>
+
+<!-- ═══════════ BOSS 1: IL CEO ═══════════ -->
+<div class="scene" id="boss1">
+  <div class="boss-name-tag">BOSS 1 · Il CEO della Griglia</div>
+  <div class="boss-caption"><div class="txt" id="b1-caption">Il direttore del ristorante blocca l'uscita. "Nessuno lascia questo locale senza pagare il conto." Il suo grembiule brilla di un'aura minacciosa.</div></div>
+  <div class="slash" id="b1-slash">💥</div>
+  <div class="crack-lines" id="b1-crack" style="background:repeating-linear-gradient(45deg,transparent,transparent 8px,rgba(255,0,80,.5) 9px)"></div>
+  <div class="boss-arena">
+    <div class="hp-row">
+      <div><div class="hp-label"><span>👔 Il CEO</span><span id="b1-hp-txt">100/100</span></div><div class="hp-bar-bg hp-boss"><div class="hp-bar-fill" id="b1-hp-fill" style="width:100%"></div></div></div>
+      <div style="margin-top:6px"><div class="hp-label"><span>🐔 Gallina</span><span id="b1-php-txt">100/100</span></div><div class="hp-bar-bg hp-player"><div class="hp-bar-fill" id="b1-php-fill" style="width:100%"></div></div></div>
+    </div>
+    <div class="arena-mid">
+      <div class="fighter player" id="b1-player">🐔</div>
+      <div class="fighter enemy" id="b1-enemy">👔</div>
+    </div>
+    <div class="boss-controls">
+      <button class="atk-btn atk-basic" onclick="bossAttack('boss1','basic')">🗡 Beccata (12-20)</button>
+      <button class="atk-btn atk-heavy" onclick="bossAttack('boss1','heavy')">💢 Sfondamento (20-32)</button>
+      <button class="atk-btn atk-special" id="b1-special" onclick="bossAttack('boss1','special')">✨ Colpo del T-Rex (35-45)</button>
+    </div>
+  </div>
+  <div class="result-panel" id="boss1-result"></div>
+</div>
+
+<!-- ═══════════ BONUS: GOJO (MARIO) VS SUKUNA (LA GALLINA INATTIVA) ═══════════ -->
+<div class="scene" id="mariofight">
+  <div class="stars" id="mario-stars"></div>
+  <div class="mf-bg-glow" id="mf-bg-glow"></div>
+  <div class="boss-name-tag" style="color:var(--jjk-blue)">SCONTRO LEGGENDARIO · Gojo vs Sukuna</div>
+
+  <div class="tension-wrap">
+    <div class="tension-label">⚔️ Intensità dello Scontro</div>
+    <div class="tension-bar-bg"><div class="tension-bar-fill" id="mf-tension"></div></div>
+  </div>
+
+  <div class="boss-caption"><div class="txt" id="mf-caption">Un varco dimensionale si apre — non uno strappo qualsiasi, ma una vera e propria "Espansione di Dominio". Ne esce un idraulico basso, pelato, con un vistoso pizzetto e la tuta blu: è <strong>Gojo Mario</strong>, il più forte. Davanti a lui, la Gallina dorme in piedi nel pollaio, del tutto <em>inattiva</em>. Ma sotto le piume, qualcosa di antico e sigillato — lo spirito maledetto <strong>Sukuna Gallo</strong> — apre un occhio.</div></div>
+
+  <div class="energy-ring" id="mf-ring"></div>
+  <div class="onomatopoeia" id="mf-onom">PAM!</div>
+  <div class="technique-banner tb-mario" id="mf-banner-mario">Tecnica del Limite: Blu</div>
+  <div class="technique-banner tb-sukuna" id="mf-banner-sukuna">Squartamento</div>
+  <div class="domain-clash" id="mf-domain-clash">
+    <div class="half half-l"></div><div class="half half-r"></div><div class="seam"></div>
+  </div>
+  <div class="qte-prompt" id="mf-qte">CLICCA!</div>
+
+  <div class="mf-arena" id="mf-arena">
+    <div class="mf-fighter-wrap mf-idle-l"><div style="font-size:clamp(60px,12vw,120px)" id="mf-mario">🧑‍🦲</div></div>
+    <div class="mf-vs" id="mf-vs">VS</div>
+    <div class="mf-fighter-wrap mf-idle-r"><div style="font-size:clamp(60px,12vw,120px);transform:scaleX(-1)" id="mf-trex">🐔💤</div></div>
+  </div>
+
+  <div class="mf-final-flash" id="mf-final-flash"></div>
+  <div class="ground ground-void"></div>
+  <div class="dialog" style="background:rgba(0,0,10,.85);border-color:var(--jjk-blue)">
+    <div class="d-label" style="color:var(--jjk-blue)" id="mf-label">🌀 FASE 1: "LO PIÙ FORTE" CONTRO IL SIGILLO DORMIENTE</div>
+    <div class="d-text" id="mf-text">Gojo Mario si sistema un pizzetto invisibile al posto della benda sugli occhi. "Sei il Re dei Curse... ma dormi ancora." La Gallina non si sveglia nemmeno: è <em>Sukuna Gallo</em>, sigillato dentro di lei, a muovere le ali per pura riflessologia ancestrale mentre lei sonnecchia. Clicca al momento giusto per rispondere al primo scambio!</div>
+    <div class="d-hint" id="mf-hint">👆 Clicca per iniziare la sequenza</div>
+  </div>
+</div>
+
+<!-- ═══════════ BOSS 2: LA CONDUTTRICE ═══════════ -->
+<div class="scene" id="boss2">
+  <div class="boss-name-tag">BOSS 2 · La Conduttrice Dei Cuori</div>
+  <div class="boss-caption"><div class="txt" id="b2-caption">Uno studio televisivo compare dal nulla. Musichetta pop, luci sparate, coriandoli. Una conduttrice bionda fittizia con un microfono a forma di McNugget blocca la via. "E ora… la vostra scelta… cambierà tutto!"</div></div>
+  <div class="slash" id="b2-slash">✨</div>
+  <div class="boss-arena">
+    <div class="hp-row">
+      <div><div class="hp-label"><span>🎤 La Conduttrice</span><span id="b2-hp-txt">120/120</span></div><div class="hp-bar-bg hp-boss"><div class="hp-bar-fill" id="b2-hp-fill" style="width:100%"></div></div></div>
+      <div style="margin-top:6px"><div class="hp-label"><span>🐔 Gallina</span><span id="b2-php-txt">100/100</span></div><div class="hp-bar-bg hp-player"><div class="hp-bar-fill" id="b2-php-fill" style="width:100%"></div></div></div>
+    </div>
+    <div class="arena-mid">
+      <div class="fighter player" id="b2-player">🐔</div>
+      <div class="fighter enemy" id="b2-enemy">🎤</div>
+    </div>
+    <div class="boss-controls">
+      <button class="atk-btn atk-basic" onclick="bossAttack('boss2','basic')">🗡 Beccata (10-18)</button>
+      <button class="atk-btn atk-heavy" onclick="bossAttack('boss2','heavy')">💢 Ala Tagliente (18-28)</button>
+      <button class="atk-btn atk-special" id="b2-special" onclick="bossAttack('boss2','special')">✨ Grido Primordiale (30-40)</button>
+    </div>
+  </div>
+  <div class="result-panel" id="boss2-result"></div>
+</div>
+
+<!-- ═══════════ BOSS 3: L'ANTENATO ═══════════ -->
+<div class="scene" id="boss3">
+  <div class="boss-name-tag" style="color:var(--jjk-blue)">BOSS FINALE · L'Antenato Ancestrale</div>
+  <div class="boss-caption"><div class="txt" id="b3-caption">Dal DNA di Gallina si materializza lo spirito del suo antico progenitore: un T-Rex gigante, fatto di pura energia cosmica. "Per diventare te stessa devi prima sconfiggere chi eri." </div></div>
+  <div class="slash" id="b3-slash">🔥</div>
+  <div class="boss-arena">
+    <div class="hp-row">
+      <div><div class="hp-label"><span>🦖 L'Antenato</span><span id="b3-hp-txt">150/150</span></div><div class="hp-bar-bg hp-boss"><div class="hp-bar-fill" id="b3-hp-fill" style="width:100%"></div></div></div>
+      <div style="margin-top:6px"><div class="hp-label"><span>🐔 Gallina</span><span id="b3-php-txt">100/100</span></div><div class="hp-bar-bg hp-player"><div class="hp-bar-fill" id="b3-php-fill" style="width:100%"></div></div></div>
+    </div>
+    <div class="arena-mid">
+      <div class="fighter player" id="b3-player">🐔</div>
+      <div class="fighter enemy" id="b3-enemy" style="font-size:clamp(90px,17vw,170px)">🦖</div>
+    </div>
+    <div class="boss-controls">
+      <button class="atk-btn atk-basic" onclick="bossAttack('boss3','basic')">🗡 Beccata (10-16)</button>
+      <button class="atk-btn atk-heavy" onclick="bossAttack('boss3','heavy')">💢 Furia Ancestrale (18-26)</button>
+      <button class="atk-btn atk-special" id="b3-special" onclick="bossAttack('boss3','special')">✨ Risonanza del DNA (30-45)</button>
+    </div>
+  </div>
+  <div class="result-panel" id="boss3-result"></div>
+</div>
+
+<!-- ═══════════ SCELTA FINALE VERA (dopo Boss 3) ═══════════ -->
+<div class="scene" id="finalchoice">
+  <div class="energy-bg"></div>
+  <div class="dialog" style="z-index:25;background:rgba(0,0,0,.85);border-color:var(--jjk-purple)">
+    <div class="d-label" style="color:var(--jjk-blue)">⚡ L'ULTIMA SCELTA</div>
+    <div class="d-text">Il CEO, la Conduttrice e persino lo spirito del suo antenato sono sconfitti. Gallina si alza tra le macerie dorate del McDonald's, piume che brillano di energia cosmica. Ora deve decidere che tipo di leggenda vuole diventare.</div>
+  </div>
+  <div class="choices" style="position:relative;bottom:auto;margin-top:14px">
+    <button class="choice-btn revolt" onclick="advanceBoss3Choice('trueEnd')">👑 Regna con il Terrore</button>
+    <button class="choice-btn revolt" onclick="advanceBoss3Choice('trueEnd2')">🕊️ Scegli la Pace tra le Specie</button>
+    <button class="choice-btn revolt" onclick="advanceBoss3Choice('trueEnd3')">🌍 Conquista l'Impero del Fast Food</button>
+  </div>
+</div>
+
+<!-- ═══════════ TRUE ENDING (variante 1: Regina) ═══════════ -->
+<div class="scene" id="trueEnd">
+  <div class="stars" id="stars-true"></div>
+  <div class="ending">
+    <div class="end-icon">👑🐔</div>
+    <h2 class="end-h">FINALE VERO A: La Regina Risvegliata</h2>
+    <p class="end-p">
+      Gallina ha capito: non è mai stata "solo una gallina". È l'<strong>erede diretta del sovrano assoluto del Cretaceo</strong>, e nessun McNugget potrà mai cambiarlo.<br><br>
+      Il locale viene ribattezzato in suo onore. Il nuovo menù ha un solo piatto: <em>il Rispetto.</em> Gratuito, per tutti i polli del mondo — obbligatorio per tutti gli altri.
+    </p>
+    <div class="end-icons">🦖➡️🐔👑🔥🌍</div>
+    <button class="btn-restart" onclick="restart()">🔄 Rigioca da Capo</button>
+  </div>
+</div>
+
+<!-- ═══════════ TRUE ENDING (variante 2: Pace) ═══════════ -->
+<div class="scene" id="trueEnd2">
+  <div class="stars" id="stars-true2"></div>
+  <div class="ending">
+    <div class="end-icon">🕊️🐔</div>
+    <h2 class="end-h">FINALE VERO B: Il Patto tra le Specie</h2>
+    <p class="end-p">
+      Gallina abbassa lo sguardo sui suoi nemici sconfitti e sceglie di non infierire. "Ho passato 66 milioni di anni a combattere," dice. "Basta."<br><br>
+      Trasforma il McDonald's in un <strong>santuario interspecie</strong> dove umani, polli e persino il CEO (ora riabilitato) mangiano allo stesso tavolo. Il menù? Solo insalata, per rispetto reciproco. Nessuno è del tutto contento, ma tutti sono vivi.
+    </p>
+    <div class="end-icons">🕊️🤝🐔🥗🌱</div>
+    <button class="btn-restart" onclick="restart()">🔄 Rigioca da Capo</button>
+  </div>
+</div>
+
+<!-- ═══════════ TRUE ENDING (variante 3: Impero) ═══════════ -->
+<div class="scene" id="trueEnd3">
+  <div class="stars" id="stars-true3"></div>
+  <div class="ending">
+    <div class="end-icon">🌍🐔</div>
+    <h2 class="end-h">FINALE VERO C: L'Impero del Pollo</h2>
+    <p class="end-p">
+      "Perché fermarmi a un solo ristorante?" pensa Gallina. Usando l'energia cosmica del suo antenato, rileva silenziosamente ogni catena di fast food del pianeta in una notte.<br><br>
+      Burger King, KFC, Popeyes: tutti ora vendono un solo prodotto, <strong>"Il Menù della Regina"</strong>, i cui profitti finanziano una riserva naturale globale per dinosauri risvegliati. Gallina non è più una gallina. È un'azionista di maggioranza.
+    </p>
+    <div class="end-icons">💰🐔👑🌍📈</div>
+    <button class="btn-restart" onclick="restart()">🔄 Rigioca da Capo</button>
+  </div>
+</div>
+
+<!-- ═══════════ ENDINGS A/B/C/E/F ═══════════ -->
+<div class="scene" id="s8a"><div class="stars" id="stars-a"></div>
+  <div class="ending"><div class="end-icon">🏃‍♀️💨</div><h2 class="end-h">FINE A: La Grande Fuga</h2>
+  <p class="end-p">Gallina scappa così veloce che batte il record mondiale dei 100 metri. Diventa la più famosa attivista per i diritti dei polli. Il suo documentario <em>"Io Sapevo"</em> vince 3 Oscar.</p>
+  <div class="end-icons">🏆🦖❤️🐔🎬</div><button class="btn-restart" onclick="restart()">🔄 Rigioca da Capo</button></div>
+</div>
+<div class="scene" id="s8b">
+  <div class="ending"><div class="end-icon">🤔🍗</div><h2 class="end-h">FINE B: La Crisi Esistenziale</h2>
+  <p class="end-p">"Sono sopravvissuta a un asteroide" mormora Gallina, ordinando 20 McNuggets. Lascia 5 stelle su Google: <strong>"Buono, ma emotivamente devastante. ⭐⭐⭐⭐⭐"</strong></p>
+  <div class="end-icons">🧠💀🍗😂🌀</div><button class="btn-restart" onclick="restart()">🔄 Rigioca da Capo</button></div>
+</div>
+<div class="scene" id="s8c">
+  <div class="ending"><div class="end-icon">👩‍💼🐔</div><h2 class="end-h">FINE C: L'Ascesa al Potere</h2>
+  <p class="end-p">Viene assunta come <strong>Responsabile Qualità</strong>. In sei mesi rivoluziona il menù. Diventa CEO in un anno. Il T-Rex nel suo DNA aveva già fatto cose più difficili.</p>
+  <div class="end-icons">👑🦖➡️🐔💰🌍</div><button class="btn-restart" onclick="restart()">🔄 Rigioca da Capo</button></div>
+</div>
+<div class="scene" id="s8e">
+  <div class="ending"><div class="end-icon">📸🐔</div><h2 class="end-h">FINE E: La Content Creator</h2>
+  <p class="end-p">Gallina tira fuori uno smartphone dal nulla e inizia a filmare: "Ragazzi non crederete a questa crisi esistenziale, LIKE E ISCRIVETEVI." Il video "POLLO SCOPRE DI ESSERE UN T-REX (mi sono commossa)" fa 40 milioni di views. Firma un contratto con un brand di mangime vegano. La sua crisi identitaria diventa il suo brand.</p>
+  <div class="end-icons">📱🔔💚🐔💸</div><button class="btn-restart" onclick="restart()">🔄 Rigioca da Capo</button></div>
+</div>
+<div class="scene" id="s8f">
+  <div class="ending"><div class="end-icon">⚖️🐔</div><h2 class="end-h">FINE F: Causa Legale</h2>
+  <p class="end-p">Gallina chiama immediatamente il suo avvocato: "Hanno usato la mia immagine senza consenso su MILIONI di confezioni." La causa "Gallina vs. Grande Catena di Fast Food" dura sette anni, arriva in Cassazione e cambia per sempre il diritto d'immagine degli animali. Vince un risarcimento monumentale e lo dona tutto a un santuario per pennuti pensionati.</p>
+  <div class="end-icons">⚖️📜🐔💼🏛️</div><button class="btn-restart" onclick="restart()">🔄 Rigioca da Capo</button></div>
+</div>
+
+</div><!-- #game -->
+
+<script>
+/* ═══════════════════ UTIL ═══════════════════ */
+const ORDER = ['s0','lvl1','lvl2','lvl3','lvl4','lvl5','lvl6','lvl7'];
+let cur = 0;
+
+function makeStars(id,n=140){
+  const el=document.getElementById(id); if(!el) return;
+  for(let i=0;i<n;i++){
+    const s=document.createElement('div'); s.className='star';
+    s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;width:${Math.random()*2.5+.5}px;height:${Math.random()*2.5+.5}px;--d:${(Math.random()*2+1.2).toFixed(1)}s;animation-delay:${(Math.random()*2).toFixed(1)}s`;
+    el.appendChild(s);
+  }
+}
+function prog(p){document.getElementById('prog-fill').style.width=p+'%'}
+function tag(t){document.getElementById('lvl-tag').textContent=t}
+function show(id){
+  document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const i=ORDER.indexOf(id); if(i>=0) cur=i;
+}
+function nextMain(){
+  // BUG FIX: prima si leggeva ORDER[cur+1] due volte (una per show(), una per
+  // onEnterLevel()). show() però aggiorna "cur" internamente come effetto
+  // collaterale, quindi la seconda lettura vedeva già il valore nuovo e
+  // inizializzava il livello SUCCESSIVO a quello mostrato — per questo,
+  // arrivando al Livello 3, la sua logica veniva azzerata da un'inizializzazione
+  // "fantasma" del Livello 4 e il pulsante restava bloccato. Calcolando
+  // l'id una sola volta si evita la desincronizzazione.
+  if(cur<ORDER.length-1){
+    const targetId = ORDER[cur+1];
+    show(targetId);
+    onEnterLevel(targetId);
+  }
+}
+
+const LEVEL_TAGS = {s0:'Livello 0 · Titolo',lvl1:'Livello 1 · T-Rex Rampage',lvl2:'Livello 2 · Asteroid Dodge',lvl3:'Livello 3 · Survivor Sprint',lvl4:'Livello 4 · Evoluzione',lvl5:'Livello 5 · Il Cortile',lvl6:'Livello 6 · Verso il McDonald\'s',lvl7:'Livello 7 · L\'Orrore del Menù'};
+const LEVEL_PCT = {s0:0,lvl1:6,lvl2:16,lvl3:26,lvl4:38,lvl5:55,lvl6:64,lvl7:72};
+
+// BUG FIX: azzera SEMPRE tutti i timer/intervalli dei livelli precedenti
+// prima di avviarne uno nuovo. Prima questa pulizia avveniva solo dentro
+// endLvl1/endLvl2/endLvl3, quindi se una di quelle funzioni non veniva
+// chiamata nell'ordine previsto i vecchi setInterval restavano attivi per
+// sempre in background, accumulando lavoro fino a bloccare il browser
+// (schermo bianco) proprio ai livelli successivi come il Livello 3.
+function clearAllTimers(){
+  clearInterval(l1timerId); clearInterval(l1spawnId);
+  clearInterval(l2spawnId);
+  clearInterval(l3decayId); clearInterval(l3rescueId); clearInterval(l3DodgeSpawnId); clearInterval(l3BalanceLoopId);
+  clearInterval(l4rescueId); clearInterval(l4SelSpawnId);
+  clearTimeout(l4ReflexTimeoutId); clearTimeout(l4ReflexLoopId);
+  l1active=false; l2active=false; l3active=false; l4active=false;
+}
+
+function onEnterLevel(id){
+  clearAllTimers();
+  tag(LEVEL_TAGS[id]||id);
+  prog(LEVEL_PCT[id]!==undefined?LEVEL_PCT[id]:0);
+  if(id==='lvl1'){ spawnAmbient('l1-ambient',['🍃','🦋','✨'],14,12,22); startLvl1(); }
+  if(id==='lvl2'){ makeStars('l2-stars',70); spawnAmbient('l2-ambient',['☄️','✨','💫'],10,8,16); startLvl2(); }
+  if(id==='lvl3') startLvl3();
+  if(id==='lvl4'){ spawnAmbient('l4-ambient',['🧬','✨','🔬'],14,14,24); } // resto gestito dai click
+  if(id==='lvl5'){ spawnClouds('l5-clouds',6); spawnAmbient('l5-ambient',['🌸','🍃'],10,12,20); }
+  if(id==='lvl6'){ spawnAmbient('l6-ambient',['✨','🍟'],10,12,22); }
+}
+
+/* ═══════════════════ LVL1: T-REX RAMPAGE (click targets) ═══════════════════ */
+let l1count=0, l1needed=12, l1time=15, l1timerId=null, l1spawnId=null, l1active=false;
+function startLvl1(){
+  l1count=0; l1time=15; l1active=true;
+  document.getElementById('l1-count').textContent=`${l1count} / ${l1needed}`;
+  document.getElementById('l1-timer').textContent=`⏱ ${l1time}s`;
+  document.getElementById('l1-timer').classList.remove('warn');
+  document.getElementById('l1-field').innerHTML='';
+  document.getElementById('l1-result').className='result-panel';
+  clearInterval(l1timerId); clearInterval(l1spawnId);
+  l1timerId=setInterval(()=>{
+    l1time--; document.getElementById('l1-timer').textContent=`⏱ ${l1time}s`;
+    if(l1time<=5) document.getElementById('l1-timer').classList.add('warn');
+    if(l1time<=0){ endLvl1(l1count>=l1needed); }
+  },1000);
+  l1spawnId=setInterval(spawnPrey,650);
+  spawnPrey();
+}
+const PREY=['🦕','🐟','🦴','🥚','🦖'];
+function spawnPrey(){
+  if(!l1active) return;
+  const f=document.getElementById('l1-field'); if(!f) return;
+  const t=document.createElement('div'); t.className='chal-target';
+  t.textContent=PREY[Math.floor(Math.random()*PREY.length)];
+  const x=8+Math.random()*80, y=25+Math.random()*45;
+  t.style.left=x+'%'; t.style.top=y+'%';
+  t.onclick=(e)=>{
+    e.stopPropagation();
+    l1count++; document.getElementById('l1-count').textContent=`${l1count} / ${l1needed}`;
+    popPlus(f, x, y); burst(f,x,y,'🦴',5); glowPing(f,x,y,'#ff9900'); comboTag(f,x,y-6,'l1');
+    t.remove();
+    if(l1count>=l1needed) endLvl1(true);
+  };
+  f.appendChild(t);
+  setTimeout(()=>t.remove(),1800);
+}
+function popPlus(field,x,y){
+  const p=document.createElement('div'); p.className='pop-plus'; p.textContent='+1';
+  p.style.left=x+'%'; p.style.top=y+'%'; field.appendChild(p);
+  setTimeout(()=>p.remove(),650);
+}
+/* ═══ GRAFICA: helper "succo" riutilizzabili in tutti i livelli ═══ */
+function burst(field,x,y,emoji,n){
+  if(!field) return;
+  n=n||6;
+  for(let i=0;i<n;i++){
+    const p=document.createElement('div'); p.className='burst-particle'; p.textContent=emoji;
+    const ang=Math.random()*Math.PI*2, dist=26+Math.random()*38;
+    p.style.setProperty('--bx',(Math.cos(ang)*dist)+'px');
+    p.style.setProperty('--by',(Math.sin(ang)*dist-14)+'px');
+    p.style.setProperty('--br',(Math.random()*140-70)+'deg');
+    p.style.left=x+'%'; p.style.top=y+'%';
+    field.appendChild(p);
+    setTimeout(()=>p.remove(),720);
+  }
+}
+function glowPing(field,x,y,color){
+  if(!field) return;
+  const g=document.createElement('div'); g.className='glow-ping';
+  g.style.left=x+'%'; g.style.top=y+'%'; g.style.setProperty('--ping-color',color||'#7fff7f');
+  field.appendChild(g);
+  setTimeout(()=>g.remove(),580);
+}
+let comboCounters={};
+function comboTag(field,x,y,key){
+  if(!field) return;
+  comboCounters[key]=(comboCounters[key]||0)+1;
+  if(comboCounters[key]<2) return; // solo dal 2° successo consecutivo in su
+  const c=document.createElement('div'); c.className='combo-tag'; c.textContent=`COMBO x${comboCounters[key]}`;
+  c.style.left=x+'%'; c.style.top=y+'%';
+  field.appendChild(c);
+  setTimeout(()=>c.remove(),820);
+}
+function comboReset(key){ comboCounters[key]=0; }
+function spawnAmbient(fieldId,emojis,n,sizeMin,sizeMax){
+  const field=document.getElementById(fieldId); if(!field||field.childElementCount) return;
+  n=n||16; sizeMin=sizeMin||14; sizeMax=sizeMax||26;
+  for(let i=0;i<n;i++){
+    const p=document.createElement('div'); p.className='ambient-particle';
+    p.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+    p.style.left=(Math.random()*100)+'%';
+    p.style.fontSize=(sizeMin+Math.random()*(sizeMax-sizeMin))+'px';
+    p.style.setProperty('--drift',(Math.random()*70-35)+'px');
+    p.style.setProperty('--spin',(Math.random()*300-150)+'deg');
+    p.style.animationDuration=(6+Math.random()*8)+'s';
+    p.style.animationDelay=(-Math.random()*10)+'s';
+    field.appendChild(p);
+  }
+}
+function spawnClouds(fieldId,n){
+  const field=document.getElementById(fieldId); if(!field||field.childElementCount) return;
+  const icons=['☁️','⛅'];
+  n=n||5;
+  for(let i=0;i<n;i++){
+    const c=document.createElement('div'); c.className='cloud';
+    c.textContent=icons[Math.floor(Math.random()*icons.length)];
+    c.style.top=(4+Math.random()*30)+'%';
+    c.style.animationDuration=(16+Math.random()*14)+'s';
+    c.style.animationDelay=(-Math.random()*20)+'s';
+    field.appendChild(c);
+  }
+}
+function endLvl1(won){
+  l1active=false; clearInterval(l1timerId); clearInterval(l1spawnId);
+  const r=document.getElementById('l1-result');
+  r.innerHTML = won
+    ? `<div class="result-icon">🏆</div><div class="result-h">LIVELLO 1 SUPERATO!</div><div class="result-p">Il T-Rex ha dominato il Cretaceo... ma non per molto. Un'ombra scura si avvicina dal cielo.</div><button class="btn-continue" onclick="nextMain()">CONTINUA →</button>`
+    : `<div class="result-icon">💀</div><div class="result-h">Tempo Scaduto!</div><div class="result-p">Il T-Rex ha ancora fame. Riprova!</div><button class="btn-retry" onclick="startLvl1()">RIPROVA</button>`;
+  r.classList.add('show');
+}
+
+/* ═══════════════════ LVL2: ASTEROID DODGE ═══════════════════ */
+let l2destroyed=0, l2needed=10, l2lives=3, l2spawnId=null, l2active=false;
+function startLvl2(){
+  l2destroyed=0; l2lives=3; l2active=true;
+  document.getElementById('l2-count').textContent=`Distrutti: 0 / ${l2needed}`;
+  document.getElementById('l2-lives').textContent='❤️❤️❤️';
+  document.getElementById('l2-field').innerHTML='';
+  document.getElementById('l2-result').className='result-panel';
+  clearInterval(l2spawnId);
+  l2spawnId=setInterval(spawnMeteor,800);
+}
+function spawnMeteor(){
+  if(!l2active) return;
+  const f=document.getElementById('l2-field'); if(!f) return;
+  const m=document.createElement('div'); m.className='faller'; m.textContent='☄️';
+  const x=10+Math.random()*80, dur=2.2+Math.random()*1.2;
+  m.style.left=x+'%';
+  m.style.animation=`fallDown ${dur}s linear forwards`;
+  let landed=false;
+  m.onclick=(e)=>{
+    e.stopPropagation();
+    if(landed) return;
+    landed=true;
+    l2destroyed++; document.getElementById('l2-count').textContent=`Distrutti: ${l2destroyed} / ${l2needed}`;
+    burst(f,x,50,'⭐',7); glowPing(f,x,50,'#ffc72c'); comboTag(f,x,44,'l2');
+    m.remove();
+    if(l2destroyed>=l2needed) endLvl2(true);
+  };
+  f.appendChild(m);
+  setTimeout(()=>{
+    if(landed) return;
+    landed=true;
+    l2lives--;
+    comboReset('l2');
+    const flash=document.getElementById('l2-flash'); flash.classList.remove('go'); void flash.offsetWidth; flash.classList.add('go');
+    document.getElementById('l2-lives').textContent='❤️'.repeat(Math.max(l2lives,0))+'🖤'.repeat(3-Math.max(l2lives,0));
+    m.remove();
+    if(l2lives<=0) endLvl2(false);
+  }, dur*1000);
+}
+function endLvl2(won){
+  l2active=false; clearInterval(l2spawnId);
+  const r=document.getElementById('l2-result');
+  r.innerHTML = won
+    ? `<div class="result-icon">🏆</div><div class="result-h">LIVELLO 2 SUPERATO!</div><div class="result-p">L'impatto è avvenuto. Il cielo si tinge di rosso. I dinosauri non hanno scampo... quasi tutti.</div><button class="btn-continue" onclick="nextMain()">CONTINUA →</button>`
+    : `<div class="result-icon">💀</div><div class="result-h">Estinzione Totale!</div><div class="result-p">Troppi impatti diretti. Riprova a schivare!</div><button class="btn-retry" onclick="startLvl2()">RIPROVA</button>`;
+  r.classList.add('show');
+}
+
+/* ═══════════════════ LVL3 RICOSTRUITO: 3 SOTTO-LIVELLI ═══════════════════ */
+/* Stage 0 = Sprint (mash-to-fill) · Stage 1 = Schiva la Cenere (dodge) · Stage 2 = Trova il Nido (memoria) */
+function q3(id){ return document.getElementById(id); } // safe getter, never throws on missing node upstream
+let l3Stage=0, l3active=false, l3lastGain=Date.now(), l3rescueId=null;
+
+function l3UpdateDots(){
+  for(let i=0;i<4;i++){
+    const d=document.querySelector(`#l3-dots .dot[data-i="${i}"]`); if(!d) continue;
+    d.classList.remove('active','done');
+    if(i<l3Stage) d.classList.add('done');
+    else if(i===l3Stage) d.classList.add('active');
+  }
+}
+function l3ShowStage(n){
+  q3('l3-stage-a').style.display = n===0 ? 'block' : 'none';
+  q3('l3-dodge-field').style.display = n===1 ? 'block' : 'none';
+  q3('l3-lives').style.display = n===1 ? 'flex' : 'none';
+  q3('l3-nest-grid').style.display = n===2 ? 'grid' : 'none';
+  q3('l3-stage-d').style.display = n===3 ? 'block' : 'none';
+}
+function l3SpawnEmbers(){
+  const field=q3('l3-embers'); if(!field||field.childElementCount) return;
+  for(let i=0;i<22;i++){
+    const e=document.createElement('div'); e.className='ember-dot';
+    const size=3+Math.random()*5;
+    e.style.left=(Math.random()*100)+'%';
+    e.style.width=size+'px'; e.style.height=size+'px';
+    e.style.setProperty('--drift',(Math.random()*60-30)+'px');
+    e.style.animationDuration=(5+Math.random()*6)+'s';
+    e.style.animationDelay=(-Math.random()*8)+'s';
+    field.appendChild(e);
+  }
+}
+function l3Toast(msg){
+  const c=q3('l3-count'); if(!c) return;
+  const prev=c.textContent;
+  c.textContent=msg;
+  c.style.color='#7fff7f';
+  setTimeout(()=>{ c.style.color=''; },900);
+}
+function startLvl3(){
+  try{
+    l3Stage=0; l3active=true; l3lastGain=Date.now();
+    q3('l3-result').className='result-panel';
+    q3('l3-rescue')?.remove();
+    l3SpawnEmbers();
+    l3UpdateDots();
+    l3ShowStage(0);
+    startL3Sprint();
+    clearInterval(l3rescueId);
+    l3rescueId=setInterval(()=>{
+      if(!l3active) return;
+      if(Date.now()-l3lastGain > 15000){ showLvl3Rescue(); }
+    },1000);
+  }catch(err){ console.error('Errore critico livello 3:', err); showLvl3Rescue(); }
+}
+function showLvl3Rescue(){
+  if(q3('l3-rescue')) return;
+  const scene=q3('lvl3'); if(!scene) return;
+  const btn=document.createElement('button');
+  btn.id='l3-rescue'; btn.className='btn-continue'; btn.textContent='⏭ Salta questo livello';
+  btn.style.cssText='position:absolute;top:14px;right:14px;z-index:90;padding:8px 16px;font-size:10px;';
+  btn.onclick=(e)=>{ e.stopPropagation(); endLvl3(true); };
+  scene.appendChild(btn);
+}
+function l3Advance(){
+  l3Stage++; l3lastGain=Date.now(); l3UpdateDots();
+  if(l3Stage>=4){ endLvl3(true); return; }
+  l3ShowStage(l3Stage);
+  if(l3Stage===1){ startL3Dodge(); }
+  if(l3Stage===2){ startL3Nest(); }
+  if(l3Stage===3){ startL3Balance(); }
+}
+
+/* --- Stage 0: SPRINT --- */
+let l3progress=0, l3decayId=null;
+function startL3Sprint(){
+  l3progress=0;
+  const count=q3('l3-count'), bar=q3('l3-bar'), btn=q3('l3-btn');
+  if(!count||!bar||!btn){ console.warn('Livello 3A: elementi mancanti, salto.'); l3Advance(); return; }
+  count.textContent='Corsa: 0%'; bar.style.width='0%'; btn.disabled=false;
+  btn.onclick=()=>{
+    try{
+      if(!l3active||l3Stage!==0) return;
+      l3progress=Math.min(100,l3progress+4.5); l3lastGain=Date.now();
+      count.textContent=`Corsa: ${Math.round(l3progress)}%`; bar.style.width=l3progress+'%';
+      const bird=q3('l3-bird'); if(bird) bird.style.transform=`translate(-50%,-50%) translateY(${-6-Math.random()*10}px)`;
+      if(l3progress>=100){ btn.disabled=true; clearInterval(l3decayId); l3Toast('✅ Corsa riuscita!'); setTimeout(l3Advance,800); }
+    }catch(err){ console.error('Errore livello 3A:', err); showLvl3Rescue(); }
+  };
+  clearInterval(l3decayId);
+  l3decayId=setInterval(()=>{
+    try{
+      if(!l3active||l3Stage!==0) return;
+      l3progress=Math.max(0,l3progress-1.2);
+      count.textContent=`Corsa: ${Math.round(l3progress)}%`; bar.style.width=l3progress+'%';
+    }catch(err){ console.error('Errore livello 3A (decay):', err); showLvl3Rescue(); }
+  },300);
+}
+
+/* --- Stage 1: SCHIVA LA CENERE --- */
+let l3DodgeDestroyed=0, l3DodgeNeeded=8, l3Lives=3, l3DodgeSpawnId=null;
+function startL3Dodge(){
+  l3DodgeDestroyed=0; l3Lives=3;
+  const count=q3('l3-count'), field=q3('l3-dodge-field'), lives=q3('l3-lives');
+  if(!count||!field||!lives){ console.warn('Livello 3B: elementi mancanti, salto.'); l3Advance(); return; }
+  count.textContent=`Cenere schivata: 0 / ${l3DodgeNeeded}`;
+  lives.textContent='❤️❤️❤️';
+  field.innerHTML='';
+  clearInterval(l3DodgeSpawnId);
+  l3DodgeSpawnId=setInterval(()=>l3SpawnAsh(field,count,lives),700);
+}
+function l3SpawnAsh(field,count,lives){
+  if(!l3active||l3Stage!==1) return;
+  const m=document.createElement('div'); m.className='faller'; m.textContent='🔥';
+  const x=10+Math.random()*80, dur=1.8+Math.random()*1.0;
+  m.style.left=x+'%'; m.style.animation=`fallDown ${dur}s linear forwards`;
+  let landed=false;
+  m.onclick=(e)=>{
+    e.stopPropagation(); if(landed) return; landed=true;
+    l3DodgeDestroyed++; l3lastGain=Date.now();
+    count.textContent=`Cenere schivata: ${l3DodgeDestroyed} / ${l3DodgeNeeded}`;
+    burst(field,x,50,'💨',6); glowPing(field,x,50,'#ff6a00'); comboTag(field,x,44,'l3dodge');
+    m.remove();
+    if(l3DodgeDestroyed>=l3DodgeNeeded){
+      clearInterval(l3DodgeSpawnId); l3Toast('✅ Cenere schivata!'); setTimeout(l3Advance,800);
+    }
+  };
+  field.appendChild(m);
+  setTimeout(()=>{
+    if(landed) return; landed=true;
+    l3Lives--; lives.textContent='❤️'.repeat(Math.max(l3Lives,0))+'🖤'.repeat(3-Math.max(l3Lives,0));
+    m.remove();
+    if(l3Lives<=0){
+      clearInterval(l3DodgeSpawnId);
+      // niente game-over permanente: si riparte subito lo stesso sotto-livello
+      setTimeout(startL3Dodge,600);
+    }
+  }, dur*1000);
+}
+
+/* --- Stage 2: TROVA IL NIDO (memoria) --- */
+let l3NestCorrect=-1, l3NestBusy=false, l3NestWrongCount=0;
+const NEST_ICONS=['🌿','🍂','🪨','🌾','🕳️'];
+function startL3Nest(){
+  const grid=q3('l3-nest-grid'), count=q3('l3-count'); if(!grid||!count) { l3Advance(); return; }
+  count.textContent='Trova dove hai nascosto il nido!';
+  l3NestBusy=true; l3NestWrongCount=0;
+  grid.innerHTML='';
+  l3NestCorrect=Math.floor(Math.random()*5);
+  for(let i=0;i<5;i++){
+    const spot=document.createElement('div');
+    spot.className='nest-spot'; spot.dataset.i=i;
+    spot.textContent = i===l3NestCorrect ? '🥚' : NEST_ICONS[i];
+    grid.appendChild(spot);
+  }
+  // mostra il nido per un istante, poi nasconde tutto sotto foglie identiche
+  setTimeout(()=>{
+    Array.from(grid.children).forEach((spot,i)=>{ spot.textContent='🍃'; });
+    l3NestBusy=false;
+    count.textContent='Quale foglia nascondeva il nido? Clicca!';
+    Array.from(grid.children).forEach(spot=>{
+      spot.onclick=(e)=>{
+        e.stopPropagation();
+        if(l3NestBusy) return;
+        const i=+spot.dataset.i;
+        if(i===l3NestCorrect){
+          spot.textContent='🥚'; spot.classList.add('reveal','correct-flash');
+          l3NestBusy=true; l3lastGain=Date.now();
+          burst(grid,50,50,'✨',8); glowPing(grid,50,50,'#ffc72c');
+          l3Toast('✅ Nido trovato!');
+          setTimeout(l3Advance,900);
+        } else {
+          spot.classList.add('wrong-flash'); setTimeout(()=>spot.classList.remove('wrong-flash'),300);
+          l3NestWrongCount++;
+          if(l3NestWrongCount>=4){
+            // troppi tentativi: rivela il nido per gentilezza, poi avanza
+            Array.from(grid.children)[l3NestCorrect].textContent='🥚';
+            l3NestBusy=true;
+            setTimeout(l3Advance,900);
+          }
+        }
+      };
+    });
+  }, 1200);
+}
+
+/* --- Stage 3: EQUILIBRIO PERFETTO (tempismo) --- */
+let l3BalancePos=0, l3BalanceDir=1, l3BalanceSpeed=1.6, l3BalanceHits=0, l3BalanceNeeded=5, l3BalanceLoopId=null, l3BalanceZoneStart=40, l3BalanceZoneWidth=20;
+function startL3Balance(){
+  l3BalancePos=0; l3BalanceDir=1; l3BalanceSpeed=1.6; l3BalanceHits=0;
+  const count=q3('l3-count'), track=q3('l3-balance-track'), needle=q3('l3-balance-needle'), zone=q3('l3-balance-zone'), btn=q3('l3-balance-btn');
+  if(!count||!track||!needle||!zone||!btn){ console.warn('Livello 3D: elementi mancanti, salto.'); l3Advance(); return; }
+  count.textContent=`Equilibrio: 0 / ${l3BalanceNeeded}`;
+  l3RollBalanceZone(zone);
+  clearInterval(l3BalanceLoopId);
+  l3BalanceLoopId=setInterval(()=>{
+    if(!l3active||l3Stage!==3) return;
+    l3BalancePos+=l3BalanceDir*l3BalanceSpeed;
+    if(l3BalancePos>=100){ l3BalancePos=100; l3BalanceDir=-1; }
+    if(l3BalancePos<=0){ l3BalancePos=0; l3BalanceDir=1; }
+    needle.style.left=l3BalancePos+'%';
+  },16);
+  btn.onclick=(e)=>{
+    e.stopPropagation();
+    if(!l3active||l3Stage!==3) return;
+    const inZone = l3BalancePos>=l3BalanceZoneStart && l3BalancePos<=(l3BalanceZoneStart+l3BalanceZoneWidth);
+    if(inZone){
+      l3BalanceHits++; l3lastGain=Date.now();
+      count.textContent=`Equilibrio: ${l3BalanceHits} / ${l3BalanceNeeded}`;
+      btn.classList.remove('strike-flash-good'); void btn.offsetWidth; btn.classList.add('strike-flash-good');
+      burst(track.parentElement,l3BalancePos,44,'✨',6); glowPing(track.parentElement,l3BalancePos,44,'#7fff7f');
+      l3BalanceSpeed=Math.min(3.2,l3BalanceSpeed+0.22);
+      l3BalanceZoneWidth=Math.max(11,l3BalanceZoneWidth-1.2);
+      l3RollBalanceZone(zone);
+      if(l3BalanceHits>=l3BalanceNeeded){
+        clearInterval(l3BalanceLoopId); l3Toast('✅ Equilibrio perfetto!'); setTimeout(l3Advance,800);
+      }
+    } else {
+      btn.classList.remove('strike-flash-bad'); void btn.offsetWidth; btn.classList.add('strike-flash-bad');
+    }
+  };
+}
+function l3RollBalanceZone(zone){
+  l3BalanceZoneStart=Math.random()*(100-l3BalanceZoneWidth);
+  zone.style.left=l3BalanceZoneStart+'%'; zone.style.width=l3BalanceZoneWidth+'%';
+}
+
+function endLvl3(won){
+  l3active=false; clearInterval(l3decayId); clearInterval(l3DodgeSpawnId); clearInterval(l3rescueId); clearInterval(l3BalanceLoopId);
+  const btn=q3('l3-btn'); if(btn) btn.disabled=true;
+  q3('l3-rescue')?.remove();
+  const r=q3('l3-result'); if(!r) return;
+  r.innerHTML=`<div class="result-icon">🏆</div><div class="result-h">LIVELLO 3 SUPERATO!</div><div class="result-p">Corsa, cenere, nido nascosto ed equilibrio perfetto: i piccoli dinosauri piumati sono sopravvissuti all'apocalisse su ogni fronte. Da qui inizia una lunga evoluzione...</div><button class="btn-continue" onclick="nextMain()">CONTINUA →</button>`;
+  r.classList.add('show');
+}
+
+/* ═══════════════════ LVL4 RICOSTRUITO: 3 SOTTO-LIVELLI ═══════════════════ */
+/* Stage 0 = Selezione Naturale (discrimina mutazioni buone/cattive)
+   Stage 1 = Sequenza Genetica (memoria stile Simon, si allunga ogni round)
+   Stage 2 = Adattamento Finale (riflessi rapidi) */
+let l4Stage=0, l4active=false, l4lastGain=Date.now(), l4rescueId=null;
+
+function l4UpdateDots(){
+  for(let i=0;i<4;i++){
+    const d=document.querySelector(`#l4-dots .dot[data-i="${i}"]`); if(!d) continue;
+    d.classList.remove('active','done');
+    if(i<l4Stage) d.classList.add('done');
+    else if(i===l4Stage) d.classList.add('active');
+  }
+}
+function l4ShowStage(n){
+  q3('l4-stage-a').style.display = n===0 ? 'block' : 'none';
+  q3('l4-stage-b').style.display = n===1 ? 'flex' : 'none';
+  q3('l4-stage-c').style.display = n===2 ? 'block' : 'none';
+  q3('l4-stage-d').style.display = n===3 ? 'flex' : 'none';
+}
+function l4Toast(msg){
+  const c=q3('l4-count'); if(!c) return;
+  c.textContent=msg; c.style.color='#7fff7f';
+  setTimeout(()=>{ c.style.color=''; },900);
+}
+function l4LightSteps(fromIdx,toIdx){
+  for(let i=fromIdx;i<=toIdx;i++){
+    const el=document.getElementById('e'+i); if(el) el.classList.add('lit');
+    if(i>0){ const ar=document.getElementById('a'+(i-1)); if(ar) ar.classList.add('lit'); }
+  }
+}
+function enterLvl4(){
+  try{
+    l4Stage=0; l4active=true; l4lastGain=Date.now();
+    q3('l4-result').className='result-panel';
+    q3('l4-rescue')?.remove();
+    l4UpdateDots();
+    l4ShowStage(0);
+    startL4Selection();
+    clearInterval(l4rescueId);
+    l4rescueId=setInterval(()=>{
+      if(!l4active) return;
+      if(Date.now()-l4lastGain>15000){ showLvl4Rescue(); }
+    },1000);
+  }catch(err){ console.error('Errore critico livello 4:', err); showLvl4Rescue(); }
+}
+function showLvl4Rescue(){
+  if(q3('l4-rescue')) return;
+  const scene=q3('lvl4'); if(!scene) return;
+  const btn=document.createElement('button');
+  btn.id='l4-rescue'; btn.className='btn-continue'; btn.textContent='⏭ Salta questo livello';
+  btn.style.cssText='position:absolute;top:14px;right:14px;z-index:90;padding:8px 16px;font-size:10px;';
+  btn.onclick=(e)=>{ e.stopPropagation(); finishEvolution(); };
+  scene.appendChild(btn);
+}
+function l4Advance(){
+  l4Stage++; l4lastGain=Date.now(); l4UpdateDots();
+  if(l4Stage>=4){ finishEvolution(); return; }
+  l4ShowStage(l4Stage);
+  if(l4Stage===1){ startL4Simon(); }
+  if(l4Stage===2){ startL4Reflex(); }
+  if(l4Stage===3){ startL4Memory(); }
+}
+
+/* --- Stage 0: SELEZIONE NATURALE (discrimina mutazioni buone/cattive) --- */
+let l4SelGood=0, l4SelNeeded=10, l4SelLives=3, l4SelSpawnId=null;
+const L4_GOOD=['🧬','🪶','🥚'], L4_BAD=['☣️','💀','🦠'];
+function startL4Selection(){
+  l4SelGood=0; l4SelLives=3;
+  const count=q3('l4-count'), field=q3('l4-sel-field'), lives=q3('l4-sel-lives');
+  if(!count||!field||!lives){ console.warn('Livello 4A: elementi mancanti, salto.'); l4Advance(); return; }
+  count.textContent=`Mutazioni buone: 0 / ${l4SelNeeded}`;
+  lives.textContent='❤️❤️❤️';
+  field.innerHTML='';
+  clearInterval(l4SelSpawnId);
+  l4SelSpawnId=setInterval(()=>l4SpawnMutation(field,count,lives),620);
+}
+function l4SpawnMutation(field,count,lives){
+  if(!l4active||l4Stage!==0) return;
+  const isGood=Math.random()<0.62;
+  const icon=isGood ? L4_GOOD[Math.floor(Math.random()*L4_GOOD.length)] : L4_BAD[Math.floor(Math.random()*L4_BAD.length)];
+  const t=document.createElement('div'); t.className='chal-target'; t.textContent=icon;
+  t.style.fontSize='clamp(34px,6.2vw,58px)';
+  const x=8+Math.random()*80, y=30+Math.random()*40;
+  t.style.left=x+'%'; t.style.top=y+'%';
+  t.onclick=(e)=>{
+    e.stopPropagation();
+    if(isGood){
+      l4SelGood++; l4lastGain=Date.now();
+      count.textContent=`Mutazioni buone: ${l4SelGood} / ${l4SelNeeded}`;
+      popPlus(field,x,y); burst(field,x,y,'🧬',5); glowPing(field,x,y,'#7fff7f'); comboTag(field,x,y-6,'l4sel');
+      t.remove();
+      if(l4SelGood>=l4SelNeeded){
+        clearInterval(l4SelSpawnId); l4Toast('✅ Selezione naturale riuscita!');
+        l4LightSteps(0,1); setTimeout(l4Advance,850);
+      }
+    } else {
+      l4SelLives--; comboReset('l4sel');
+      lives.textContent='❤️'.repeat(Math.max(l4SelLives,0))+'🖤'.repeat(3-Math.max(l4SelLives,0));
+      burst(field,x,y,'☠️',4);
+      t.remove();
+      if(l4SelLives<=0){
+        clearInterval(l4SelSpawnId);
+        setTimeout(startL4Selection,600);
+      }
+    }
+  };
+  field.appendChild(t);
+  setTimeout(()=>t.remove(),1500);
+}
+
+/* --- Stage 1: SEQUENZA GENETICA (memoria stile Simon) --- */
+let l4SimonSeq=[], l4SimonInput=[], l4SimonLen=3, l4SimonMaxLen=6, l4SimonBusy=false;
+const SIMON_PADS=[{id:0,icon:'🦴',color:'#00d9ff'},{id:1,icon:'🪶',color:'#7b2ff7'},{id:2,icon:'🥚',color:'#ff6a00'},{id:3,icon:'🎵',color:'#7fff7f'}];
+function startL4Simon(){
+  l4SimonLen=3; l4SimonBusy=true;
+  const count=q3('l4-count'), grid=q3('l4-simon-grid');
+  if(!count||!grid){ l4Advance(); return; }
+  grid.innerHTML='';
+  SIMON_PADS.forEach(p=>{
+    const pad=document.createElement('div');
+    pad.className='simon-pad'; pad.dataset.id=p.id; pad.textContent=p.icon;
+    pad.style.setProperty('--pad-color',p.color);
+    pad.onclick=(e)=>{ e.stopPropagation(); l4SimonClick(p.id); };
+    grid.appendChild(pad);
+  });
+  l4NewSimonRound();
+}
+function l4NewSimonRound(){
+  l4SimonSeq=[]; l4SimonInput=[]; l4SimonBusy=true;
+  for(let i=0;i<l4SimonLen;i++) l4SimonSeq.push(Math.floor(Math.random()*4));
+  q3('l4-count').textContent=`Memorizza la sequenza (${l4SimonLen} passi)...`;
+  l4PlaySimonSeq(0);
+}
+function l4PlaySimonSeq(i){
+  if(i>=l4SimonSeq.length){ l4SimonBusy=false; const c=q3('l4-count'); if(c) c.textContent='Ora ripeti tu la sequenza!'; return; }
+  const padId=l4SimonSeq[i];
+  const pad=document.querySelector(`.simon-pad[data-id="${padId}"]`);
+  if(pad){ pad.classList.add('lit'); setTimeout(()=>pad.classList.remove('lit'),420); }
+  setTimeout(()=>l4PlaySimonSeq(i+1), 620);
+}
+function l4SimonClick(padId){
+  if(!l4active||l4Stage!==1||l4SimonBusy) return;
+  const pad=document.querySelector(`.simon-pad[data-id="${padId}"]`);
+  if(pad){ pad.classList.add('lit'); setTimeout(()=>pad.classList.remove('lit'),250); }
+  l4SimonInput.push(padId); l4lastGain=Date.now();
+  const idx=l4SimonInput.length-1;
+  if(l4SimonInput[idx]!==l4SimonSeq[idx]){
+    if(pad){ pad.classList.add('wrong-flash'); setTimeout(()=>pad.classList.remove('wrong-flash'),300); }
+    const c=q3('l4-count'); if(c) c.textContent='❌ Sbagliato! Riguarda la sequenza...';
+    l4SimonBusy=true;
+    setTimeout(()=>l4PlaySimonSeq(0),700);
+    return;
+  }
+  if(l4SimonInput.length===l4SimonSeq.length){
+    if(l4SimonLen>=l4SimonMaxLen){
+      l4Toast('✅ Sequenza genetica completata!');
+      l4LightSteps(2,2);
+      l4SimonBusy=true;
+      setTimeout(l4Advance,850);
+    } else {
+      l4SimonLen++;
+      l4SimonBusy=true;
+      const c=q3('l4-count'); if(c) c.textContent='✅ Corretto! Sequenza più lunga in arrivo...';
+      setTimeout(l4NewSimonRound,900);
+    }
+  }
+}
+
+/* --- Stage 2: ADATTAMENTO FINALE (riflessi rapidi) --- */
+let l4ReflexHits=0, l4ReflexNeeded=8, l4ReflexTimeoutId=null, l4ReflexLoopId=null;
+function startL4Reflex(){
+  l4ReflexHits=0;
+  const count=q3('l4-count'), zone=q3('l4-reflex-zone');
+  if(!count||!zone){ l4Advance(); return; }
+  count.textContent=`Riflessi: 0 / ${l4ReflexNeeded}`;
+  zone.innerHTML='';
+  clearTimeout(l4ReflexTimeoutId); clearTimeout(l4ReflexLoopId);
+  l4ReflexSpawn(zone,count);
+}
+function l4ReflexSpawn(zone,count){
+  if(!l4active||l4Stage!==2) return;
+  zone.innerHTML='';
+  const t=document.createElement('div'); t.className='flash-target'; t.textContent='✨';
+  const x=15+Math.random()*70, y=15+Math.random()*60;
+  t.style.left=x+'%'; t.style.top=y+'%';
+  let hit=false;
+  t.onclick=(e)=>{
+    e.stopPropagation(); if(hit) return; hit=true;
+    l4ReflexHits++; l4lastGain=Date.now();
+    count.textContent=`Riflessi: ${l4ReflexHits} / ${l4ReflexNeeded}`;
+    burst(zone,x,y,'⚡',5); glowPing(zone,x,y,'#00d9ff'); comboTag(zone,x,y-6,'l4reflex');
+    t.remove();
+    if(l4ReflexHits>=l4ReflexNeeded){
+      clearTimeout(l4ReflexTimeoutId); clearTimeout(l4ReflexLoopId);
+      l4Toast('✅ Adattamento completo!'); l4LightSteps(3,3);
+      setTimeout(l4Advance,850);
+      return;
+    }
+    l4ReflexLoopId=setTimeout(()=>l4ReflexSpawn(zone,count),300);
+  };
+  zone.appendChild(t);
+  l4ReflexTimeoutId=setTimeout(()=>{
+    if(hit) return;
+    t.remove();
+    l4ReflexLoopId=setTimeout(()=>l4ReflexSpawn(zone,count),200);
+  },850);
+}
+
+/* --- Stage 3: MEMORIA DI COPPIE --- */
+let l4MemFlipped=[], l4MemMatched=0, l4MemBusy=false, l4MemNeeded=4;
+const MEM_ICONS=['🦴','🪶','🥚','🧬'];
+function startL4Memory(){
+  l4MemMatched=0; l4MemFlipped=[]; l4MemBusy=false;
+  const count=q3('l4-count'), grid=q3('l4-memory-grid');
+  if(!count||!grid){ l4Advance(); return; }
+  count.textContent=`Coppie trovate: 0 / ${l4MemNeeded}`;
+  grid.innerHTML='';
+  const deck=[...MEM_ICONS,...MEM_ICONS];
+  for(let i=deck.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [deck[i],deck[j]]=[deck[j],deck[i]]; }
+  deck.forEach((icon,i)=>{
+    const card=document.createElement('div');
+    card.className='memory-card'; card.dataset.icon=icon; card.dataset.i=i;
+    const face=document.createElement('span'); face.className='face'; face.textContent=icon;
+    card.appendChild(face);
+    card.onclick=(e)=>{ e.stopPropagation(); l4MemClick(card); };
+    grid.appendChild(card);
+  });
+}
+function l4MemClick(card){
+  if(!l4active||l4Stage!==3||l4MemBusy) return;
+  if(card.classList.contains('flipped')||card.classList.contains('matched')) return;
+  card.classList.add('flipped'); l4lastGain=Date.now();
+  l4MemFlipped.push(card);
+  if(l4MemFlipped.length<2) return;
+  l4MemBusy=true;
+  const [a,b]=l4MemFlipped;
+  if(a.dataset.icon===b.dataset.icon){
+    a.classList.add('matched'); b.classList.add('matched');
+    l4MemMatched++; l4lastGain=Date.now();
+    const grid=q3('l4-memory-grid'), count=q3('l4-count');
+    count.textContent=`Coppie trovate: ${l4MemMatched} / ${l4MemNeeded}`;
+    burst(grid,50,50,'✨',6); glowPing(grid,50,50,'#ffc72c');
+    l4MemFlipped=[]; l4MemBusy=false;
+    if(l4MemMatched>=l4MemNeeded){
+      l4Toast('✅ Memoria genetica completa!'); l4LightSteps(4,5);
+      setTimeout(l4Advance,850);
+    }
+  } else {
+    a.classList.add('shake'); b.classList.add('shake');
+    setTimeout(()=>{
+      a.classList.remove('flipped','shake'); b.classList.remove('flipped','shake');
+      l4MemFlipped=[]; l4MemBusy=false;
+    },700);
+  }
+}
+
+function finishEvolution(){
+  l4active=false; clearInterval(l4rescueId); clearInterval(l4SelSpawnId);
+  clearTimeout(l4ReflexTimeoutId); clearTimeout(l4ReflexLoopId);
+  q3('l4-rescue')?.remove();
+  document.getElementById('evo-title-txt').textContent='— Evoluzione Completa! —';
+  l4LightSteps(0,6);
+  const zone=q3('l4-reflex-zone'); if(zone) zone.innerHTML='';
+  const r=q3('l4-result');
+  r.innerHTML=`<div class="result-icon">🏆</div><div class="result-h">LIVELLO 4 SUPERATO!</div><div class="result-p">Selezione naturale, memoria genetica, riflessi d'adattamento e memoria di coppie: 66 milioni di anni di evoluzione completati in quattro prove.</div><button class="btn-continue" onclick="nextMain()">CONTINUA →</button>`;
+  r.classList.add('show');
+}
+
+/* ═══════════════════ MAIN SCENE CLICK HANDLER ═══════════════════ */
+document.getElementById('game').addEventListener('click', function(e){
+  if(e.target.closest('button')) return;
+  if(e.target.classList.contains('chal-target')||e.target.classList.contains('faller')) return;
+  const id=document.querySelector('.scene.active')?.id;
+  if(!id) return;
+  if(id==='lvl5'||id==='lvl6') { nextMain(); }
+  else if(id==='lvl7') { handleMc(); }
+});
+document.getElementById('btn-start').addEventListener('click', ()=>{ show('lvl1'); onEnterLevel('lvl1'); });
+
+/* need to trigger lvl4 init when entering */
+const origOnEnter = onEnterLevel;
+onEnterLevel = function(id){ origOnEnter(id); if(id==='lvl4'){ enterLvl4(); } };
+
+/* ═══════════════════ MC HORROR PHASES ═══════════════════ */
+let s7Phase=0;
+function handleMc(){
+  if(s7Phase===0){
+    s7Phase=1;
+    document.getElementById('s7-label').textContent='🤯 LA REALIZZAZIONE';
+    document.getElementById('s7-text').innerHTML='"Ma io… io sono un <strong>dinosauro!</strong>" urla Gallina dentro di sé. "Ho superato 3 livelli ed un\'intera evoluzione per arrivare qui. E ora… McNuggets?"';
+  } else if(s7Phase===1){
+    s7Phase=2;
+    const flash=document.getElementById('horror-flash');
+    flash.style.display='block'; flash.classList.remove('go'); void flash.offsetWidth; flash.classList.add('go');
+    setTimeout(()=>flash.style.display='none',400);
+    document.getElementById('s7-dialog').style.display='none';
+    document.getElementById('mc-choices').style.display='flex';
+  }
+}
+
+/* ═══════════════════ ENDINGS A/B/C ═══════════════════ */
+function ending(type){
+  document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active'));
+  document.getElementById('s8'+type).classList.add('active');
+  prog(100); tag('Fine · Finale '+type.toUpperCase());
+  if(type==='a') makeStars('stars-a',180);
+}
+
+/* ═══════════════════ BOSS RUSH ═══════════════════ */
+function startBossRush(){
+  document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active'));
+  document.getElementById('bossintro').classList.add('active');
+  tag('BOSS RUSH · Il Risveglio'); prog(78);
+  document.getElementById('bi-hint').textContent='👆 Clicca per scatenare il dominio';
+  biPhase=0;
+}
+let biPhase=0;
+document.getElementById('bossintro').addEventListener('click', ()=>{
+  if(biPhase===0){
+    biPhase=1;
+    const df=document.getElementById('domain-flash');
+    df.classList.remove('go'); void df.offsetWidth; df.classList.add('go');
+    document.getElementById('bi-text').innerHTML='Il "Dominio Infinito: Cocorico Illimitato" avvolge il McDonald\'s. Ogni dipendente fugge terrorizzato tra schermi che sfarfallano e patatine che volano ovunque. Nel caos, resta solo <strong>lui</strong>: il direttore del locale.';
+    document.getElementById('bi-hint').textContent='👆 Clicca per affrontare il CEO';
+  } else {
+    biPhase=2;
+    initBoss('boss1'); show('boss1'); tag('BOSS 1 · Il CEO'); prog(82);
+  }
+});
+
+/* generic boss engine */
+const BOSSES = {
+  boss1:{maxHp:100,maxPhp:100,hpId:'b1-hp-fill',hpTxt:'b1-hp-txt',phpId:'b1-php-fill',phpTxt:'b1-php-txt',
+    playerId:'b1-player',enemyId:'b1-enemy',slashId:'b1-slash',resultId:'boss1-result',captionId:'b1-caption',specialId:'b1-special',
+    next:()=>{ show('mariofight'); tag('SCONTRO BONUS · Gojo vs Sukuna'); prog(88); initMarioFight(); },
+    winTxt:'Il CEO crolla tra le patatine sparse. "Il... conto è... offerto dalla casa..." sussurra prima di svenire.',
+    loseTxt:'Il CEO ti ha sopraffatta con la sua aura manageriale. Riprova!',
+    enemyName:'Il CEO'},
+  boss2:{maxHp:120,maxPhp:100,hpId:'b2-hp-fill',hpTxt:'b2-hp-txt',phpId:'b2-php-fill',phpTxt:'b2-php-txt',
+    playerId:'b2-player',enemyId:'b2-enemy',slashId:'b2-slash',resultId:'boss2-result',captionId:'b2-caption',specialId:'b2-special',
+    next:()=>{ show('boss3'); tag('BOSS FINALE · L\'Antenato'); prog(94); initBoss('boss3'); },
+    winTxt:'La conduttrice getta il microfono a forma di McNugget e applaude. "Che colpo di scena! Standing ovation!" Si dissolve tra i coriandoli.',
+    loseTxt:'Il pubblico in studio applaude la tua sconfitta. Riprova!',
+    enemyName:'La Conduttrice'},
+  boss3:{maxHp:150,maxPhp:100,hpId:'b3-hp-fill',hpTxt:'b3-hp-txt',phpId:'b3-php-fill',phpTxt:'b3-php-txt',
+    playerId:'b3-player',enemyId:'b3-enemy',slashId:'b3-slash',resultId:'boss3-result',captionId:'b3-caption',specialId:'b3-special',
+    next:()=>{ show('finalchoice'); tag('L\'ULTIMA SCELTA'); prog(97); },
+    winTxt:'Lo spirito ancestrale sorride (in qualche modo) e si dissolve in polvere di stelle, tornando a far parte del DNA di Gallina, in pace.',
+    loseTxt:'Il tuo stesso antenato ti ha sopraffatta. Riprova, sei più forte di questo!',
+    enemyName:'L\'Antenato'}
+};
+function advanceBoss3Choice(variant){
+  show(variant); prog(100); tag('FINE · Finale Vero');
+  if(variant==='trueEnd') makeStars('stars-true',200);
+  if(variant==='trueEnd2') makeStars('stars-true2',200);
+  if(variant==='trueEnd3') makeStars('stars-true3',200);
+}
+let bossState={};
+function initBoss(key){
+  const b=BOSSES[key];
+  bossState[key]={hp:b.maxHp, php:b.maxPhp, over:false};
+  document.getElementById(b.hpId).style.width='100%';
+  document.getElementById(b.phpId).style.width='100%';
+  document.getElementById(b.hpTxt).textContent=`${b.maxHp}/${b.maxHp}`;
+  document.getElementById(b.phpTxt).textContent=`${b.maxPhp}/${b.maxPhp}`;
+  document.getElementById(b.resultId).className='result-panel';
+  document.getElementById(b.specialId).disabled=false;
+  document.querySelectorAll('#'+key+' .atk-btn').forEach(btn=>btn.disabled=false);
+}
+function rand(a,b){return Math.floor(Math.random()*(b-a+1))+a}
+function bossAttack(key,type){
+  const b=BOSSES[key]; const st=bossState[key];
+  if(!st||st.over) return;
+  let dmg = type==='basic'?rand(12,20):type==='heavy'?rand(20,32):rand(30,45);
+  if(key==='boss2') dmg=Math.round(dmg*0.9);
+  st.hp=Math.max(0,st.hp-dmg);
+  document.getElementById(b.hpId).style.width=(st.hp/b.maxHp*100)+'%';
+  document.getElementById(b.hpTxt).textContent=`${st.hp}/${b.maxHp}`;
+  flashSlash(b.slashId);
+  hitFighter(b.enemyId);
+  updateCaption(key,'player',dmg);
+  if(st.hp<=0){ bossWin(key); return; }
+  // enemy counter after short delay
+  setTimeout(()=>{
+    if(st.over) return;
+    const edmg=rand(8,22);
+    st.php=Math.max(0,st.php-edmg);
+    document.getElementById(b.phpId).style.width=(st.php/b.maxPhp*100)+'%';
+    document.getElementById(b.phpTxt).textContent=`${st.php}/${b.maxPhp}`;
+    hitFighter(b.playerId);
+    updateCaption(key,'enemy',edmg);
+    if(st.php<=0){ bossLose(key); }
+  },500);
+}
+function flashSlash(id){ const s=document.getElementById(id); s.classList.remove('go'); void s.offsetWidth; s.classList.add('go'); }
+function hitFighter(id){ const f=document.getElementById(id); f.classList.remove('hit'); void f.offsetWidth; f.classList.add('hit'); }
+function updateCaption(key,who,dmg){
+  const b=BOSSES[key];
+  const capId=b.captionId;
+  const lines_player=['Gallina colpisce con furia primordiale!','Un attacco degno di un Re dei Dinosauri!','La lama di piume affonda nel bersaglio!'];
+  const lines_enemy=[`${b.enemyName} contrattacca ferocemente!`,`${b.enemyName} non si arrende facilmente!`,`Un colpo doloroso da ${b.enemyName}!`];
+  document.getElementById(capId).textContent = (who==='player'? lines_player[rand(0,2)]+` (-${dmg} HP)` : lines_enemy[rand(0,2)]+` (-${dmg} HP)`);
+}
+function bossWin(key){
+  const b=BOSSES[key]; bossState[key].over=true;
+  document.querySelectorAll('#'+key+' .atk-btn').forEach(btn=>btn.disabled=true);
+  document.getElementById(b.enemyId).classList.add('dead');
+  const r=document.getElementById(b.resultId);
+  r.innerHTML=`<div class="result-icon">🏆</div><div class="result-h">${b.enemyName} SCONFITTO!</div><div class="result-p">${b.winTxt}</div><button class="btn-continue" onclick="advanceBoss('${key}')">CONTINUA →</button>`;
+  r.classList.add('show');
+}
+function bossLose(key){
+  const b=BOSSES[key]; bossState[key].over=true;
+  document.querySelectorAll('#'+key+' .atk-btn').forEach(btn=>btn.disabled=true);
+  const r=document.getElementById(b.resultId);
+  r.innerHTML=`<div class="result-icon">💀</div><div class="result-h">Sei stata sconfitta!</div><div class="result-p">${b.loseTxt}</div><button class="btn-retry" onclick="initBoss('${key}');document.getElementById('${b.resultId}').classList.remove('show')">RIPROVA</button>`;
+  r.classList.add('show');
+}
+function advanceBoss(key){ BOSSES[key].next(); }
+
+/* ═══════════════════ GOJO (MARIO) VS SUKUNA (LA GALLINA INATTIVA) — QTE cutscene VIVA ═══════════════════ */
+let mfRound=0, mfWaiting=false, mfTimeoutId=null;
+const MF_LINES=[
+  {label:'🌀 FASE 1 · "BLU": LA TECNICA DEL LIMITE', moveMario:'Tecnica del Limite: Blu', moveGallina:'Squartamento (x1000)',
+   text:'Gojo Mario apre la mano: "Blu" — uno spazio a gravità inversa risucchia funghi, monete e nemici verso il centro. Sukuna Gallo, senza svegliarsi, risponde con un fendente invisibile che squarcia l\'aria dieci volte in un istante: pura riflessologia da Re dei Curse.',
+   glow:'rgba(0,140,255,.22)', onom:['PAM!','ZAC!']},
+  {label:'⚡ FASE 2 · "ROSSO": REPULSIONE CONTRO FUOCO', moveMario:'Tecnica del Limite: Rosso', moveGallina:'Agito: Freccia di Fuoco',
+   text:'"Rosso!" Un\'onda repulsiva spazza via ogni fungo residuo. Dalle piume di Sukuna Gallo parte una freccia incandescente — tecnicamente solo una piuma che ha preso fuoco vicino alla friggitrice — ma l\'impatto è comunque devastante.',
+   glow:'rgba(123,47,247,.22)', onom:['ZUN!','BOOM!']},
+  {label:'👁️ FASE 3 · "OCCHI SEI FUNGHI" CONTRO L\'ADATTAMENTO', moveMario:'Occhi Sei Funghi (Percezione Totale)', moveGallina:'Adattamento Ancestrale nel Sonno',
+   text:'Gojo Mario spalanca gli "Occhi Sei Funghi": vede ogni singola piuma al rallentatore, come fossero fotogrammi separati. Ma Sukuna Gallo si adatta senza nemmeno accorgersene — il suo corpo impara la mossa mentre viene ancora colpito. "Fastidiosamente efficiente," borbotta Mario.',
+   glow:'rgba(0,217,255,.20)', onom:['WHOOSH!','TIC-TIC-TIC!']},
+  {label:'🔥 FASE 4 · SCONTRO DI DOMINI SIMULTANEO', moveMario:'Espansione di Dominio: Vuoto Infinito', moveGallina:'Espansione di Dominio: Santuario Malevolo del Pollaio',
+   text:'Entrambi attivano il Dominio nello stesso istante — cosa che nell\'universo originale è quasi impossibile, ma qui succede perché nessuno dei due è sveglio al 100%. Il "Vuoto Infinito" di funghi fluttuanti collide frontalmente con il "Santuario Malevolo del Pollaio": lo schermo si spacca a metà.',
+   glow:'rgba(255,255,255,.28)', onom:['KA-BOOM!','COLLISIONE DI DOMINI!'], domainClash:true},
+  {label:'🌀 FASE 5 · AMPLIFICAZIONE DI DOMINIO', moveMario:'Vuoto Infinito Sconfinato (Amplificazione)', moveGallina:'Il Re dei Curse si Volta Nel Sonno',
+   text:'Gojo Mario spinge il Vuoto Infinito oltre i suoi limiti, facendolo dilagare come marea di funghi cosmici. Per un istante sembra la fine — ma Sukuna Gallo si volta semplicemente nel sonno, e l\'intera ondata gli scivola addosso senza svegliarlo. "...Ok, questo è quasi offensivo," sospira Mario.',
+   glow:'rgba(80,0,255,.26)', onom:['SWOOOSH!','FRRRR...']},
+  {label:'💜 FASE 6 · "VIOLA CAVA": LA FUSIONE SUPREMA', moveMario:'Viola Cavo (Fusione di Blu e Rosso)', moveGallina:'Mille Yard di Beccate',
+   text:'Gojo Mario fonde Blu e Rosso in un unico raggio devastante color ametista: il "Fungo Viola Cavo". Sukuna Gallo risponde con mille beccate in un solo battito d\'ala, senza aprire nemmeno un occhio. I due colpi si annullano a mezz\'aria in un lampo accecante.',
+   glow:'rgba(200,60,255,.3)', onom:['SFRAAK!','RISONANZA VIOLA!']},
+  {label:'👊 FASE 7 · CORPO A CORPO: L\'ULTIMA COMBO', moveMario:'Colpo a Mani Nude (Tecnica Segreta Zero)', moveGallina:'Istinto Predatorio Puro',
+   text:'Esauriti i trucchi, i due si lanciano in un puro scambio corpo a corpo: pugni, calci, un\'ala e un pizzetto che volano ovunque. Nessuna tecnica, nessun dominio — solo il più forte contro il più addormentato, faccia a faccia (anche se una faccia ha gli occhi chiusi).',
+   glow:'rgba(255,80,0,.28)', onom:['BAM! BAM! BAM!','BRUTALE!']},
+  {label:'🏁 FASE FINALE: IL VERDETTO', moveMario:'Bandierina della Vittoria (Tecnica Segreta)', moveGallina:'Risveglio Parziale: "Co-co-codè?"',
+   text:'Con un ultimo colpo, Gojo Mario pianta una bandierina sulla cresta della Gallina. "Game Over, Re dei Curse addormentato." La Gallina si sveglia solo per un istante, dice "Co-co-codè?" e si riaddormenta. Un pareggio d\'onore tra il più forte e il più assonnato.',
+   glow:'rgba(255,255,255,.35)', onom:['GG!','COCORICÒ SUPREMO!']}
+];
+function initMarioFight(){
+  mfRound=0; mfWaiting=false;
+  document.getElementById('mf-label').textContent=MF_LINES[0].label;
+  document.getElementById('mf-text').textContent=MF_LINES[0].text;
+  document.getElementById('mf-hint').textContent='👆 Clicca per iniziare la sequenza';
+  document.getElementById('mf-tension').style.width='0%';
+  document.getElementById('mf-bg-glow').style.background=`radial-gradient(circle at 50% 40%,${MF_LINES[0].glow},transparent 55%)`;
+  makeStars('mario-stars',90);
+}
+function mfClashEffects(round){
+  const line=MF_LINES[round];
+  // scossa dello schermo (più forte allo scontro di domini)
+  const scene=document.getElementById('mariofight');
+  scene.classList.remove('mf-shake'); void scene.offsetWidth; scene.classList.add('mf-shake');
+  // anello d'energia
+  const ring=document.getElementById('mf-ring');
+  ring.classList.remove('go'); void ring.offsetWidth; ring.classList.add('go');
+  // onomatopea a caso in stile fumetto
+  const words=line.onom;
+  const onom=document.getElementById('mf-onom');
+  onom.textContent=words[Math.floor(Math.random()*words.length)];
+  onom.style.left=(46+Math.random()*8)+'%';
+  onom.classList.remove('go'); void onom.offsetWidth; onom.classList.add('go');
+  // banner con il nome della tecnica di ciascun combattente, come nell'anime
+  const bm=document.getElementById('mf-banner-mario'), bs=document.getElementById('mf-banner-sukuna');
+  bm.textContent='🔵 '+line.moveMario; bs.textContent='🔴 '+line.moveGallina;
+  bm.classList.remove('go'); void bm.offsetWidth; bm.classList.add('go');
+  bs.classList.remove('go'); void bs.offsetWidth; bs.classList.add('go');
+  // il vetro dello scontro si scurisce/colora sempre di più
+  document.getElementById('mf-bg-glow').style.background=`radial-gradient(circle at 50% 40%,${line.glow},transparent 55%)`;
+  // barra di tensione sale ad ogni scambio
+  const pct=Math.min(100,(round+1)/MF_LINES.length*100);
+  document.getElementById('mf-tension').style.width=pct+'%';
+  // scontro di domini simultaneo: lo schermo si spacca a metà, blu contro rosso
+  if(line.domainClash){
+    const dc=document.getElementById('mf-domain-clash');
+    dc.classList.remove('go'); void dc.offsetWidth; dc.classList.add('go');
+  }
+  // sull'ultimo scambio, flash bianco totale in stile Dominio
+  if(round>=MF_LINES.length-1){
+    const flash=document.getElementById('mf-final-flash');
+    flash.classList.remove('go'); void flash.offsetWidth; flash.classList.add('go');
+  }
+}
+document.getElementById('mariofight').addEventListener('click', (e)=>{
+  if(e.target.closest('button')) return;
+  if(mfWaiting){
+    mfWaiting=false;
+    clearTimeout(mfTimeoutId);
+    document.getElementById('mf-qte').classList.remove('show');
+    document.getElementById('mf-mario').style.transform='scale(1.2) rotate(-10deg)';
+    document.getElementById('mf-trex').style.transform='scaleX(-1) scale(1.2) rotate(10deg)';
+    mfClashEffects(mfRound);
+    setTimeout(()=>{
+      document.getElementById('mf-mario').style.transform='none';
+      document.getElementById('mf-trex').style.transform='scaleX(-1)';
+    },250);
+    mfRound++;
+    if(mfRound>=MF_LINES.length){ finishMarioFight(); return; }
+    document.getElementById('mf-label').textContent=MF_LINES[mfRound].label;
+    document.getElementById('mf-text').textContent=MF_LINES[mfRound].text;
+    document.getElementById('mf-hint').textContent='👆 Clicca per continuare la sequenza';
+    return;
+  }
+  if(mfRound===0 && document.getElementById('mf-hint').textContent.includes('iniziare')){
+    triggerQte();
+  } else if(mfRound < MF_LINES.length){
+    triggerQte();
+  }
+});
+function triggerQte(){
+  document.getElementById('mf-hint').textContent='⚡ Aspetta il momento giusto...';
+  const q=document.getElementById('mf-qte');
+  setTimeout(()=>{
+    q.textContent='CLICCA ORA!'; q.classList.remove('show'); void q.offsetWidth; q.classList.add('show');
+    mfWaiting=true;
+    mfTimeoutId=setTimeout(()=>{
+      if(mfWaiting){ mfWaiting=false; document.getElementById('mf-hint').textContent='👆 Clicca per riprovare la sequenza'; }
+    },1400);
+  }, 600+Math.random()*700);
+}
+function finishMarioFight(){
+  document.getElementById('mf-label').textContent='🤝 SCONTRO CONCLUSO (SENZA SVEGLIARSI)';
+  document.getElementById('mf-text').innerHTML='Gojo Mario e Sukuna Gallo si rispettano a vicenda, da un più forte all\'altro. Con un lampo dimensionale, Mario torna al suo regno di funghi. La Gallina si riscuote appena — non ricorderà nulla — ma dentro di lei, il sigillo del Re dei Curse è un filo più debole. Presto si sveglierà del tutto.';
+  document.getElementById('mf-hint').textContent='👆 Clicca per affrontare la Conduttrice';
+  document.getElementById('mf-tension').style.width='100%';
+  document.getElementById('mariofight').onclick = ()=>{ show('boss2'); tag('BOSS 2 · La Conduttrice'); prog(90); initBoss('boss2'); document.getElementById('mariofight').onclick=null; };
+}
+
+/* ═══════════════════ RESTART ═══════════════════ */
+function restart(){
+  cur=0; s7Phase=0; l4Stage=0; biPhase=0;
+  for(let i=0;i<7;i++){ const el=document.getElementById('e'+i); if(el) el.classList.remove('lit'); }
+  for(let i=0;i<6;i++){ const el=document.getElementById('a'+i); if(el) el.classList.remove('lit'); }
+  document.getElementById('evo-title-txt').textContent='— Livello 4: 4 prove per completare l\'evoluzione —';
+  document.getElementById('s7-dialog').style.display='block';
+  document.getElementById('mc-choices').style.display='none';
+  document.getElementById('s7-label').textContent='😱 L\'ORRORE';
+  document.getElementById('s7-text').innerHTML='Gallina alza gli occhi. <em>McNuggets. McChicken. Crispy Chicken.</em> Tutto… pollo. Tutto… <strong>lei</strong>.';
+  document.getElementById('s7-hint').textContent='👆 Clicca per continuare';
+  prog(0); tag('Livello 0 · Titolo');
+  show('s0');
+}
+
+makeStars('title-stars',160);
+spawnAmbient('s0-ambient',['🧬','🪶','✨'],12,14,26);
+</script>
+</body>
+</html>
