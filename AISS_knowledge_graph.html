@@ -112,6 +112,7 @@ html,body{height:100%;overflow:hidden;background:var(--paper);color:var(--ink);f
   #bottombar .tourbtn{padding:8px 10px;font-size:11px}#bottombar .dpill{padding:7px 9px;font-size:11px}
   #tourcard{left:12px;right:12px;bottom:70px;width:auto;transform:translateY(8px)}#tourcard.show{transform:none}
   #pathcard{left:12px;right:12px;bottom:70px;width:auto;transform:translateY(8px)}#pathcard.show{transform:none}
+  #artscard{left:12px;right:12px;bottom:70px;width:auto;transform:translateY(8px)}#artscard.show{transform:none}
   body.path-on #panpad,body.path-on #legend{display:none}
   body.tour-on #panpad,body.tour-on #legend{display:none}
   body.hero-open #bottombar,body.detail-open #bottombar{display:none}
@@ -151,6 +152,18 @@ html,body{height:100%;overflow:hidden;background:var(--paper);color:var(--ink);f
 #tourcard.show{opacity:1;transform:translateX(-50%);pointer-events:auto}
 #pathcard{position:absolute;left:50%;bottom:82px;transform:translateX(-50%) translateY(8px);z-index:7;width:min(440px,calc(100vw - 32px));background:var(--card);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--hair);border-radius:18px;padding:18px 20px 16px;box-shadow:0 16px 44px rgba(40,30,10,.13);opacity:0;pointer-events:none;transition:opacity .3s,transform .3s}
 #pathcard.show{opacity:1;transform:translateX(-50%);pointer-events:auto}
+#artscard{position:absolute;left:50%;bottom:82px;transform:translateX(-50%) translateY(8px);z-index:7;width:min(440px,calc(100vw - 32px));background:var(--card);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--hair);border-radius:18px;padding:18px 20px 14px;box-shadow:0 16px 44px rgba(40,30,10,.13);opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;max-height:min(60vh,420px);overflow-y:auto}
+#artscard.show{opacity:1;transform:translateX(-50%);pointer-events:auto}
+#artscard .tkick{display:flex;align-items:center;gap:8px;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+#artscard .tkick .tdot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+#artscard .tclose{position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:8px;border:1px solid var(--hair);background:transparent;color:var(--ink-soft);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center}
+#artscard .tclose:hover{background:var(--btnhover)}
+.artrow{display:flex;align-items:center;gap:11px;padding:11px 12px;margin-bottom:8px;border-radius:12px;background:var(--accent);color:#fff;text-decoration:none;transition:filter .15s}
+.artrow:hover{filter:brightness(1.08)}
+.artrow .aico{flex-shrink:0}.artrow .aico svg{width:16px;height:16px;display:block}
+.artrow .amid{flex:1;min-width:0}.artrow .atit{font-size:13px;font-weight:600;line-height:1.2}
+.artrow .aby{font-size:11px;opacity:.85;margin-top:1px}
+.artrow .aarr{font-size:15px;opacity:.9;flex-shrink:0}
 #pathcard .tkick{display:flex;align-items:center;gap:8px;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
 #pathcard .tkick .tdot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
 #pathcard .phint{font-size:13px;color:var(--ink-soft);line-height:1.5}
@@ -206,6 +219,7 @@ html,body{height:100%;overflow:hidden;background:var(--paper);color:var(--ink);f
       <div class="ctl" id="btn-week" title="Mostra o nascondi la barra settimana"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span class="cl">Settimana</span></div>
       <div class="ctl" id="btn-joystick" title="Mostra o nascondi il joystick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20M8 6l4-4 4 4M8 18l4 4 4-4M6 8l-4 4 4 4M18 8l4 4-4 4"/></svg><span class="cl">Joystick</span></div>
       <div class="ctl" id="btn-path" title="Percorso: tocca due nodi per vedere la catena che li collega"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="19" r="3"/><circle cx="18" cy="5" r="3"/><path d="M8.5 17.5 15.5 6.5"/></svg><span class="cl">Percorso</span></div>
+      <div class="ctl" id="btn-arts" title="Tutti gli artefatti degli studenti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7 12 3 4 7v10l8 4 8-4z"/><path d="M4 7l8 4 8-4M12 11v10"/></svg><span class="cl">Artefatti</span></div>
       <div class="cdiv"></div>
       <div class="ctl on" id="life-btn" title="Attiva o ferma il movimento organico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg><span class="cl">Moto</span></div>
       <div class="ctl on" id="spin-btn" title="Attiva o ferma la rotazione"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v5h-5"/></svg><span class="cl">Ruota</span></div>
@@ -252,6 +266,12 @@ html,body{height:100%;overflow:hidden;background:var(--paper);color:var(--ink);f
     <button class="tclose" id="path-close">&times;</button>
     <div class="tkick"><span class="tdot"></span><span>Percorso</span></div>
     <div id="path-body"></div>
+  </div>
+
+  <div id="artscard">
+    <button class="tclose" id="arts-close">&times;</button>
+    <div class="tkick"><span class="tdot"></span><span>Artefatti degli studenti</span></div>
+    <div id="arts-body"></div>
   </div>
 
   <div id="credit"><b>AI Summer School</b> &middot; prototipo pedagogico<br>Skills Lab &middot; Enzima12 &middot; a cura di Mario Mele</div>
@@ -371,7 +391,7 @@ wrap.addEventListener('wheel',e=>{e.preventDefault();camDist*=(1+Math.sign(e.del
 let lastTap=0;
 wrap.addEventListener('pointerup',e=>{const now=Date.now();if(now-lastTap<300&&moved<10){camDist=Math.max(520,camDist*0.6);clampDist();updateCam();maybeHideHero();}lastTap=now;});
 function pick(e){const r=renderer.domElement.getBoundingClientRect();mouse.x=((e.clientX-r.left)/W)*2-1;mouse.y=-((e.clientY-r.top)/H)*2+1;
-  ray.setFromCamera(mouse,cam);const hits=ray.intersectObject(points);const vis=hits.filter(h=>activeCats.has(NODES[h.index].category)&&alpha[h.index]>0.25);
+  ray.setFromCamera(mouse,cam);const hits=ray.intersectObject(points);const vis=hits.filter(h=>activeCats.has(NODES[h.index].category)&&(pathMode||alpha[h.index]>0.25));
   if(pathMode){if(vis.length)handlePathPick(NODES[vis[0].index].id);return;}
   if(vis.length)select(NODES[vis[0].index].id);else clearSelect();}
 function select(id){clearDayUI();dayFocus=null;selected=id;const nb=new Set([id]);adj[id].forEach(a=>nb.add(a.id));focusSet=nb;
@@ -417,7 +437,7 @@ function setPanel(name,on){const el=document.getElementById(PANELS[name]);if(!el
 let heroOpen=true;
 function maybeHideHero(){if(heroReady&&camDist<1750&&panelOn('intro'))setPanel('intro',false);}
 document.getElementById('hero-close').onclick=()=>setPanel('intro',false);
-document.getElementById('reset-btn').onclick=()=>{camDist=2600;rotX=0.28;rotY=0.5;target.set(0,0,0);updateCam();initLowerView();clearSelect();spinning=true;alive=true;document.getElementById('spin-btn').classList.add('on');document.getElementById('life-btn').classList.add('on');if(typeof endTour==='function')endTour();if(typeof endPathMode==='function')endPathMode();applyPanelDefaults();q.value='';};
+document.getElementById('reset-btn').onclick=()=>{camDist=2600;rotX=0.28;rotY=0.5;target.set(0,0,0);updateCam();initLowerView();clearSelect();spinning=true;alive=true;document.getElementById('spin-btn').classList.add('on');document.getElementById('life-btn').classList.add('on');if(typeof endTour==='function')endTour();if(typeof endPathMode==='function')endPathMode();if(typeof closeArts==='function')closeArts();applyPanelDefaults();q.value='';};
 function applyPanelDefaults(){const mob=W<820;setPanel('intro',!mob);setPanel('legend',!mob);setPanel('week',!mob);setPanel('joystick',false);}
 // theme
 let dark=false;
@@ -467,7 +487,7 @@ function renderTour(){const t=TOUR[tourStep];document.getElementById('tour-kick'
   document.getElementById('tour-next').textContent=tourStep===TOUR.length-1?'Fine':'Avanti';
   focusDay(t.day);}
 function gotoTour(i){tourStep=Math.max(0,Math.min(TOUR.length-1,i));renderTour();}
-function startTour(){tourOn=true;document.body.classList.add('tour-on');tourCard.classList.add('show');spinning=false;document.getElementById('spin-btn').classList.remove('on');tourStep=0;renderTour();}
+function startTour(){if(typeof closeArts==='function')closeArts();tourOn=true;document.body.classList.add('tour-on');tourCard.classList.add('show');spinning=false;document.getElementById('spin-btn').classList.remove('on');tourStep=0;renderTour();}
 function endTour(){tourOn=false;document.body.classList.remove('tour-on');tourCard.classList.remove('show');clearDayFocus();}
 document.getElementById('tour-start').onclick=()=>{tourOn?endTour():startTour();};
 document.getElementById('tour-close').onclick=endTour;
@@ -498,18 +518,32 @@ function renderPathCard(){
   pathBody.innerHTML=html;pathCard.classList.add('show');}
 function handlePathPick(id){
   if(!pathA||(pathA&&pathB)){pathA=id;pathB=null;focusSet=new Set([id]);
-    NODES.forEach((n,i)=>{alpha[i]=n.id===id?1:0.2;sizes[i]=baseSize[i]*(n.id===id?1.4:1);});
+    NODES.forEach((n,i)=>{alpha[i]=n.id===id?1:0.5;sizes[i]=baseSize[i]*(n.id===id?1.4:1);});
     EDGES.forEach((e,i)=>{ealpha[i*2]=0.04;ealpha[i*2+1]=0.04;ecol.set([...DIM,...DIM],i*6);});
     nodeGeo.attributes.alpha.needsUpdate=true;nodeGeo.attributes.size.needsUpdate=true;edgeGeo.attributes.alpha.needsUpdate=true;edgeGeo.attributes.color.needsUpdate=true;
     renderPathCard();
   } else if(!pathB){ if(id===pathA)return; pathB=id; renderPathCard(); }
 }
-function startPathMode(){pathMode=true;pathA=null;pathB=null;document.body.classList.add('path-on');document.getElementById('btn-path').classList.add('on');
+function startPathMode(){if(typeof closeArts==='function')closeArts();pathMode=true;pathA=null;pathB=null;document.body.classList.add('path-on');document.getElementById('btn-path').classList.add('on');
   document.getElementById('detail').classList.remove('show');document.body.classList.remove('detail-open');if(typeof endTour==='function')endTour();clearDayUI();dayFocus=null;
   renderPathCard();}
 function endPathMode(){pathMode=false;pathA=null;pathB=null;document.body.classList.remove('path-on');document.getElementById('btn-path').classList.remove('on');pathCard.classList.remove('show');clearSelect();}
 document.getElementById('btn-path').onclick=()=>{pathMode?endPathMode():startPathMode();};
 document.getElementById('path-close').onclick=endPathMode;
+// ---- ARTEFATTI gallery (accessible list of all student artifacts) ----
+const artsCard=document.getElementById('artscard');
+(function buildArts(){
+  const list=[],seen=new Set();
+  NODES.forEach(n=>{if(n.art)n.art.forEach(a=>{if(!seen.has(a.u)){seen.add(a.u);const author=NODES.find(m=>m.category==='studenti'&&m.art&&m.art.some(x=>x.u===a.u));list.push({t:a.t,u:a.u,by:author?author.label:'',nodeId:author?author.id:n.id});}});});
+  let h='';
+  list.forEach(a=>{h+='<a class="artrow" href="'+a.u+'" target="_blank" rel="noopener"><span class="aico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 5v14l11-7z"/></svg></span><span class="amid"><span class="atit">'+a.t+'</span>'+(a.by?'<span class="aby">di '+a.by+'</span>':'')+'</span><span class="aarr">&#8599;</span></a>';});
+  document.getElementById('arts-body').innerHTML=h||'<div style="font-size:13px;color:var(--ink-soft)">Nessun artefatto ancora collegato.</div>';
+})();
+function openArts(){if(typeof endTour==='function')endTour();if(typeof endPathMode==='function')endPathMode();artsCard.classList.add('show');document.getElementById('btn-arts').classList.add('on');}
+function closeArts(){artsCard.classList.remove('show');document.getElementById('btn-arts').classList.remove('on');}
+document.getElementById('btn-arts').onclick=()=>{artsCard.classList.contains('show')?closeArts():openArts();};
+document.getElementById('arts-close').onclick=closeArts;
+
 
 
 // search: clicking the box focuses input
