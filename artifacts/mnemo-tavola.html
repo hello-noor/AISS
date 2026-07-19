@@ -3,276 +3,248 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tavola periodica a memoria — Mnemotecniche per i gruppi principali</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<title>Tavola periodica a memoria — Gruppi principali</title>
 <style>
-  :root{
-    --paper:#F5EFE3;
-    --ink:#1C1710;
-    --g1:#E08A3C; --i1:#382208;
-    --g2:#E4C478; --i2:#3A2D0E;
-    --g3:#A3B564; --i3:#222A0E;
-    --g4:#74A892; --i4:#0E2620;
-    --g5:#7C9CBF; --i5:#0F1E2E;
-    --g6:#A78BC2; --i6:#211230;
-    --g7:#CD7A6D; --i7:#341210;
-    --g8:#9AA1A8; --i8:#181D22;
-  }
-  *{margin:0;padding:0;box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
-  body{
-    background:var(--paper);
-    color:var(--ink);
-    font-family:'Archivo',Helvetica,Arial,sans-serif;
-    -webkit-font-smoothing:antialiased;
-    font-size:15px;
-    line-height:1.5;
-  }
-  ::selection{background:var(--ink);color:var(--paper);}
-  .mono{font-family:'IBM Plex Mono',monospace;}
+:root{
+  --paper:#F5EFE3; --ink:#1C1710;
+  --g1:#E08A3C; --i1:#382208;
+  --g2:#E4C478; --i2:#3A2D0E;
+  --g3:#A3B564; --i3:#222A0E;
+  --g4:#74A892; --i4:#0E2620;
+  --g5:#7C9CBF; --i5:#0F1E2E;
+  --g6:#A78BC2; --i6:#211230;
+  --g7:#CD7A6D; --i7:#341210;
+  --g8:#9AA1A8; --i8:#181D22;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased; font-size:15px; line-height:1.5;
+}
+.mono{font-family:"Courier New",monospace; font-weight:bold;}
+.wide{font-stretch:expanded; letter-spacing:-.01em;}
 
-  /* ---------- top bar ---------- */
-  .topbar{
-    display:flex;justify-content:space-between;align-items:baseline;
-    padding:18px 40px;border-bottom:1px solid var(--ink);
-    text-transform:uppercase;letter-spacing:.18em;font-size:11px;font-weight:600;
-  }
-  .topbar nav a{
-    color:var(--ink);text-decoration:none;border-bottom:1px solid var(--ink);
-    margin-left:28px;padding-bottom:2px;transition:color .18s ease;
-  }
-  .topbar nav a:hover{color:transparent;} /* ghost hover: resta solo la riga */
+/* barra superiore */
+.topbar{
+  display:flex; justify-content:space-between; align-items:baseline;
+  padding:18px 40px; border-bottom:1px solid var(--ink);
+  text-transform:uppercase; letter-spacing:.18em; font-size:11px; font-weight:600;
+}
+.topbar nav a{color:var(--ink); text-decoration:none; border-bottom:1px solid var(--ink); margin-left:28px; padding-bottom:2px;}
 
-  /* ---------- hero ---------- */
-  .hero{padding:64px 40px 56px;border-bottom:1px solid var(--ink);}
-  .eyebrow{
-    text-transform:uppercase;letter-spacing:.22em;font-size:11px;font-weight:600;
-    display:flex;justify-content:space-between;margin-bottom:28px;
-  }
-  h1{
-    font-stretch:122%;font-weight:860;text-transform:uppercase;
-    font-size:clamp(52px,9.6vw,148px);line-height:.87;letter-spacing:-.015em;
-  }
-  h1 .thin{font-weight:290;}
-  .hero p.lead{
-    max-width:760px;margin-top:34px;font-size:clamp(16px,1.5vw,20px);line-height:1.45;font-weight:450;
-  }
-  .hero p.lead b{font-weight:750;}
-  .meta-strip{
-    display:flex;gap:0;margin-top:44px;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);
-  }
-  .meta-strip div{
-    flex:1;padding:12px 16px;font-size:11px;text-transform:uppercase;letter-spacing:.16em;font-weight:600;
-    border-right:1px solid var(--ink);
-  }
-  .meta-strip div:last-child{border-right:none;}
-  .meta-strip .mono{font-size:15px;font-weight:600;letter-spacing:0;display:block;margin-top:2px;}
+/* hero */
+.hero{padding:64px 40px 56px; border-bottom:1px solid var(--ink);}
+.eyebrow{
+  text-transform:uppercase; letter-spacing:.22em; font-size:11px; font-weight:600;
+  display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:28px;
+}
+h1{
+  text-transform:uppercase; font-weight:900;
+  font-size:clamp(52px,9.6vw,148px); line-height:.87; letter-spacing:-.015em;
+}
+h1 .thin{font-weight:300;}
+.hero p.lead{max-width:760px; margin-top:34px; font-size:clamp(16px,1.5vw,20px); line-height:1.45;}
+.hero p.lead b{font-weight:800;}
+.meta-strip{display:flex; margin-top:44px; border-top:1px solid var(--ink); border-bottom:1px solid var(--ink); flex-wrap:wrap;}
+.meta-strip div{flex:1; min-width:150px; padding:12px 16px; font-size:11px; text-transform:uppercase; letter-spacing:.16em; font-weight:600; border-right:1px solid var(--ink);}
+.meta-strip div:last-child{border-right:none;}
+.meta-strip .mono{font-size:15px; display:block; margin-top:2px;}
 
-  /* ---------- section headers ---------- */
-  .sec-head{
-    display:flex;justify-content:space-between;align-items:baseline;
-    padding:22px 40px;border-bottom:1px solid var(--ink);
-  }
-  .sec-head h2{
-    font-stretch:120%;font-weight:830;text-transform:uppercase;
-    font-size:clamp(26px,3.6vw,52px);line-height:.95;letter-spacing:-.01em;
-  }
-  .sec-head span{font-size:11px;text-transform:uppercase;letter-spacing:.18em;font-weight:600;}
+/* titoli di sezione */
+.sec-head{display:flex; justify-content:space-between; align-items:baseline; gap:16px; flex-wrap:wrap; padding:22px 40px; border-bottom:1px solid var(--ink);}
+.sec-head h2{text-transform:uppercase; font-weight:900; font-size:clamp(26px,3.6vw,52px); line-height:.95;}
+.sec-head span{font-size:11px; text-transform:uppercase; letter-spacing:.18em; font-weight:600;}
 
-  /* ---------- mnemonic bands (color fields) ---------- */
-  .band{
-    display:grid;grid-template-columns:minmax(180px,26vw) 1fr;
-    background:var(--bg);color:var(--ink2);
-    border-bottom:1px solid var(--ink2);
-  }
-  .band-num{
-    font-stretch:125%;font-weight:900;line-height:.78;
-    font-size:clamp(90px,15vw,220px);
-    padding:34px 0 30px 40px;
-    border-right:1px solid color-mix(in srgb,var(--ink2) 45%,transparent);
-    align-self:stretch;display:flex;align-items:flex-start;
-  }
-  .band-body{padding:34px 40px 36px;}
-  .band-tag{
-    font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.2em;
-    padding-bottom:14px;margin-bottom:18px;
-    border-bottom:1px solid color-mix(in srgb,var(--ink2) 45%,transparent);
-    display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
-  }
-  .phrase{
-    font-stretch:118%;font-weight:780;
-    font-size:clamp(25px,3.3vw,46px);line-height:1.14;letter-spacing:-.005em;
-    max-width:20ch;
-  }
-  .phrase .h,.phrase .h2,.phrase .h3{
-    border-radius:2px;padding:.01em .09em;margin:0 .01em;
-    transition:transform .15s ease;
-    display:inline-block;
-  }
-  .phrase .h{background:var(--ink2);color:var(--bg);}
-  .phrase .h2{box-shadow:inset 0 0 0 .06em var(--ink2);}
-  .phrase:hover .h{transform:translateY(-.06em);}
-  .phrase .w{white-space:nowrap;}
-  .band-note{
-    margin-top:16px;font-size:13px;max-width:64ch;
-    color:color-mix(in srgb,var(--ink2) 88%,transparent);
-  }
-  .band-note b{font-weight:750;}
-  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px;}
-  .chip{
-    font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500;
-    border:1px solid var(--ink2);padding:6px 10px 5px;border-radius:2px;
-    cursor:default;transition:background .15s ease,color .15s ease;
-    white-space:nowrap;
-  }
-  .chip b{font-weight:600;}
-  .chip:hover{background:var(--ink2);color:var(--bg);}
+/* bande colorate: una per gruppo */
+.band{display:grid; grid-template-columns:minmax(180px,26vw) 1fr; background:var(--bg); color:var(--fg); border-bottom:1px solid var(--fg);}
+.band-num{
+  font-weight:900; line-height:.78; font-size:clamp(90px,15vw,220px);
+  padding:34px 0 30px 40px; border-right:1px solid var(--fg);
+}
+.band-body{padding:34px 40px 36px;}
+.band-tag{
+  font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.2em;
+  padding-bottom:14px; margin-bottom:18px; border-bottom:1px solid var(--fg);
+  display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap;
+}
+.phrase{font-weight:800; font-size:clamp(25px,3.3vw,46px); line-height:1.14; max-width:22ch;}
+.phrase .w{white-space:nowrap;}
+.phrase .h,.phrase .h2{display:inline-block; border-radius:2px; padding:.01em .09em; margin:0 .01em;}
+.phrase .h{background:var(--fg); color:var(--bg);}
+.phrase .h2{box-shadow:inset 0 0 0 .06em var(--fg);}
+.band-note{margin-top:16px; font-size:13px; max-width:64ch;}
+.band-note b{font-weight:800;}
+.chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:20px;}
+.chip{
+  font-family:"Courier New",monospace; font-weight:bold; font-size:12px;
+  border:1px solid var(--fg); padding:6px 10px 5px; border-radius:2px; white-space:nowrap;
+}
 
-  /* ---------- periodic table ---------- */
-  .pt-wrap{padding:34px 40px 44px;overflow-x:auto;}
-  .pt{
-    display:grid;grid-template-columns:repeat(18,minmax(46px,1fr));
-    gap:1px;background:var(--ink);border:1px solid var(--ink);
-    min-width:940px;
-  }
-  .pt .gh{
-    background:var(--paper);padding:8px 6px;text-align:center;
-    font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;
-  }
-  .pt .gh .mono{display:block;font-size:9px;font-weight:500;opacity:.6;margin-top:1px;}
-  .pt .el{
-    aspect-ratio:1/1.06;position:relative;cursor:pointer;
-    background:var(--bg);color:var(--ink2);
-    display:flex;align-items:center;justify-content:center;
-    transition:background .12s ease,color .12s ease;
-  }
-  .pt .el .z{position:absolute;top:3px;left:5px;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:500;}
-  .pt .el .s{font-weight:800;font-stretch:115%;font-size:clamp(12px,1.5vw,19px);line-height:1;}
-  .pt .el:hover{background:var(--ink2);color:var(--bg);}
-  .pt .empty{background:var(--paper);}
-  .pt .voidcell{background:var(--paper);}
-  .pt .frow{aspect-ratio:auto;padding:9px 10px;}
-  .pt .gapcell{
-    background:repeating-linear-gradient(45deg,var(--paper) 0 6px,#EDE5D3 6px 7px);
-    display:flex;align-items:center;justify-content:center;text-align:center;
-    font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.14em;
-    color:#8A8070;padding:10px;
-  }
-  @keyframes flash{
-    0%{box-shadow:inset 0 0 0 3px var(--ink);}
-    100%{box-shadow:inset 0 0 0 0 transparent;}
-  }
-  .pt .el.flash{animation:flash .9s ease-out 2;}
-  .pt-legend{
-    display:flex;flex-wrap:wrap;gap:18px;margin-top:18px;
-    font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.14em;
-  }
-  .pt-legend span{display:flex;align-items:center;gap:7px;}
-  .pt-legend i{width:12px;height:12px;border:1px solid var(--ink);display:inline-block;}
-  .pt-note{margin-top:14px;font-size:12.5px;color:#6B6252;max-width:100ch;}
+/* tavola periodica */
+.pt-wrap{padding:34px 40px 44px; overflow-x:auto;}
+.pt{display:grid; grid-template-columns:repeat(18,minmax(46px,1fr)); gap:1px; background:var(--ink); border:1px solid var(--ink); min-width:940px;}
+.pt .gh{background:var(--paper); padding:8px 6px; text-align:center; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.12em;}
+.pt .gh .mono{display:block; font-size:9px; opacity:.6; margin-top:1px;}
+.pt .el{
+  aspect-ratio:1/1.06; position:relative; cursor:pointer;
+  background:var(--bg); color:var(--fg);
+  display:flex; align-items:center; justify-content:center;
+}
+.pt .el .z{position:absolute; top:3px; left:5px; font-family:"Courier New",monospace; font-weight:bold; font-size:9px;}
+.pt .el .s{font-weight:900; font-size:clamp(12px,1.5vw,19px); line-height:1;}
+.pt .el:active{background:var(--fg); color:var(--bg);}
+.pt .empty,.pt .voidcell{background:var(--paper);}
+.pt .gapcell{
+  background:repeating-linear-gradient(45deg,var(--paper) 0 6px,#EDE5D3 6px 7px);
+  display:flex; align-items:center; justify-content:center; text-align:center;
+  font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.14em; color:#8A8070; padding:10px;
+}
+.pt .frow{aspect-ratio:auto; padding:9px 10px;}
+@keyframes flash{0%{box-shadow:inset 0 0 0 3px var(--ink);}100%{box-shadow:inset 0 0 0 0 transparent;}}
+.pt .el.flash{animation:flash .9s ease-out 2;}
+.pt-legend{display:flex; flex-wrap:wrap; gap:18px; margin-top:18px; font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.14em;}
+.pt-legend span{display:flex; align-items:center; gap:7px;}
+.pt-legend i{width:12px; height:12px; border:1px solid var(--ink); display:inline-block;}
+.pt-note{margin-top:14px; font-size:12.5px; color:#6B6252; max-width:100ch;}
+.scroll-hint{display:none;}
 
-  /* ---------- detail panel (hover reveal) ---------- */
+/* pannello dettaglio */
+#panel{
+  position:fixed; right:36px; top:50%; transform:translateY(-50%) translateX(8px);
+  width:320px; background:var(--ink); color:var(--paper);
+  padding:22px 24px 24px; z-index:50;
+  opacity:0; visibility:hidden; transition:opacity .16s ease,transform .16s ease,visibility .16s;
+}
+#panel.on{opacity:1; visibility:visible; transform:translateY(-50%) translateX(0);}
+#panel .p-g{font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.18em; display:flex; justify-content:space-between; gap:10px;}
+#panel .p-sym{font-weight:900; font-size:86px; line-height:.9; margin:12px 0 4px;}
+#panel .p-name{font-size:19px; font-weight:700;}
+#panel .p-z{font-family:"Courier New",monospace; font-weight:bold; font-size:12px; opacity:.75; margin-top:2px;}
+#panel .p-frag{margin-top:16px; padding-top:14px; border-top:1px solid rgba(245,239,227,.35); font-size:13px; line-height:1.5;}
+#panel .p-frag .h{background:var(--paper); color:var(--ink); padding:0 .12em; border-radius:2px; font-weight:800;}
+#panel .p-frag .h2{box-shadow:inset 0 0 0 1px var(--paper); padding:0 .1em; border-radius:2px; font-weight:800;}
+#panel .p-cur{margin-top:12px; padding-top:12px; border-top:1px solid rgba(245,239,227,.35); font-size:12.5px; line-height:1.5; opacity:.85;}
+#panel .p-close{
+  display:none; position:absolute; top:8px; right:10px; background:none; border:none;
+  color:var(--paper); font-size:22px; line-height:1; cursor:pointer; font-family:inherit; padding:4px 6px;
+}
+
+
+
+.pt .el.dim{opacity:.34; filter:saturate(.2);}
+.pt .el.metal{background:#EAE2CF; color:#4A4234;}
+.pt .el.metal:hover{background:#4A4234; color:#EAE2CF;}
+.pt .gapcell b{font-weight:800;}
+
+/* gioco */
+.game{padding:34px 40px 44px; border-bottom:1px solid var(--ink);}
+.game p.g-intro{max-width:70ch; font-size:14.5px; line-height:1.55; margin-bottom:22px;}
+.game p.g-intro b{font-weight:800;}
+.g-inputrow{display:flex; gap:10px; align-items:stretch; flex-wrap:wrap;}
+#ginput{
+  flex:1; min-width:240px; font-family:inherit; font-size:19px; font-weight:600;
+  padding:14px 16px; border:1px solid var(--ink); background:#fff; color:var(--ink);
+  border-radius:0; outline:none;
+}
+#ginput:focus{box-shadow:inset 0 0 0 2px var(--ink);}
+.g-btn{
+  font-family:inherit; font-size:12px; font-weight:700; text-transform:uppercase;
+  letter-spacing:.16em; padding:14px 22px; border:1px solid var(--ink);
+  background:var(--ink); color:var(--paper); cursor:pointer;
+}
+.g-btn.ghost{background:transparent; color:var(--ink);}
+.g-btn:active{transform:translateY(1px);}
+.g-examples{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.14em; align-items:center;}
+.g-ex{
+  font-family:inherit; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.14em;
+  border:1px solid var(--ink); background:transparent; color:var(--ink);
+  padding:7px 10px; cursor:pointer;
+}
+.g-ex:hover{background:var(--ink); color:var(--paper);}
+.g-render{
+  margin-top:26px; font-weight:800; font-size:clamp(20px,2.6vw,34px); line-height:1.35;
+  min-height:1.4em; word-spacing:.06em;
+}
+.g-render .gw{white-space:nowrap;}
+.g-render .gl{position:relative; display:inline-block; padding:.01em .07em; margin:0 .01em; border-radius:2px; cursor:pointer;}
+.g-render .gl.g1{background:var(--ink); color:var(--paper);}
+.g-render .gl.g2{box-shadow:inset 0 0 0 .055em var(--ink);}
+.g-render .gl:hover{outline:2px solid var(--ink); outline-offset:1px;}
+.g-tip{position:fixed; z-index:80; background:var(--ink); color:var(--paper); font-size:12px; font-weight:600; padding:5px 9px; border-radius:2px; pointer-events:none; transform:translate(-50%,-130%); white-space:nowrap;}
+.g-stats{
+  display:flex; gap:0; margin-top:26px; border-top:1px solid var(--ink); border-bottom:1px solid var(--ink);
+  flex-wrap:wrap;
+}
+.g-stats > div{flex:1; min-width:150px; padding:14px 16px; border-right:1px solid var(--ink); font-size:11px; text-transform:uppercase; letter-spacing:.16em; font-weight:600;}
+.g-stats > div:last-child{border-right:none;}
+.g-stats .mono{font-size:20px; display:block; margin-top:2px; letter-spacing:0;}
+.g-chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:18px;}
+.g-chip{
+  font-family:"Courier New",monospace; font-weight:bold; font-size:12px;
+  border:1px solid var(--ink); padding:6px 10px 5px; border-radius:2px; white-space:nowrap;
+  cursor:pointer; background:transparent; color:var(--ink);
+}
+.g-chip:hover{background:var(--ink); color:var(--paper);}
+.g-chip.wrong{opacity:.45; border-style:dashed;}
+.g-empty{margin-top:18px; font-size:13px; color:#6B6252; font-style:italic;}
+.g-toggle{margin-top:26px;}
+#gboard{display:none; margin-top:16px;}
+#gboard.open{display:block;}
+
+/* metodo */
+.method{display:grid; grid-template-columns:repeat(3,1fr); border-bottom:1px solid var(--ink);}
+.method article{padding:30px 40px 40px; border-right:1px solid var(--ink);}
+.method article:last-child{border-right:none;}
+.method .n{font-family:"Courier New",monospace; font-weight:bold; font-size:12px; display:block; margin-bottom:44px;}
+.method h3{text-transform:uppercase; font-weight:900; font-size:clamp(19px,1.8vw,26px); line-height:1.05; margin-bottom:12px;}
+.method p{font-size:14px; line-height:1.55; color:#4A4234;}
+.latin{padding:22px 40px; border-bottom:1px solid var(--ink); font-size:13px; display:flex; gap:14px; align-items:baseline; flex-wrap:wrap;}
+.latin b{font-weight:800; text-transform:uppercase; letter-spacing:.14em; font-size:11px;}
+.latin .mono{font-size:12px; border:1px solid var(--ink); padding:3px 8px; border-radius:2px;}
+
+footer{padding:20px 40px; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; font-size:10px; text-transform:uppercase; letter-spacing:.16em; font-weight:600; color:#6B6252;}
+
+@media (max-width:900px){
+  .topbar{padding:14px 16px; flex-wrap:wrap; gap:6px 0;}
+  .topbar nav a{margin-left:0; margin-right:16px;}
+  .hero,.sec-head,.pt-wrap,.latin{padding-left:16px; padding-right:16px;}
+  .hero{padding-top:46px; padding-bottom:42px;}
+  h1{font-size:clamp(44px,13.5vw,84px);}
+  .hero p.lead{font-size:16px; max-width:none;}
+  .eyebrow{margin-bottom:22px; font-size:10px; letter-spacing:.14em;}
+  .meta-strip div{flex:1 1 45%; padding:10px 12px; border-bottom:1px solid var(--ink);}
+  .sec-head{padding-top:20px; padding-bottom:20px;}
+  .band{grid-template-columns:1fr;}
+  .band-num{border-right:none; border-bottom:1px solid var(--fg); padding:16px 16px 4px; font-size:clamp(60px,17vw,110px); line-height:.8;}
+  .band-body{padding:18px 16px 28px;}
+  .band-tag{padding-bottom:12px; margin-bottom:16px; font-size:10px; letter-spacing:.14em;}
+  .phrase{font-size:clamp(21px,6.2vw,32px); max-width:none; line-height:1.22;}
+  .chips{gap:6px; margin-top:18px;}
+  .chip{padding:8px 9px; font-size:11px; cursor:pointer;}
+  .band-note{font-size:12.5px;}
+  .pt-wrap{padding:18px 16px 30px;}
+  .scroll-hint{display:block; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.18em; color:#8A8070; margin-bottom:10px;}
+  .pt{min-width:880px;}
+  .pt-legend{font-size:9px; gap:10px 14px;}
+  .game{padding:22px 16px 32px;}
+  .g-stats > div{flex:1 1 45%; border-bottom:1px solid var(--ink);}
+  .g-inputrow{flex-direction:column;}
+  .g-btn{width:100%;}
+  .method{grid-template-columns:1fr;}
+  .method article{border-right:none; border-bottom:1px solid var(--ink); padding:24px 16px 30px;}
+  .method .n{margin-bottom:24px;}
   #panel{
-    position:fixed;right:36px;top:50%;transform:translateY(-50%) translateX(8px);
-    width:320px;background:var(--ink);color:var(--paper);
-    padding:22px 24px 24px;z-index:50;pointer-events:none;
-    opacity:0;transition:opacity .16s ease,transform .16s ease;
+    left:12px; right:12px; top:auto; bottom:12px; width:auto;
+    transform:translateY(calc(100% + 30px)); opacity:1; visibility:visible;
+    max-height:56vh; overflow-y:auto; transition:transform .25s ease;
   }
-  #panel.on{opacity:1;transform:translateY(-50%) translateX(0);}
-  #panel .p-g{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.2em;display:flex;justify-content:space-between;}
-  #panel .p-sym{font-stretch:125%;font-weight:900;font-size:86px;line-height:.9;margin:12px 0 4px;}
-  #panel .p-name{font-size:19px;font-weight:650;}
-  #panel .p-z{font-family:'IBM Plex Mono',monospace;font-size:12px;opacity:.75;margin-top:2px;}
-  #panel .p-frag{
-    margin-top:16px;padding-top:14px;border-top:1px solid rgba(245,239,227,.35);
-    font-size:13px;line-height:1.45;
-  }
-  #panel .p-frag .h{background:var(--paper);color:var(--ink);padding:0 .12em;border-radius:2px;font-weight:700;}
-  #panel .p-frag .h2{box-shadow:inset 0 0 0 1px var(--paper);padding:0 .1em;border-radius:2px;font-weight:700;}
-  #panel .p-cur{
-    margin-top:12px;padding-top:12px;border-top:1px solid rgba(245,239,227,.35);
-    font-size:12.5px;line-height:1.5;opacity:.85;
-  }
-  #panel .p-close{
-    display:none;position:absolute;top:8px;right:10px;background:none;border:none;
-    color:var(--paper);font-size:22px;line-height:1;cursor:pointer;font-family:inherit;padding:4px 6px;
-  }
-
-  /* ---------- method ---------- */
-  .method{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--ink);}
-  .method article{padding:30px 40px 40px;border-right:1px solid var(--ink);}
-  .method article:last-child{border-right:none;}
-  .method .n{
-    font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;
-    display:block;margin-bottom:44px;
-  }
-  .method h3{
-    font-stretch:118%;font-weight:800;text-transform:uppercase;
-    font-size:clamp(19px,1.8vw,26px);line-height:1.05;margin-bottom:12px;
-  }
-  .method p{font-size:14px;line-height:1.55;color:#4A4234;}
-  .latin{
-    padding:22px 40px;border-bottom:1px solid var(--ink);
-    font-size:13px;display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;
-  }
-  .latin b{font-weight:750;text-transform:uppercase;letter-spacing:.14em;font-size:11px;}
-  .latin .mono{font-size:12px;border:1px solid var(--ink);padding:3px 8px;border-radius:2px;}
-
-  footer{
-    padding:20px 40px;display:flex;justify-content:space-between;
-    font-size:10px;text-transform:uppercase;letter-spacing:.16em;font-weight:600;color:#6B6252;
-  }
-
-  .scroll-hint{display:none;}
-  @media (max-width:900px){
-    html{-webkit-tap-highlight-color:transparent;}
-    body{overflow-x:hidden;}
-    .topbar{padding:14px 16px;flex-wrap:wrap;gap:6px 0;}
-    .topbar nav a{margin-left:0;margin-right:16px;}
-    .hero,.sec-head,.pt-wrap,.latin{padding-left:16px;padding-right:16px;}
-    .hero{padding-top:46px;padding-bottom:42px;}
-    h1{font-size:clamp(44px,13.5vw,84px);}
-    .hero p.lead{font-size:16px;max-width:none;}
-    .eyebrow{margin-bottom:22px;font-size:10px;letter-spacing:.14em;}
-    .meta-strip{flex-wrap:wrap;}
-    .meta-strip div{flex:1 1 45%;border-bottom:1px solid var(--ink);padding:10px 12px;}
-    .sec-head{flex-direction:column;align-items:flex-start;gap:6px;padding-top:20px;padding-bottom:20px;}
-    .band{grid-template-columns:1fr;}
-    .band-num{
-      border-right:none;border-bottom:1px solid color-mix(in srgb,var(--ink2) 45%,transparent);
-      padding:16px 16px 4px;font-size:clamp(60px,17vw,110px);line-height:.8;
-    }
-    .band-body{padding:18px 16px 28px;}
-    .band-tag{padding-bottom:12px;margin-bottom:16px;font-size:10px;letter-spacing:.14em;}
-    .phrase{font-size:clamp(21px,6.2vw,32px);max-width:none;line-height:1.22;}
-    .chips{gap:6px;margin-top:18px;}
-    .chip{padding:8px 9px;font-size:11px;cursor:pointer;}
-    .band-note{font-size:12.5px;}
-    .pt-wrap{padding:18px 16px 30px;}
-    .scroll-hint{
-      display:block;font-size:10px;font-weight:700;text-transform:uppercase;
-      letter-spacing:.18em;color:#8A8070;margin-bottom:10px;
-    }
-    .pt{min-width:880px;}
-    .pt-legend{font-size:9px;gap:10px 14px;}
-    .method{grid-template-columns:1fr;}
-    .method article{border-right:none;border-bottom:1px solid var(--ink);padding:24px 16px 30px;}
-    .method .n{margin-bottom:24px;}
-    .latin{gap:8px;}
-    #panel{
-      display:block;pointer-events:auto;
-      left:12px;right:12px;top:auto;bottom:12px;width:auto;
-      transform:translateY(calc(100% + 30px));opacity:1;
-      max-height:56vh;overflow-y:auto;
-      transition:transform .25s ease;
-    }
-    #panel.on{transform:translateY(0);}
-    #panel .p-close{display:block;}
-    #panel .p-g{padding-right:34px;}
-    footer{padding:16px;flex-direction:column;gap:6px;}
-  }
+  #panel.on{transform:translateY(0);}
+  #panel .p-close{display:block;}
+  #panel .p-g{padding-right:34px;}
+  footer{padding:16px; flex-direction:column; gap:6px;}
+}
 </style>
 </head>
 <body>
@@ -282,6 +254,7 @@
   <nav>
     <a href="#frasi">Le frasi</a>
     <a href="#tavola">La tavola</a>
+    <a href="#gioco">Il gioco</a>
     <a href="#metodo">Il metodo</a>
   </nav>
 </div>
@@ -292,7 +265,7 @@
   <p class="lead">Otto frasi assurde per otto colonne della tavola di Mendeleev. In ogni parola si nascondono le lettere del <b>simbolo chimico</b> — evidenziate qui una a una, anche quando sono distanti dentro la parola. L'occhio impara prima della memoria: dopo poche letture vedrai «Ruba» e penserai <b>Rb</b>, vedrai «Tallone» e penserai <b>Tl</b>. E più la scena è ridicola — un gallo indiano sul tallone, ossa di tè e pollo — più resta impressa.</p>
   <div class="meta-strip">
     <div>Gruppi coperti<span class="mono">I → VIII</span></div>
-    <div>Elementi<span class="mono">50</span></div>
+    <div>Elementi in tavola<span class="mono">118</span></div>
     <div>Frasi mnemoniche<span class="mono">8</span></div>
     <div>Numerazione IUPAC<span class="mono">1 · 2 · 13–18</span></div>
   </div>
@@ -304,140 +277,140 @@
 </div>
 
 <!-- GRUPPO I -->
-<section class="band" style="--bg:var(--g1);--ink2:var(--i1)">
+<section class="band" style="--bg:var(--g1);--fg:var(--i1)">
   <div class="band-num">I</div>
   <div class="band-body">
     <div class="band-tag"><span>Gruppo I · Metalli alcalini</span><span class="mono">IUPAC 1</span></div>
     <p class="phrase"><span class="w"><span class="h">H</span>o</span> <span class="w"><span class="h">Li</span><span class="h2">Na</span></span> <span class="w"><span class="h">K</span>e</span> <span class="w"><span class="h">R</span>u<span class="h">b</span>a</span> <span class="w">il</span> <span class="w"><span class="h">C</span>e<span class="h">s</span>so</span> <span class="w">a</span> <span class="w"><span class="h">Fr</span>ancio</span></p>
     <div class="chips">
-      <span class="chip" data-sym="H"><b>H</b> · 1 · Idrogeno</span>
-      <span class="chip" data-sym="Li"><b>Li</b> · 3 · Litio</span>
-      <span class="chip" data-sym="Na"><b>Na</b> · 11 · Sodio</span>
-      <span class="chip" data-sym="K"><b>K</b> · 19 · Potassio</span>
-      <span class="chip" data-sym="Rb"><b>Rb</b> · 37 · Rubidio</span>
-      <span class="chip" data-sym="Cs"><b>Cs</b> · 55 · Cesio</span>
-      <span class="chip" data-sym="Fr"><b>Fr</b> · 87 · Francio</span>
+      <span class="chip" data-sym="H">H · 1 · Idrogeno</span>
+      <span class="chip" data-sym="Li">Li · 3 · Litio</span>
+      <span class="chip" data-sym="Na">Na · 11 · Sodio</span>
+      <span class="chip" data-sym="K">K · 19 · Potassio</span>
+      <span class="chip" data-sym="Rb">Rb · 37 · Rubidio</span>
+      <span class="chip" data-sym="Cs">Cs · 55 · Cesio</span>
+      <span class="chip" data-sym="Fr">Fr · 87 · Francio</span>
     </div>
     <p class="band-note"><b>Attenzione:</b> Na e K non vengono dal nome italiano ma dal latino — <i>natrium</i> e <i>kalium</i>. La frase te li regala gratis: «LiNa» e «Ke».</p>
   </div>
 </section>
 
 <!-- GRUPPO II -->
-<section class="band" style="--bg:var(--g2);--ink2:var(--i2)">
+<section class="band" style="--bg:var(--g2);--fg:var(--i2)">
   <div class="band-num">II</div>
   <div class="band-body">
     <div class="band-tag"><span>Gruppo II · Metalli alcalino-terrosi</span><span class="mono">IUPAC 2</span></div>
     <p class="phrase"><span class="w"><span class="h">Be</span></span> <span class="w"><span class="h">M</span>anna<span class="h">g</span>ia</span> <span class="w">da</span> <span class="w">un</span> <span class="w"><span class="h">Ca</span>lcio</span> <span class="w">a</span> <span class="w">quello</span> <span class="w"><span class="h">S</span>t<span class="h">r</span>onzio</span> <span class="w">che</span> <span class="w"><span class="h">Ba</span><span class="h2">Ra</span></span></p>
     <div class="chips">
-      <span class="chip" data-sym="Be"><b>Be</b> · 4 · Berillio</span>
-      <span class="chip" data-sym="Mg"><b>Mg</b> · 12 · Magnesio</span>
-      <span class="chip" data-sym="Ca"><b>Ca</b> · 20 · Calcio</span>
-      <span class="chip" data-sym="Sr"><b>Sr</b> · 38 · Stronzio</span>
-      <span class="chip" data-sym="Ba"><b>Ba</b> · 56 · Bario</span>
-      <span class="chip" data-sym="Ra"><b>Ra</b> · 88 · Radio</span>
+      <span class="chip" data-sym="Be">Be · 4 · Berillio</span>
+      <span class="chip" data-sym="Mg">Mg · 12 · Magnesio</span>
+      <span class="chip" data-sym="Ca">Ca · 20 · Calcio</span>
+      <span class="chip" data-sym="Sr">Sr · 38 · Stronzio</span>
+      <span class="chip" data-sym="Ba">Ba · 56 · Bario</span>
+      <span class="chip" data-sym="Ra">Ra · 88 · Radio</span>
     </div>
     <p class="band-note"><b>Mg</b> si nasconde dentro <i>Mannagia</i>: la <b>M</b> iniziale e la <b>g</b> in mezzo → <b>M</b>a<b>g</b>nesio. Il resto della parola è scenografia: più è teatrale, meglio si ricorda.</p>
   </div>
 </section>
 
 <!-- GRUPPO III -->
-<section class="band" style="--bg:var(--g3);--ink2:var(--i3)">
+<section class="band" style="--bg:var(--g3);--fg:var(--i3)">
   <div class="band-num">III</div>
   <div class="band-body">
     <div class="band-tag"><span>Gruppo III · Gruppo del boro</span><span class="mono">IUPAC 13</span></div>
     <p class="phrase"><span class="w"><span class="h">B</span><span class="h2">Al</span>la</span> <span class="w">un</span> <span class="w"><span class="h">Ga</span>llo</span> <span class="w"><span class="h">In</span>diano</span> <span class="w">sul</span> <span class="w"><span class="h">T</span>a<span class="h">l</span>lone</span></p>
     <div class="chips">
-      <span class="chip" data-sym="B"><b>B</b> · 5 · Boro</span>
-      <span class="chip" data-sym="Al"><b>Al</b> · 13 · Alluminio</span>
-      <span class="chip" data-sym="Ga"><b>Ga</b> · 31 · Gallio</span>
-      <span class="chip" data-sym="In"><b>In</b> · 49 · Indio</span>
-      <span class="chip" data-sym="Tl"><b>Tl</b> · 81 · Tallio</span>
+      <span class="chip" data-sym="B">B · 5 · Boro</span>
+      <span class="chip" data-sym="Al">Al · 13 · Alluminio</span>
+      <span class="chip" data-sym="Ga">Ga · 31 · Gallio</span>
+      <span class="chip" data-sym="In">In · 49 · Indio</span>
+      <span class="chip" data-sym="Tl">Tl · 81 · Tallio</span>
     </div>
     <p class="band-note">Doppio colpo nella prima parola: «<b>B</b>-<b>Al</b>-la» contiene sia il Boro sia l'Alluminio. E nel <b>T</b>a<b>l</b>lone si nasconde il <b>Tl</b> — Tallio: la scena si commenta da sola.</p>
   </div>
 </section>
 
 <!-- GRUPPO IV -->
-<section class="band" style="--bg:var(--g4);--ink2:var(--i4)">
+<section class="band" style="--bg:var(--g4);--fg:var(--i4)">
   <div class="band-num">IV</div>
   <div class="band-body">
     <div class="band-tag"><span>Gruppo IV · Gruppo del carbonio</span><span class="mono">IUPAC 14</span></div>
     <p class="phrase"><span class="w"><span class="h">C</span>arlo</span> <span class="w"><span class="h">Si</span></span> <span class="w"><span class="h">Ge</span>tta</span> <span class="w">in</span> <span class="w">uno</span> <span class="w"><span class="h">S</span>tag<span class="h">n</span>o</span> <span class="w">di</span> <span class="w"><span class="h">P</span>iom<span class="h">b</span>o</span></p>
     <div class="chips">
-      <span class="chip" data-sym="C"><b>C</b> · 6 · Carbonio</span>
-      <span class="chip" data-sym="Si"><b>Si</b> · 14 · Silicio</span>
-      <span class="chip" data-sym="Ge"><b>Ge</b> · 32 · Germanio</span>
-      <span class="chip" data-sym="Sn"><b>Sn</b> · 50 · Stagno</span>
-      <span class="chip" data-sym="Pb"><b>Pb</b> · 82 · Piombo</span>
+      <span class="chip" data-sym="C">C · 6 · Carbonio</span>
+      <span class="chip" data-sym="Si">Si · 14 · Silicio</span>
+      <span class="chip" data-sym="Ge">Ge · 32 · Germanio</span>
+      <span class="chip" data-sym="Sn">Sn · 50 · Stagno</span>
+      <span class="chip" data-sym="Pb">Pb · 82 · Piombo</span>
     </div>
     <p class="band-note">Le lettere di <b>Sn</b> e <b>Pb</b> sono distanti dentro la parola — <b>S</b>tag<b>n</b>o, <b>P</b>iom<b>b</b>o — perché i simboli arrivano dal latino: <i>stannum</i> e <i>plumbum</i>.</p>
   </div>
 </section>
 
 <!-- GRUPPO V -->
-<section class="band" style="--bg:var(--g5);--ink2:var(--i5)">
+<section class="band" style="--bg:var(--g5);--fg:var(--i5)">
   <div class="band-num">V</div>
   <div class="band-body">
     <div class="band-tag"><span>Gruppo V · Gruppo dell'azoto</span><span class="mono">IUPAC 15</span></div>
     <p class="phrase"><span class="w"><span class="h">N</span>on</span> <span class="w"><span class="h">P</span>ortare</span> <span class="w"><span class="h">A</span>r<span class="h">s</span>enico</span> <span class="w"><span class="h">S</span>em<span class="h">b</span>ra</span> <span class="w"><span class="h">Bi</span>rra</span></p>
     <div class="chips">
-      <span class="chip" data-sym="N"><b>N</b> · 7 · Azoto</span>
-      <span class="chip" data-sym="P"><b>P</b> · 15 · Fosforo</span>
-      <span class="chip" data-sym="As"><b>As</b> · 33 · Arsenico</span>
-      <span class="chip" data-sym="Sb"><b>Sb</b> · 51 · Antimonio</span>
-      <span class="chip" data-sym="Bi"><b>Bi</b> · 83 · Bismuto</span>
+      <span class="chip" data-sym="N">N · 7 · Azoto</span>
+      <span class="chip" data-sym="P">P · 15 · Fosforo</span>
+      <span class="chip" data-sym="As">As · 33 · Arsenico</span>
+      <span class="chip" data-sym="Sb">Sb · 51 · Antimonio</span>
+      <span class="chip" data-sym="Bi">Bi · 83 · Bismuto</span>
     </div>
     <p class="band-note"><b>As</b> e <b>Sb</b> hanno lettere distanti: <b>A</b>r<b>s</b>enico e <b>S</b>em<b>b</b>ra (Antimonio, dal latino <i>stibium</i>). E no, l'arsenico non è birra.</p>
   </div>
 </section>
 
 <!-- GRUPPO VI -->
-<section class="band" style="--bg:var(--g6);--ink2:var(--i6)">
+<section class="band" style="--bg:var(--g6);--fg:var(--i6)">
   <div class="band-num">VI</div>
   <div class="band-body">
     <div class="band-tag"><span>Gruppo VI · Gruppo dell'ossigeno · Calcogeni</span><span class="mono">IUPAC 16</span></div>
     <p class="phrase"><span class="w"><span class="h">O</span><span class="h2">S</span><span class="h">Se</span><span class="h2">Te</span><span class="h">Po</span></span></p>
     <div class="chips">
-      <span class="chip" data-sym="O"><b>O</b> · 8 · Ossigeno</span>
-      <span class="chip" data-sym="S"><b>S</b> · 16 · Zolfo</span>
-      <span class="chip" data-sym="Se"><b>Se</b> · 34 · Selenio</span>
-      <span class="chip" data-sym="Te"><b>Te</b> · 52 · Tellurio</span>
-      <span class="chip" data-sym="Po"><b>Po</b> · 84 · Polonio</span>
+      <span class="chip" data-sym="O">O · 8 · Ossigeno</span>
+      <span class="chip" data-sym="S">S · 16 · Zolfo</span>
+      <span class="chip" data-sym="Se">Se · 34 · Selenio</span>
+      <span class="chip" data-sym="Te">Te · 52 · Tellurio</span>
+      <span class="chip" data-sym="Po">Po · 84 · Polonio</span>
     </div>
     <p class="band-note">Una sola parola-treno: <b>O</b>-<b>S</b>-<b>Se</b>-<b>Te</b>-<b>Po</b>. Le evidenziazioni alternate (piena / contornata) ti aiutano a non fondere i simboli vicini.</p>
   </div>
 </section>
 
 <!-- GRUPPO VII -->
-<section class="band" style="--bg:var(--g7);--ink2:var(--i7)">
+<section class="band" style="--bg:var(--g7);--fg:var(--i7)">
   <div class="band-num">VII</div>
   <div class="band-body">
     <div class="band-tag"><span>Gruppo VII · Alogeni</span><span class="mono">IUPAC 17</span></div>
     <p class="phrase"><span class="w"><span class="h">F</span>lora</span> <span class="w">e</span> <span class="w"><span class="h">Cl</span>ora</span> <span class="w"><span class="h">Br</span>indano</span> <span class="w"><span class="h">I</span>nsime</span> <span class="w"><span class="h">At</span>tavola</span></p>
     <div class="chips">
-      <span class="chip" data-sym="F"><b>F</b> · 9 · Fluoro</span>
-      <span class="chip" data-sym="Cl"><b>Cl</b> · 17 · Cloro</span>
-      <span class="chip" data-sym="Br"><b>Br</b> · 35 · Bromo</span>
-      <span class="chip" data-sym="I"><b>I</b> · 53 · Iodio</span>
-      <span class="chip" data-sym="At"><b>At</b> · 85 · Astato</span>
+      <span class="chip" data-sym="F">F · 9 · Fluoro</span>
+      <span class="chip" data-sym="Cl">Cl · 17 · Cloro</span>
+      <span class="chip" data-sym="Br">Br · 35 · Bromo</span>
+      <span class="chip" data-sym="I">I · 53 · Iodio</span>
+      <span class="chip" data-sym="At">At · 85 · Astato</span>
     </div>
     <p class="band-note">Due nomi propri (Flora, Clora) e un brindisi: «<b>At</b>tavola» si legge <b>At</b> — Astato, l'ultimo degli alogeni.</p>
   </div>
 </section>
 
 <!-- GRUPPO VIII -->
-<section class="band" style="--bg:var(--g8);--ink2:var(--i8)">
+<section class="band" style="--bg:var(--g8);--fg:var(--i8)">
   <div class="band-num">VIII</div>
   <div class="band-body">
     <div class="band-tag"><span>Gruppo VIII · Gas nobili</span><span class="mono">IUPAC 18</span></div>
     <p class="phrase"><span class="w"><span class="h">He</span>lio</span> <span class="w">accende</span> <span class="w">il</span> <span class="w"><span class="h">Ne</span>on</span> <span class="w">sotto</span> <span class="w"><span class="h">Ar</span>co</span> <span class="w">della</span> <span class="w"><span class="h">Kr</span>ipta</span> <span class="w">di</span> <span class="w"><span class="h">Xe</span>no</span> <span class="w">e</span> <span class="w"><span class="h">R</span>ado<span class="h">n</span></span></p>
     <div class="chips">
-      <span class="chip" data-sym="He"><b>He</b> · 2 · Elio</span>
-      <span class="chip" data-sym="Ne"><b>Ne</b> · 10 · Neon</span>
-      <span class="chip" data-sym="Ar"><b>Ar</b> · 18 · Argon</span>
-      <span class="chip" data-sym="Kr"><b>Kr</b> · 36 · Kripton</span>
-      <span class="chip" data-sym="Xe"><b>Xe</b> · 54 · Xeno</span>
-      <span class="chip" data-sym="Rn"><b>Rn</b> · 86 · Radon</span>
+      <span class="chip" data-sym="He">He · 2 · Elio</span>
+      <span class="chip" data-sym="Ne">Ne · 10 · Neon</span>
+      <span class="chip" data-sym="Ar">Ar · 18 · Argon</span>
+      <span class="chip" data-sym="Kr">Kr · 36 · Kripton</span>
+      <span class="chip" data-sym="Xe">Xe · 54 · Xeno</span>
+      <span class="chip" data-sym="Rn">Rn · 86 · Radon</span>
     </div>
     <p class="band-note">Una scena gotica completa: la cripta di Xeno illuminata al neon. Per il Radon bastano la <b>R</b> e la <b>n</b> finale.</p>
   </div>
@@ -449,11 +422,54 @@
 </div>
 
 <section class="pt-wrap">
-  <div class="scroll-hint">&#8592; scorri la tavola &#8594;</div>
+  <div class="scroll-hint">&larr; scorri la tavola &rarr;</div>
   <div class="pt" id="ptable"></div>
   <div class="pt-legend" id="plegend"></div>
-  <p class="pt-note">Tavola semplificata ai gruppi principali: colonne 1, 2 e 13–18 del sistema IUPAC (numerazione tradizionale I–VIII). Il blocco d tratteggiato al centro (colonne 3–12, metalli di transizione) e le due righe in basso (lantanidi e attinidi, blocco f) non sono coperti dalle frasi. L'idrogeno compare nel Gruppo I per posizione, pur non essendo un metallo alcalino.</p>
+  <p class="pt-note">Tavola completa di tutti i 118 elementi. Le frasi coprono i gruppi principali (colonne 1, 2 e 13–18 del sistema IUPAC, numerazione tradizionale I–VIII): i 50 elementi colorati. In tinta neutra i metalli di transizione (blocco d, colonne 3–12) e, nelle due righe staccate in basso, lantanidi e attinidi (blocco f). L'idrogeno compare nel Gruppo I per posizione, pur non essendo un metallo alcalino.</p>
 </section>
+
+
+<div class="sec-head" id="gioco">
+  <h2>Il gioco: la tua frase</h2>
+  <span>Scrivi una frase · scova i simboli nascosti</span>
+</div>
+
+<section class="game">
+  <p class="g-intro">Stesso gioco delle frasi qui sopra, ma stavolta tocca a te: <b>scrivi una frase usando quanti più simboli possibile</b>. Il gioco li cerca dentro le parole — anche non consecutivi, come la <b>M</b> e la <b>g</b> di «Ma<b>nna</b>g<b>ia</b>» — li evidenzia, li conta e ti mostra sulla tavola quali elementi hai catturato. Prova a battere il prof. Matera: la sua frase migliore ne incastra 7 su 7.</p>
+  <div class="g-inputrow">
+    <input id="ginput" type="text" maxlength="140" placeholder="Scrivi qui la tua frase…" autocomplete="off">
+    <button class="g-btn" id="ggo">Analizza</button>
+    <button class="g-btn ghost" id="gclear">Pulisci</button>
+  </div>
+  <div class="g-examples">
+    <span>Prova:</span>
+    <button class="g-ex">Carla nuota con Sirio nel Reno</button>
+    <button class="g-ex">Osvaldo brinda al fluoro del siero</button>
+    <button class="g-ex">Non fermarti: cerca ancora!</button>
+  </div>
+
+  <div class="g-render" id="grender"></div>
+
+  <div class="g-stats">
+    <div>Elementi trovati<span class="mono" id="gcount">0</span></div>
+    <div>Gruppi toccati<span class="mono" id="ggroups">—</span></div>
+    <div>Copertura della frase<span class="mono" id="gcov">0%</span></div>
+    <div>Record in questa pagina<span class="mono" id="gbest">0</span></div>
+  </div>
+
+  <div class="g-chips" id="gchips"></div>
+  <div class="g-empty" id="gempty">Nessun simbolo trovato finora. Suggerimento: le prime lettere delle parole sono il punto di partenza — poi prova lettere interne, come in «Cesso» (C-e-s-so → Cs).</div>
+
+  <div class="g-toggle">
+    <button class="g-btn ghost" id="gshow">Mostra sulla tavola</button>
+  </div>
+  <div id="gboard">
+    <div class="pt" id="gptable"></div>
+    <div class="pt-legend" id="gplegend"></div>
+  </div>
+</section>
+
+<div class="g-tip" id="gtip" style="display:none"></div>
 
 <div class="sec-head" id="metodo">
   <h2>Perché funziona</h2>
@@ -495,65 +511,66 @@
 <div id="panel"></div>
 
 <script>
-const GROUPS = {
-  1:{num:'I',   name:'Metalli alcalini',        bg:'var(--g1)', ink:'var(--i1)'},
-  2:{num:'II',  name:'Metalli alcalino-terrosi',bg:'var(--g2)', ink:'var(--i2)'},
-  3:{num:'III', name:'Gruppo del boro',         bg:'var(--g3)', ink:'var(--i3)'},
-  4:{num:'IV',  name:'Gruppo del carbonio',     bg:'var(--g4)', ink:'var(--i4)'},
-  5:{num:'V',   name:"Gruppo dell'azoto",       bg:'var(--g5)', ink:'var(--i5)'},
-  6:{num:'VI',  name:"Gruppo dell'ossigeno",    bg:'var(--g6)', ink:'var(--i6)'},
-  7:{num:'VII', name:'Alogeni',                 bg:'var(--g7)', ink:'var(--i7)'},
-  8:{num:'VIII',name:'Gas nobili',              bg:'var(--g8)', ink:'var(--i8)'},
+var GROUPS = {
+  1:{num:'I',   name:'Metalli alcalini',        bg:'var(--g1)', fg:'var(--i1)'},
+  2:{num:'II',  name:'Metalli alcalino-terrosi',bg:'var(--g2)', fg:'var(--i2)'},
+  3:{num:'III', name:'Gruppo del boro',         bg:'var(--g3)', fg:'var(--i3)'},
+  4:{num:'IV',  name:'Gruppo del carbonio',     bg:'var(--g4)', fg:'var(--i4)'},
+  5:{num:'V',   name:"Gruppo dell'azoto",       bg:'var(--g5)', fg:'var(--i5)'},
+  6:{num:'VI',  name:"Gruppo dell'ossigeno",    bg:'var(--g6)', fg:'var(--i6)'},
+  7:{num:'VII', name:'Alogeni',                 bg:'var(--g7)', fg:'var(--i7)'},
+  8:{num:'VIII',name:'Gas nobili',              bg:'var(--g8)', fg:'var(--i8)'}
 };
-// z, sym, name, group, row(period), col, fragment html (phrase word with highlighted letters)
-const EL = [
-  [1,'H','Idrogeno',1,1,1,'<span class="h">H</span>o'],
-  [3,'Li','Litio',1,2,1,'<span class="h">Li</span>Na'],
-  [11,'Na','Sodio',1,3,1,'Li<span class="h">Na</span> · lat. natrium'],
-  [19,'K','Potassio',1,4,1,'<span class="h">K</span>e · lat. kalium'],
-  [37,'Rb','Rubidio',1,5,1,'<span class="h">R</span>u<span class="h">b</span>a'],
-  [55,'Cs','Cesio',1,6,1,'<span class="h">C</span>e<span class="h">s</span>so'],
-  [87,'Fr','Francio',1,7,1,'<span class="h">Fr</span>ancio'],
-  [4,'Be','Berillio',2,2,2,'<span class="h">Be</span>…'],
-  [12,'Mg','Magnesio',2,3,2,'<span class="h">M</span>anna<span class="h">g</span>ia'],
-  [20,'Ca','Calcio',2,4,2,'<span class="h">Ca</span>lcio'],
-  [38,'Sr','Stronzio',2,5,2,'<span class="h">S</span>t<span class="h">r</span>onzio'],
-  [56,'Ba','Bario',2,6,2,'<span class="h">Ba</span>Ra'],
-  [88,'Ra','Radio',2,7,2,'Ba<span class="h">Ra</span>'],
-  [5,'B','Boro',3,2,13,'<span class="h">B</span>alla'],
-  [13,'Al','Alluminio',3,3,13,'B<span class="h">Al</span>la'],
-  [31,'Ga','Gallio',3,4,13,'<span class="h">Ga</span>llo'],
-  [49,'In','Indio',3,5,13,'<span class="h">In</span>diano'],
-  [81,'Tl','Tallio',3,6,13,'<span class="h">T</span>a<span class="h">l</span>lone'],
-  [6,'C','Carbonio',4,2,14,'<span class="h">C</span>arlo'],
-  [14,'Si','Silicio',4,3,14,'<span class="h">Si</span>'],
-  [32,'Ge','Germanio',4,4,14,'<span class="h">Ge</span>tta'],
-  [50,'Sn','Stagno',4,5,14,'<span class="h">S</span>tag<span class="h">n</span>o · lat. stannum'],
-  [82,'Pb','Piombo',4,6,14,'<span class="h">P</span>iom<span class="h">b</span>o · lat. plumbum'],
-  [7,'N','Azoto',5,2,15,'<span class="h">N</span>on'],
-  [15,'P','Fosforo',5,3,15,'<span class="h">P</span>ortare'],
-  [33,'As','Arsenico',5,4,15,'<span class="h">A</span>r<span class="h">s</span>enico'],
-  [51,'Sb','Antimonio',5,5,15,'<span class="h">S</span>em<span class="h">b</span>ra · lat. stibium'],
-  [83,'Bi','Bismuto',5,6,15,'<span class="h">Bi</span>rra'],
-  [8,'O','Ossigeno',6,2,16,'<span class="h">O</span>SSeTePo'],
-  [16,'S','Zolfo',6,3,16,'O<span class="h">S</span>SeTePo'],
-  [34,'Se','Selenio',6,4,16,'OS<span class="h">Se</span>TePo'],
-  [52,'Te','Tellurio',6,5,16,'OSSe<span class="h">Te</span>Po'],
-  [84,'Po','Polonio',6,6,16,'OSSeTe<span class="h">Po</span>'],
-  [9,'F','Fluoro',7,2,17,'<span class="h">F</span>lora'],
-  [17,'Cl','Cloro',7,3,17,'<span class="h">Cl</span>ora'],
-  [35,'Br','Bromo',7,4,17,'<span class="h">Br</span>indano'],
-  [53,'I','Iodio',7,5,17,'<span class="h">I</span>nsime'],
-  [85,'At','Astato',7,6,17,'<span class="h">At</span>tavola'],
-  [2,'He','Elio',8,1,18,'<span class="h">He</span>lio'],
-  [10,'Ne','Neon',8,2,18,'<span class="h">Ne</span>on'],
-  [18,'Ar','Argon',8,3,18,"<span class=\"h\">Ar</span>co"],
-  [36,'Kr','Kripton',8,4,18,'<span class="h">Kr</span>ipta'],
-  [54,'Xe','Xeno',8,5,18,'<span class="h">Xe</span>no'],
-  [86,'Rn','Radon',8,6,18,'<span class="h">R</span>ado<span class="h">n</span>'],
+/* z, simbolo, nome, gruppo, periodo, colonna */
+var EL = [
+  [1,'H','Idrogeno',1,1,1],[3,'Li','Litio',1,2,1],[11,'Na','Sodio',1,3,1],
+  [19,'K','Potassio',1,4,1],[37,'Rb','Rubidio',1,5,1],[55,'Cs','Cesio',1,6,1],
+  [87,'Fr','Francio',1,7,1],
+  [4,'Be','Berillio',2,2,2],[12,'Mg','Magnesio',2,3,2],[20,'Ca','Calcio',2,4,2],
+  [38,'Sr','Stronzio',2,5,2],[56,'Ba','Bario',2,6,2],[88,'Ra','Radio',2,7,2],
+  [5,'B','Boro',3,2,13],[13,'Al','Alluminio',3,3,13],[31,'Ga','Gallio',3,4,13],
+  [49,'In','Indio',3,5,13],[81,'Tl','Tallio',3,6,13],
+  [6,'C','Carbonio',4,2,14],[14,'Si','Silicio',4,3,14],[32,'Ge','Germanio',4,4,14],
+  [50,'Sn','Stagno',4,5,14],[82,'Pb','Piombo',4,6,14],
+  [7,'N','Azoto',5,2,15],[15,'P','Fosforo',5,3,15],[33,'As','Arsenico',5,4,15],
+  [51,'Sb','Antimonio',5,5,15],[83,'Bi','Bismuto',5,6,15],
+  [8,'O','Ossigeno',6,2,16],[16,'S','Zolfo',6,3,16],[34,'Se','Selenio',6,4,16],
+  [52,'Te','Tellurio',6,5,16],[84,'Po','Polonio',6,6,16],
+  [9,'F','Fluoro',7,2,17],[17,'Cl','Cloro',7,3,17],[35,'Br','Bromo',7,4,17],
+  [53,'I','Iodio',7,5,17],[85,'At','Astato',7,6,17],
+  [2,'He','Elio',8,1,18],[10,'Ne','Neon',8,2,18],[18,'Ar','Argon',8,3,18],
+  [36,'Kr','Kripton',8,4,18],[54,'Xe','Xeno',8,5,18],[86,'Rn','Radon',8,6,18]
 ];
 
-const INFO = {
+/* metalli di transizione (blocco d) e terre rare (blocco f): z, simbolo, nome, periodo, colonna, massa */
+var EXTRA = [
+[21,'Sc','Scandio',4,3,'44,96'],[22,'Ti','Titanio',4,4,'47,87'],[23,'V','Vanadio',4,5,'50,94'],
+[24,'Cr','Cromo',4,6,'52,00'],[25,'Mn','Manganese',4,7,'54,94'],[26,'Fe','Ferro',4,8,'55,85'],
+[27,'Co','Cobalto',4,9,'58,93'],[28,'Ni','Nichel',4,10,'58,69'],[29,'Cu','Rame',4,11,'63,55'],
+[30,'Zn','Zinco',4,12,'65,38'],
+[39,'Y','Ittrio',5,3,'88,91'],[40,'Zr','Zirconio',5,4,'91,22'],[41,'Nb','Niobio',5,5,'92,91'],
+[42,'Mo','Molibdeno',5,6,'95,95'],[43,'Tc','Tecnezio',5,7,'≈ 98'],[44,'Ru','Rutenio',5,8,'101,07'],
+[45,'Rh','Rodio',5,9,'102,91'],[46,'Pd','Palladio',5,10,'106,42'],[47,'Ag','Argento',5,11,'107,87'],
+[48,'Cd','Cadmio',5,12,'112,41'],
+[72,'Hf','Afnio',6,4,'178,49'],[73,'Ta','Tantalio',6,5,'180,95'],[74,'W','Tungsteno',6,6,'183,84'],
+[75,'Re','Renio',6,7,'186,21'],[76,'Os','Osmio',6,8,'190,23'],[77,'Ir','Iridio',6,9,'192,22'],
+[78,'Pt','Platino',6,10,'195,08'],[79,'Au','Oro',6,11,'196,97'],[80,'Hg','Mercurio',6,12,'200,59'],
+[104,'Rf','Rutherfordio',7,4,'≈ 267'],[105,'Db','Dubnio',7,5,'≈ 268'],[106,'Sg','Seaborgio',7,6,'≈ 269'],
+[107,'Bh','Bohrio',7,7,'≈ 270'],[108,'Hs','Hassio',7,8,'≈ 277'],[109,'Mt','Meitnerio',7,9,'≈ 278'],
+[110,'Ds','Darmstadtio',7,10,'≈ 281'],[111,'Rg','Roentgenio',7,11,'≈ 282'],[112,'Cn','Copernicio',7,12,'≈ 285'],
+[57,'La','Lantanio','f1',3,'138,91'],[58,'Ce','Cerio','f1',4,'140,12'],[59,'Pr','Praseodimio','f1',5,'140,91'],
+[60,'Nd','Neodimio','f1',6,'144,24'],[61,'Pm','Promezio','f1',7,'≈ 145'],[62,'Sm','Samario','f1',8,'150,36'],
+[63,'Eu','Europio','f1',9,'151,96'],[64,'Gd','Gadolinio','f1',10,'157,25'],[65,'Tb','Terbio','f1',11,'158,93'],
+[66,'Dy','Disprosio','f1',12,'162,50'],[67,'Ho','Olmio','f1',13,'164,93'],[68,'Er','Erbio','f1',14,'167,26'],
+[69,'Tm','Tulio','f1',15,'168,93'],[70,'Yb','Itterbio','f1',16,'173,05'],[71,'Lu','Lutezio','f1',17,'174,97'],
+[89,'Ac','Attinio','f2',3,'≈ 227'],[90,'Th','Torio','f2',4,'232,04'],[91,'Pa','Protoattinio','f2',5,'231,04'],
+[92,'U','Uranio','f2',6,'238,03'],[93,'Np','Nettunio','f2',7,'≈ 237'],[94,'Pu','Plutonio','f2',8,'≈ 244'],
+[95,'Am','Americio','f2',9,'≈ 243'],[96,'Cm','Curio','f2',10,'≈ 247'],[97,'Bk','Berchelio','f2',11,'≈ 247'],
+[98,'Cf','Californio','f2',12,'≈ 251'],[99,'Es','Einsteinio','f2',13,'≈ 252'],[100,'Fm','Fermio','f2',14,'≈ 257'],
+[101,'Md','Mendelevio','f2',15,'≈ 258'],[102,'No','Nobelio','f2',16,'≈ 259'],[103,'Lr','Laurenzio','f2',17,'≈ 266']
+];
+
+var INFO = {
 H:{m:'1,008',c:"L'elemento più abbondante dell'universo: il Sole è quasi tutto idrogeno."},
 Li:{m:'6,94',c:"Il metallo più leggero: dà il nome alle batterie dei cellulari."},
 Na:{m:'22,99',c:"Puro, esplode nell'acqua; col cloro diventa il sale da cucina."},
@@ -597,9 +614,9 @@ Ne:{m:'20,18',c:"«Nuovo» in greco; le insegne luminose rosso-arancio sono tubi
 Ar:{m:'39,95',c:"Dal greco argos, pigro: non combina nulla, per questo riempie le lampadine."},
 Kr:{m:'83,80',c:"«Il nascosto»: così raro e inerte che sfuggì ai chimici fino al 1898."},
 Xe:{m:'131,29',c:"«Lo straniero»; i motori ionici dei satelliti lo sputano nello spazio."},
-Rn:{m:'≈ 222',c:"Gas radioattivo che risale dal terreno e si accumula nelle cantine."},
+Rn:{m:'≈ 222',c:"Gas radioattivo che risale dal terreno e si accumula nelle cantine."}
 };
-const GPHRASE = {
+var GPHRASE = {
 1:'<span class="h">H</span>o <span class="h">Li</span><span class="h2">Na</span> <span class="h">K</span>e <span class="h">R</span>u<span class="h">b</span>a il <span class="h">C</span>e<span class="h">s</span>so a <span class="h">Fr</span>ancio',
 2:'<span class="h">Be</span> <span class="h">M</span>anna<span class="h">g</span>ia da un <span class="h">Ca</span>lcio a quello <span class="h">S</span>t<span class="h">r</span>onzio che <span class="h">Ba</span><span class="h2">Ra</span>',
 3:'<span class="h">B</span><span class="h2">Al</span>la un <span class="h">Ga</span>llo <span class="h">In</span>diano sul <span class="h">T</span>a<span class="h">l</span>lone',
@@ -607,119 +624,138 @@ const GPHRASE = {
 5:'<span class="h">N</span>on <span class="h">P</span>ortare <span class="h">A</span>r<span class="h">s</span>enico <span class="h">S</span>em<span class="h">b</span>ra <span class="h">Bi</span>rra',
 6:'<span class="h">O</span><span class="h2">S</span><span class="h">Se</span><span class="h2">Te</span><span class="h">Po</span>',
 7:'<span class="h">F</span>lora e <span class="h">Cl</span>ora <span class="h">Br</span>indano <span class="h">I</span>nsime <span class="h">At</span>tavola',
-8:'<span class="h">He</span>lio accende il <span class="h">Ne</span>on sotto <span class="h">Ar</span>co della <span class="h">Kr</span>ipta di <span class="h">Xe</span>no e <span class="h">R</span>ado<span class="h">n</span>',
+8:'<span class="h">He</span>lio accende il <span class="h">Ne</span>on sotto <span class="h">Ar</span>co della <span class="h">Kr</span>ipta di <span class="h">Xe</span>no e <span class="h">R</span>ado<span class="h">n</span>'
 };
 
-const pt = document.getElementById('ptable');
+var pt = document.getElementById('ptable');
+var panel = document.getElementById('panel');
+var hoverOK = window.matchMedia && window.matchMedia('(hover: hover)').matches;
+var HEADS = [[1,'I','1'],[2,'II','2'],[3,'3','3'],[4,'4','4'],[5,'5','5'],[6,'6','6'],[7,'7','7'],
+[8,'8','8'],[9,'9','9'],[10,'10','10'],[11,'11','11'],[12,'12','12'],
+[13,'III','13'],[14,'IV','14'],[15,'V','15'],[16,'VI','16'],[17,'VII','17'],[18,'VIII','18']];
 
-// --- header row: group numerals ---
-const heads = [
-  {label:'I', sub:'1', col:1, span:1},
-  {label:'II', sub:'2', col:2, span:1},
-  {label:'III', sub:'13', col:13, span:1},
-  {label:'IV', sub:'14', col:14, span:1},
-  {label:'V', sub:'15', col:15, span:1},
-  {label:'VI', sub:'16', col:16, span:1},
-  {label:'VII', sub:'17', col:17, span:1},
-  {label:'VIII', sub:'18', col:18, span:1},
-];
-heads.forEach(h=>{
-  const d = document.createElement('div');
-  d.className = 'gh' + (h.spacer ? ' spacer' : '');
-  d.style.gridRow = 1;
-  d.style.gridColumn = `${h.col} / span ${h.span}`;
-  d.innerHTML = `${h.label}<span class="mono">IUPAC ${h.sub}</span>`;
-  pt.appendChild(d);
-});
-
-// --- empty cells (periods 1-7, skipping element spots and the merged gap region) ---
-const taken = new Set(EL.map(e => e[4] + '-' + e[5]));
-for (let r = 1; r <= 7; r++) {
-  for (let c = 1; c <= 18; c++) {
-    if (taken.has(r + '-' + c)) continue;
-    if (c >= 3 && c <= 12) continue; // void (periods 1-3) + merged d-block gap (4-7)
-    const d = document.createElement('div');
-    d.className = 'empty';
-    d.style.gridRow = r + 1;
-    d.style.gridColumn = c;
-    pt.appendChild(d);
-  }
-}
-// --- clean void above the d-block (periods 1-3, cols 3-12): no grid lines ---
-const voidc = document.createElement('div');
-voidc.className = 'voidcell';
-voidc.style.gridRow = '1 / span 4';
-voidc.style.gridColumn = '3 / span 10';
-pt.appendChild(voidc);
-
-// --- merged gap cell: transition metals block ---
-const gap = document.createElement('div');
-gap.className = 'gapcell';
-gap.style.gridRow = '5 / span 4';
-gap.style.gridColumn = '3 / span 10';
-gap.textContent = 'blocco d · metalli di transizione';
-[['lantanidi','La – Lu · periodo 6', 9], ['attinidi','Ac – Lr · periodo 7', 10]].forEach(([t, sub, row])=>{
-  const f = document.createElement('div');
-  f.className = 'gapcell frow';
-  f.style.gridRow = row;
-  f.style.gridColumn = '1 / span 18';
-  f.innerHTML = `<span>${t}&nbsp;&nbsp;<span class="mono" style="letter-spacing:.06em;text-transform:none;font-weight:500">${sub}</span></span>`;
-  pt.appendChild(f);
-});
-pt.appendChild(gap);
-
-// --- element cells ---
-const panel = document.getElementById('panel');
-const cellBySym = {};
-const hoverOK = window.matchMedia('(hover: hover)').matches;
 function openPanel(e){
-  const [z, sym, name, g, r] = e;
-  const G = GROUPS[g], info = INFO[sym];
-  panel.innerHTML = `
-    <button class="p-close" aria-label="Chiudi">&times;</button>
-    <div class="p-g"><span>Gruppo ${G.num} · ${G.name}</span><span class="mono">n° ${z}</span></div>
-    <div class="p-sym" style="color:${G.bg}">${sym}</div>
-    <div class="p-name">${name}</div>
-    <div class="p-z">numero atomico ${z} · periodo ${r} · massa atomica ${info.m} u</div>
-    <div class="p-frag">Nella frase: «${GPHRASE[g]}»</div>
-    <div class="p-cur"><b>Curiosità.</b> ${info.c}</div>`;
+  var z = e[0], sym = e[1], name = e[2], g = e[3], per = e[4];
+  var G = GROUPS[g];
+  var groupLabel = G ? ('Gruppo ' + G.num + ' · ' + G.name) : (g === 'f1' ? 'Lantanidi' : g === 'f2' ? 'Attinidi' : 'Metalli di transizione');
+  var info = INFO[sym];
+  var massa = info ? info.m : e[6];
+  var symColor = G ? G.bg : '#8A8070';
+  var html =
+    '<button class="p-close" aria-label="Chiudi">&times;</button>' +
+    '<div class="p-g"><span>' + groupLabel + '</span><span class="mono">n° ' + z + '</span></div>' +
+    '<div class="p-sym" style="color:' + symColor + '">' + sym + '</div>' +
+    '<div class="p-name">' + name + '</div>' +
+    '<div class="p-z">numero atomico ' + z + (typeof per === 'number' ? ' · periodo ' + per : '') + ' · massa atomica ' + massa + ' u</div>';
+  if (G) html += '<div class="p-frag">Nella frase: «' + GPHRASE[g] + '»</div>';
+  if (info && info.c) html += '<div class="p-cur"><b>Curiosità.</b> ' + info.c + '</div>';
+  panel.innerHTML = html;
   panel.classList.add('on');
-  panel.querySelector('.p-close').onclick = ev => { ev.stopPropagation(); panel.classList.remove('on'); };
+  panel.querySelector('.p-close').onclick = function(ev){ ev.stopPropagation(); panel.classList.remove('on'); };
 }
-EL.forEach(e => {
-  const [z, sym, name, g, r, c, frag] = e;
-  const G = GROUPS[g];
-  const d = document.createElement('div');
-  d.className = 'el';
-  d.style.gridRow = r + 1;
-  d.style.gridColumn = c;
-  d.style.setProperty('--bg', G.bg);
-  d.style.setProperty('--ink2', G.ink);
-  d.dataset.sym = sym;
-  d.innerHTML = `<span class="z">${z}</span><span class="s">${sym}</span>`;
-  if (hoverOK) {
-    d.addEventListener('mouseenter', () => openPanel(e));
-    d.addEventListener('mouseleave', () => panel.classList.remove('on'));
-  }
-  d.addEventListener('click', ev => { ev.stopPropagation(); openPanel(e); });
-  pt.appendChild(d);
-  cellBySym[sym] = d;
-});
-document.addEventListener('click', () => panel.classList.remove('on'));
 
-// --- legend ---
-const legend = document.getElementById('plegend');
-Object.values(GROUPS).forEach(G => {
-  const s = document.createElement('span');
-  s.innerHTML = `<i style="background:${G.bg}"></i>${G.num} · ${G.name}`;
+/* costruisce una tavola completa dentro `target`; mode: 'full' | {found:{...}} */
+function buildTable(target, opts){
+  var found = (opts && opts.found) || null;
+  var cellMap = {};
+  HEADS.forEach(function(h){
+    var d = document.createElement('div');
+    d.className = 'gh';
+    d.style.gridRow = '1';
+    d.style.gridColumn = String(h[0]);
+    d.innerHTML = h[1] + '<span class="mono">' + h[2] + '</span>';
+    target.appendChild(d);
+  });
+  var taken = {};
+  EL.forEach(function(e){ taken[e[4] + '-' + e[5]] = true; });
+  EXTRA.forEach(function(e){ if (typeof e[3] === 'number') taken[e[3] + '-' + e[4]] = true; });
+  for (var r = 1; r <= 7; r++){
+    for (var c = 1; c <= 18; c++){
+      if (taken[r + '-' + c]) continue;
+      var d = document.createElement('div');
+      d.className = 'empty';
+      d.style.gridRow = String(r + 1);
+      d.style.gridColumn = String(c);
+      target.appendChild(d);
+    }
+  }
+  /* lantanidi / attinidi */
+  [['lantanidi','f1',9], ['attinidi','f2',10]].forEach(function(row){
+    var lab = document.createElement('div');
+    lab.className = 'gh';
+    lab.style.gridRow = String(row[2]);
+    lab.style.gridColumn = '1 / span 2';
+    lab.innerHTML = row[0];
+    target.appendChild(lab);
+    var hl = document.createElement('div');
+    hl.className = 'empty';
+    hl.style.gridRow = String(row[2]);
+    hl.style.gridColumn = '18';
+    target.appendChild(hl);
+  });
+  /* gruppi principali */
+  EL.forEach(function(e){
+    var G = GROUPS[e[3]];
+    var d = document.createElement('div');
+    d.className = 'el';
+    d.style.gridRow = String(e[4] + 1);
+    d.style.gridColumn = String(e[5]);
+    if (found && !found[e[1]]){
+      d.classList.add('dim');
+      d.style.setProperty('--bg', G.bg);
+      d.style.setProperty('--fg', G.fg);
+    } else {
+      d.style.setProperty('--bg', G.bg);
+      d.style.setProperty('--fg', G.fg);
+    }
+    d.innerHTML = '<span class="z">' + e[0] + '</span><span class="s">' + e[1] + '</span>';
+    if (hoverOK){
+      d.addEventListener('mouseenter', (function(x){ return function(){ openPanel(x); }; })(e));
+      d.addEventListener('mouseleave', function(){ panel.classList.remove('on'); });
+    }
+    d.addEventListener('click', (function(x){ return function(ev){ ev.stopPropagation(); openPanel(x); }; })(e));
+    target.appendChild(d);
+    cellMap[e[1]] = d;
+  });
+  /* blocco d + f */
+  EXTRA.forEach(function(e){
+    var d = document.createElement('div');
+    d.className = 'el metal';
+    var row = (e[3] === 'f1') ? 9 : (e[3] === 'f2') ? 10 : e[3] + 1;
+    d.style.gridRow = String(row);
+    d.style.gridColumn = String(e[4]);
+    if (found) d.classList.add('dim');
+    d.innerHTML = '<span class="z">' + e[0] + '</span><span class="s">' + e[1] + '</span>';
+    if (hoverOK){
+      d.addEventListener('mouseenter', (function(x){ return function(){ openPanel(x); }; })(e));
+      d.addEventListener('mouseleave', function(){ panel.classList.remove('on'); });
+    }
+    d.addEventListener('click', (function(x){ return function(ev){ ev.stopPropagation(); openPanel(x); }; })(e));
+    target.appendChild(d);
+  });
+  return cellMap;
+}
+
+var cellBySym = buildTable(pt, null);
+document.addEventListener('click', function(){ panel.classList.remove('on'); });
+
+/* legenda */
+var legend = document.getElementById('plegend');
+Object.keys(GROUPS).forEach(function(k){
+  var G = GROUPS[k];
+  var s = document.createElement('span');
+  s.innerHTML = '<i style="background:' + G.bg + '"></i>' + G.num + ' · ' + G.name;
   legend.appendChild(s);
 });
+var legM = document.createElement('span');
+legM.innerHTML = '<i style="background:#EAE2CF"></i>metalli di transizione · lantanidi · attinidi';
+legend.appendChild(legM);
 
-// --- chips flash the matching table cell ---
-document.querySelectorAll('.chip').forEach(ch => {
-  const sym = ch.dataset.sym;
-  const fire = () => {
-    const cell = cellBySym[sym];
+/* i chip evidenziano la casella corrispondente */
+Array.prototype.forEach.call(document.querySelectorAll('.chip'), function(ch){
+  var sym = ch.getAttribute('data-sym');
+  var fire = function(){
+    var cell = cellBySym[sym];
     if (!cell) return;
     cell.scrollIntoView({behavior:'smooth', block:'nearest', inline:'nearest'});
     cell.classList.remove('flash');
@@ -729,6 +765,184 @@ document.querySelectorAll('.chip').forEach(ch => {
   ch.addEventListener('mouseenter', fire);
   ch.addEventListener('click', fire);
 });
+</script>
+
+<script>
+/* ================= IL GIOCO ================= */
+var SYM2EL = {};
+EL.forEach(function(e){ SYM2EL[e[1]] = e; });
+var SYMBOLS = Object.keys(SYM2EL).sort(function(a,b){ return b.length - a.length; });
+
+function normalize(str){
+  return str.toLowerCase().replace(/[àáâä]/g,'a').replace(/[èéêë]/g,'e')
+    .replace(/[ìíîï]/g,'i').replace(/[òóôö]/g,'o').replace(/[ùúûü]/g,'u');
+}
+function esc(t){
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* trova un simbolo dentro una parola (lettere in ordine, non per forza consecutive) */
+function findInWord(word, sym){
+  var w = normalize(word), s = sym.toLowerCase();
+  var pos = [], i = 0, j;
+  for (j = 0; j < s.length; j++){
+    var k = w.indexOf(s[j], i);
+    if (k === -1) return null;
+    pos.push(k); i = k + 1;
+  }
+  return pos;
+}
+
+/* miglior simbolo per la parola: preferenza a 2 lettere, poi inizio parola, poi meno buchi */
+function bestForWord(word){
+  var best = null;
+  SYMBOLS.forEach(function(sym){
+    var pos = findInWord(word, sym);
+    if (!pos) return;
+    var gaps = pos[pos.length-1] - pos[0] + 1 - pos.length;
+    var score = (pos[0] === 0 ? 100 : 0) + sym.length * 40 - gaps * 5 - pos[0] * 2;
+    if (!best || score > best.score) best = {sym:sym, pos:pos, score:score};
+  });
+  return best;
+}
+
+var gInput = document.getElementById('ginput');
+var gRender = document.getElementById('grender');
+var gChips = document.getElementById('gchips');
+var gEmpty = document.getElementById('gempty');
+var gTip = document.getElementById('gtip');
+var gBoard = document.getElementById('gboard');
+var gBest = 0;
+var currentFound = [];
+
+function analyze(){
+  var text = gInput.value.trim();
+  var found = [];
+  gRender.innerHTML = '';
+  gChips.innerHTML = '';
+  if (!text) { paintStats(found, 0, 0); gEmpty.style.display='block'; return; }
+
+  var words = text.split(/\s+/);
+  var covered = 0, total = 0, alt = 0;
+  var foundSyms = {};
+
+  words.forEach(function(w, wi){
+    var clean = w.replace(/^[^A-Za-zÀ-ÿ]+|[^A-Za-zÀ-ÿ]+$/g,'');
+    total += clean.length;
+    var best = clean.length ? bestForWord(clean) : null;
+    var span = document.createElement('span');
+    span.className = 'gw';
+    if (best && !foundSyms[best.sym]){
+      foundSyms[best.sym] = true;
+      var e = SYM2EL[best.sym];
+      found.push(e);
+      covered += best.pos.length;
+      alt++;
+      /* ricostruisci la parola con le lettere evidenziate */
+      var out = '', ci = 0, lead = w.indexOf(clean);
+      out += esc(w.slice(0, lead));
+      for (var i = 0; i < clean.length; i++){
+        var ch = esc(clean[i]);
+        if (best.pos.indexOf(i) !== -1){
+          var cls = (alt % 2 === 1) ? 'g1' : 'g2';
+          out += '<span class="gl ' + cls + '" data-sym="' + best.sym + '">' + ch + '</span>';
+        } else out += ch;
+      }
+      out += esc(w.slice(lead + clean.length));
+      span.innerHTML = out;
+    } else {
+      span.textContent = w;
+    }
+    gRender.appendChild(span);
+    gRender.appendChild(document.createTextNode(' '));
+  });
+
+  /* chip degli elementi trovati */
+  found.forEach(function(e){
+    var c = document.createElement('button');
+    c.className = 'g-chip';
+    c.textContent = e[1] + ' · ' + e[0] + ' · ' + e[2];
+    c.setAttribute('data-sym', e[1]);
+    c.addEventListener('click', function(){ flashSym(e[1]); });
+    gChips.appendChild(c);
+  });
+
+  gEmpty.style.display = found.length ? 'none' : 'block';
+  paintStats(found, covered, total);
+  renderBoard(found);
+  currentFound = found;
+
+  /* tooltip sulle lettere evidenziate */
+  Array.prototype.forEach.call(gRender.querySelectorAll('.gl'), function(gl){
+    var sym = gl.getAttribute('data-sym');
+    var e = SYM2EL[sym];
+    gl.addEventListener('mouseenter', function(ev){
+      gTip.textContent = sym + ' · ' + e[2] + ' (n° ' + e[0] + ')';
+      gTip.style.display = 'block';
+    });
+    gl.addEventListener('mousemove', function(ev){
+      gTip.style.left = ev.clientX + 'px';
+      gTip.style.top = ev.clientY + 'px';
+    });
+    gl.addEventListener('mouseleave', function(){ gTip.style.display = 'none'; });
+    gl.addEventListener('click', function(){ flashSym(sym); });
+  });
+}
+
+function paintStats(found, covered, total){
+  document.getElementById('gcount').textContent = String(found.length);
+  var groups = {};
+  found.forEach(function(e){ groups[e[3]] = true; });
+  var gkeys = Object.keys(groups).map(function(k){ return GROUPS[k].num; });
+  document.getElementById('ggroups').textContent = gkeys.length ? gkeys.join(' · ') : '—';
+  var cov = total ? Math.round(covered / total * 100) : 0;
+  document.getElementById('gcov').textContent = cov + '%';
+  if (found.length > gBest){ gBest = found.length; }
+  document.getElementById('gbest').textContent = String(gBest);
+}
+
+function flashSym(sym){
+  var cell = gCellBySym[sym];
+  if (cell){
+    cell.scrollIntoView({behavior:'smooth', block:'nearest', inline:'nearest'});
+    cell.classList.remove('flash'); void cell.offsetWidth; cell.classList.add('flash');
+  }
+}
+
+/* mini tavola dei risultati: stessa tavola completa, elementi trovati a colori */
+var gCellBySym = {};
+function renderBoard(found){
+  var foundSyms = {};
+  found.forEach(function(e){ foundSyms[e[1]] = true; });
+  var gp = document.getElementById('gptable');
+  gp.innerHTML = '';
+  gCellBySym = buildTable(gp, {found: foundSyms});
+  var lg = document.getElementById('gplegend');
+  lg.innerHTML = '';
+  var hit = document.createElement('span');
+  hit.innerHTML = '<i style="background:var(--g1)"></i>elementi della tua frase';
+  var miss = document.createElement('span');
+  miss.innerHTML = '<i style="background:#EAE2CF"></i>metalli di transizione e terre rare (fuori gioco)';
+  lg.appendChild(hit); lg.appendChild(miss);
+}
+
+document.getElementById('ggo').addEventListener('click', analyze);
+gInput.addEventListener('keydown', function(ev){ if (ev.key === 'Enter') analyze(); });
+document.getElementById('gclear').addEventListener('click', function(){
+  gInput.value = ''; analyze(); gRender.innerHTML=''; gChips.innerHTML=''; gBoard.classList.remove('open');
+  document.getElementById('gshow').textContent = 'Mostra sulla tavola';
+});
+document.getElementById('gshow').addEventListener('click', function(){
+  gBoard.classList.toggle('open');
+  this.textContent = gBoard.classList.contains('open') ? 'Nascondi la tavola' : 'Mostra sulla tavola';
+});
+Array.prototype.forEach.call(document.querySelectorAll('.g-ex'), function(b){
+  b.addEventListener('click', function(){
+    gInput.value = b.textContent;
+    analyze();
+  });
+});
+renderBoard([]);
 </script>
 </body>
 </html>
